@@ -1,18 +1,3 @@
-# WordPress core (opcional excluirlo, ya que se descarga de wordpress.org)
-/wp-admin/
-/wp-includes/
-/index.php
-/wp-*.php
-/xmlrpc.php
-/license.txt
-/readme.html
-
-# Configuración con credenciales
-wp-config.php
-
-# Contenido subido por usuarios (pesado, no es código)
-wp-content/uploads/
-
 # Cache y archivos temporales
 wp-content/cache/
 wp-content/upgrade/
