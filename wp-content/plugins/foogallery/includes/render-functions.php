@@ -1,0 +1,811 @@
+<?php
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ *
+ * FooGallery helper functions for rendering HTML
+ * Created by Brad Vincent
+ * Date: 11/07/2017
+ *
+ * @since 1.4.0
+ */
+
+/**
+ * Returns the attachment image source only
+ *
+ * @param FooGalleryAttachment $foogallery_attachment
+ * @param array $args
+ *
+ * @since 1.4.0
+ *
+ * @return string
+ */
+function foogallery_attachment_html_image_src( $foogallery_attachment, $args = array() ) {
+	return apply_filters( 'foogallery_attachment_resize_thumbnail', $foogallery_attachment->url, $args, $foogallery_attachment );
+}
+
+/**
+ * Return explicitly selected, valid mobile caption source settings.
+ *
+ * Missing and empty settings inherit the desktop DOM (Same as desktop).
+ *
+ * @return array
+ */
+function foogallery_get_mobile_caption_sources() {
+	global $current_foogallery_template;
+	if ( empty( $current_foogallery_template ) ) {
+		return array();
+	}
+
+	$template = foogallery_get_gallery_template( $current_foogallery_template );
+	if ( ! is_array( $template ) || ! isset( $template['fields'] ) ) {
+		return array();
+	}
+
+	$sources = array();
+	$fields  = foogallery_get_fields_for_template( $template );
+	foreach ( array( 'title' => 'caption_title_source', 'description' => 'caption_desc_source' ) as $key => $field_id ) {
+		foreach ( $fields as $field ) {
+			if ( ! is_array( $field ) || $field_id !== ( $field['id'] ?? '' ) || ! is_array( $field['choices'] ?? null ) ) {
+				continue;
+			}
+
+			$source = foogallery_gallery_template_mobile_setting( 'mobile_' . $field_id, '__foogallery_mobile_inherit__' );
+			if ( is_scalar( $source ) && '' !== (string) $source && array_key_exists( (string) $source, $field['choices'] ) ) {
+				$sources[ $key ] = (string) $source;
+			}
+			break;
+		}
+	}
+
+	return $sources;
+}
+
+/**
+ * Resolve explicitly selected mobile thumbnail caption sources.
+ *
+ * The returned values are thumbnail-only overrides. The canonical attachment
+ * caption properties remain untouched for desktop and lightbox consumers.
+ *
+ * @param FooGalleryAttachment $foogallery_attachment FooGallery attachment.
+ * @return array
+ */
+function foogallery_get_mobile_caption_overrides( $foogallery_attachment ) {
+	if ( ! is_object( $foogallery_attachment ) ) {
+		return array();
+	}
+
+	$sources       = foogallery_get_mobile_caption_sources();
+	$overrides     = array();
+	$caption_types = array(
+		'title'       => array( 'general' => 'foogallery_caption_title_source', 'type' => 'title' ),
+		'description' => array( 'general' => 'foogallery_caption_desc_source', 'type' => 'desc' ),
+	);
+
+	foreach ( $caption_types as $key => $caption ) {
+		if ( ! array_key_exists( $key, $sources ) ) {
+			continue;
+		}
+
+		$source = $sources[ $key ];
+		if ( '' === $source ) {
+			$source = call_user_func( $caption['general'] );
+		}
+
+		if ( 'none' === $source ) {
+			$value = '';
+		} elseif ( 'title' === $caption['type'] && $foogallery_attachment->_post instanceof WP_Post ) {
+			$value = foogallery_get_caption_title_for_attachment( $foogallery_attachment->_post, $source );
+		} elseif ( 'desc' === $caption['type'] && $foogallery_attachment->_post instanceof WP_Post ) {
+			$value = foogallery_get_caption_desc_for_attachment( $foogallery_attachment->_post, $source );
+		} else {
+			$value = foogallery_get_caption_by_source( $foogallery_attachment, $source, $caption['type'] );
+		}
+		$value = is_scalar( $value ) ? foogallery_sanitize_full( (string) $value ) : '';
+
+		$overrides[ $key ] = $value;
+	}
+
+	return $overrides;
+}
+
+/**
+ * Returns the attachment img HTML
+ *
+ * @param FooGalleryAttachment $foogallery_attachment
+ * @param array $args
+ *
+ * @since 1.4.0
+ *
+ * @return string
+ */
+function foogallery_attachment_html_image( $foogallery_attachment, $args = array() ) {
+	$attr = foogallery_build_attachment_html_image_attributes( $foogallery_attachment, $args );
+
+	$html = foogallery_html_opening_tag( 'img', $attr );
+
+	return apply_filters( 'foogallery_attachment_html_image', $html, $args, $foogallery_attachment );
+}
+
+/**
+ * Returns the attachment img HTML
+ *
+ * @param FooGalleryAttachment $foogallery_attachment
+ * @param array $args
+ *
+ * @since 1.4.9
+ *
+ * @return array
+ */
+function foogallery_build_attachment_html_image_attributes( $foogallery_attachment, $args = array() ) {
+	$attr['src'] = foogallery_process_image_url( foogallery_attachment_html_image_src( $foogallery_attachment, $args ) );
+
+	if ( ! empty( $foogallery_attachment->alt ) ) {
+		$attr['alt'] = $foogallery_attachment->alt;
+	}
+
+	if ( ! empty( $foogallery_attachment->caption ) ) {
+		$attr['title'] = $foogallery_attachment->caption;
+	}
+
+	//pull any custom attributes out the args
+	if ( isset( $args['image_attributes'] ) && is_array( $args['image_attributes'] ) ) {
+		$attr = array_merge( $attr, $args['image_attributes'] );
+	}
+
+	//check for width and height args and add those to the image
+	if ( isset( $args['width'] ) && intval( $args['width'] ) > 0 ) {
+		$attr['width'] = $args['width'];
+	}
+	if ( isset( $args['height'] ) && intval( $args['height'] ) > 0 ) {
+		$attr['height'] = $args['height'];
+	}
+
+	$attr = apply_filters( 'foogallery_attachment_html_image_attributes', $attr, $args, $foogallery_attachment );
+
+	if ( array_key_exists( 'class', $attr ) ) {
+		$attr['class'] .= ' fg-image';
+	} else {
+		$attr['class'] = 'fg-image';
+	}
+
+	// Always output the loading attribute on the img tags unless filtered off.
+	$loading = apply_filters( 'foogallery_attachment_html_image_loading_attribute', 'eager', $attr, $args, $foogallery_attachment );
+	if ( false !== $loading && null !== $loading && '' !== $loading ) {
+		$attr['loading'] = $loading;
+	}
+
+	return $attr;
+}
+
+/**
+ * Returns the attachment anchor HTML opening tag
+ *
+ * @param FooGalleryAttachment $foogallery_attachment
+ * @param array $args
+ *
+ * @since 1.4.0
+ *
+ * @return string
+ */
+function foogallery_attachment_html_anchor_opening( $foogallery_attachment, $args = array() ) {
+	$attr = foogallery_build_attachment_html_anchor_attributes( $foogallery_attachment, $args );
+
+	$html = foogallery_html_opening_tag( 'a', $attr );
+
+    return apply_filters( 'foogallery_attachment_html_anchor_opening', $html, $args, $foogallery_attachment );
+}
+
+/**
+ * Returns the array of attributes that will be used on the anchor for a FooGalleryAttachment
+ *
+ * @param FooGalleryAttachment $foogallery_attachment
+ * @param array $args
+ *
+ * @since 1.4.9
+ *
+ * @return array
+ */
+function foogallery_build_attachment_html_anchor_attributes( $foogallery_attachment, $args = array() ) {
+	$arg_defaults = array(
+		'link' => 'image',
+		'custom_link' => $foogallery_attachment->custom_url
+	);
+
+	$args = wp_parse_args( $args, $arg_defaults );
+
+	$link = $args['link'];
+
+	if ( 'page' === $link ) {
+		// get the URL to the attachment page.
+		$url = get_attachment_link( $foogallery_attachment->ID );
+	} elseif ( 'parent_post' === $link ) {
+		$url = '';
+		if ( ! empty( $foogallery_attachment->parent_post_id ) && get_post( $foogallery_attachment->parent_post_id ) ) {
+			$url = $foogallery_attachment->parent_post_url;
+		}
+	} elseif ( 'custom' === $link ) {
+		$url = foogallery_sanitize_attachment_custom_url( $args['custom_link'] );
+	} else {
+		$url = $foogallery_attachment->url;
+	}
+
+	// fallback for images that might not have a custom url.
+	if ( empty( $url ) ) {
+		$url = $foogallery_attachment->url;
+	}
+
+	$attr = array();
+
+	// only add href and target attributes to the anchor if the link is NOT set to 'none'.
+	if ( 'none' !== $link ) {
+		$attr['href'] = foogallery_process_image_url( $url );
+		if ( ! empty( $foogallery_attachment->custom_target ) && 'default' !== $foogallery_attachment->custom_target ) {
+			$attr['target'] = $foogallery_attachment->custom_target;
+		}
+		if ( ! empty( $foogallery_attachment->custom_rel ) ) {
+			$attr['rel'] = $foogallery_attachment->custom_rel;
+		}
+	}
+
+	if ( ! empty( $foogallery_attachment->caption ) ) {
+		$attr['data-caption-title'] = foogallery_sanitize_full( $foogallery_attachment->caption );
+	}
+
+	if ( ! empty( $foogallery_attachment->description ) ) {
+		$attr['data-caption-desc'] = foogallery_sanitize_full( $foogallery_attachment->description );
+	}
+
+	if ( isset( $foogallery_attachment->caption_title ) ) {
+		$attr['data-caption-title'] = foogallery_sanitize_full( $foogallery_attachment->caption_title );
+	}
+
+	if ( isset( $foogallery_attachment->caption_desc ) ) {
+		$attr['data-caption-desc'] = foogallery_sanitize_full( $foogallery_attachment->caption_desc );
+	}
+
+	$mobile_captions = foogallery_get_mobile_caption_overrides( $foogallery_attachment );
+	if ( ! empty( $mobile_captions ) ) {
+		$attr['data-mobile-captions'] = wp_json_encode( $mobile_captions );
+	}
+
+	// set the ID attribute for the attachment.
+	if ( $foogallery_attachment->ID > 0 ) {
+		$attribute_key = foogallery_get_setting( 'attachment_id_attribute', 'data-attachment-id' );
+		if ( foogallery_is_safe_html_attribute_key( $attribute_key ) ) {
+			$attr[ trim( $attribute_key ) ] = $foogallery_attachment->ID;
+		}
+	}
+
+	// pull any custom attributes out the args.
+	if ( isset( $args['link_attributes'] ) && is_array( $args['link_attributes'] ) ) {
+		$attr = array_merge( $attr, $args['link_attributes'] );
+	}
+
+	$attr = apply_filters( 'foogallery_attachment_html_link_attributes', $attr, $args, $foogallery_attachment );
+
+	// always add the fg-thumb class.
+	if ( array_key_exists( 'class', $attr ) && ! empty( $attr['class'] ) ) {
+		$attr['class'] .= ' fg-thumb';
+	} else {
+		$attr['class'] = 'fg-thumb';
+	}
+
+	return $attr;
+}
+
+/**
+ * Returns the attachment anchor HTML
+ *
+ * @param FooGalleryAttachment $foogallery_attachment
+ * @param array $args
+ * @param bool $output_image
+ * @param bool $output_closing_tag
+ *
+ * @since 1.4.0
+ *
+ * @return string
+ */
+function foogallery_attachment_html_anchor( $foogallery_attachment, $args = array(), $output_image = true, $output_closing_tag = true ) {
+	if ( empty ( $foogallery_attachment->url ) )  {
+		return '';
+	}
+
+    $html = foogallery_attachment_html_anchor_opening( $foogallery_attachment, $args );
+
+	if ( $output_image ) {
+		$html .= foogallery_attachment_html_image( $foogallery_attachment, $args );;
+	}
+
+	if ( $output_closing_tag ) {
+		$html .= '</a>';
+	}
+
+	return apply_filters( 'foogallery_attachment_html_anchor', $html, $args, $foogallery_attachment );
+}
+
+/**
+ * Builds up the captions for an attachment
+ *
+ * @param FooGalleryAttachment $foogallery_attachment
+ * @param array $args
+ *
+ * @since 1.4.9
+ *
+ * @return array|bool
+ */
+function foogallery_build_attachment_html_caption( &$foogallery_attachment, $args = array() ) {
+
+	//allow for custom captions to be set
+	$captions = apply_filters( 'foogallery_build_attachment_html_caption_custom', false, $foogallery_attachment, $args);
+
+	if ( false === $captions ) {
+
+        $captions = array();
+
+        $preset = foogallery_gallery_template_setting( 'caption_preset', 'fg-custom' );
+
+        if ( 'none' !== $preset ) {
+
+            $show_caption_title = false;
+            $show_caption_desc = false;
+
+            $caption_title_source = foogallery_gallery_template_setting( 'caption_title_source', '' );
+
+            //if we need to use the settings, then make sure our source is false
+            if ( empty( $caption_title_source ) ) {
+                $caption_title_source = false;
+            }
+
+            if ( 'fg-custom' === $preset ) {
+                $show_caption_title = $caption_title_source !== 'none';
+            } else {
+                //always show both title and desc for the presets
+                $show_caption_title = true;
+            }
+
+            //get the correct captions
+            if ( $foogallery_attachment->_post ) {
+                $caption_title = foogallery_get_caption_title_for_attachment($foogallery_attachment->_post, $caption_title_source);
+            } else {
+                $caption_title = foogallery_get_caption_by_source($foogallery_attachment, $caption_title_source, 'title');
+            }
+
+            $caption_desc_source = foogallery_gallery_template_setting('caption_desc_source', '');
+
+            //if we need to use the settings, then make sure our source is false
+            if ( empty( $caption_desc_source ) ) {
+                $caption_desc_source = false;
+            }
+
+            if ( 'fg-custom' === $preset ) {
+                $show_caption_desc = $caption_desc_source !== 'none';
+            } else {
+                //always show both title and desc for the presets
+                $show_caption_desc = true;
+            }
+
+            if ( $foogallery_attachment->_post ) {
+                $caption_desc = foogallery_get_caption_desc_for_attachment($foogallery_attachment->_post, $caption_desc_source);
+            } else {
+	            $caption_desc = foogallery_get_caption_by_source( $foogallery_attachment, $caption_desc_source, 'desc' );
+            }
+
+            if ( $caption_title && $show_caption_title ) {
+                $captions['title'] = $foogallery_attachment->caption_title = $caption_title;
+            }
+            if ( $caption_desc && $show_caption_desc ) {
+                $captions['desc'] = $foogallery_attachment->caption_desc = $caption_desc;
+            }
+
+        } else {
+            $captions = false;
+        }
+    }
+
+	//extra sanitization for HTML captions
+	if ( isset( $args['override_caption_title'] ) ) {
+		$captions['override_title'] = foogallery_sanitize_full( $args['override_caption_title'] );
+	}
+	if ( isset( $args['override_caption_desc']) ) {
+		$captions['override_desc'] = foogallery_sanitize_full( $args['override_caption_desc'] );
+	}
+
+	//extra sanitization for HTML captions
+	if ( !empty( $captions['title']) ) {
+		$captions['title'] = foogallery_sanitize_full( $captions['title'] );
+	}
+	if ( !empty( $captions['desc']) ) {
+		$captions['desc'] = foogallery_sanitize_full( $captions['desc'] );
+	}
+
+	return apply_filters( 'foogallery_build_attachment_html_caption', $captions, $foogallery_attachment, $args );
+}
+
+/**
+ * Returns generic html for captions
+ *
+ * @param FooGalleryAttachment $foogallery_attachment
+ * @param array $args
+ *
+ * @since 1.4.0
+ *
+ * @return string
+ */
+function foogallery_attachment_html_caption( $foogallery_attachment, $args = array() ) {
+	$captions = foogallery_build_attachment_html_caption( $foogallery_attachment, $args );
+	$html = '';
+
+	if ( $captions !== false ) {
+
+		$caption_title = null;
+		$caption_desc = null;
+
+		if ( array_key_exists( 'override_title', $captions ) ) {
+			$caption_title = $captions['override_title'];
+		} else if ( array_key_exists( 'title', $captions ) ) {
+			$caption_title = $captions['title'];
+		}
+		if ( array_key_exists( 'override_desc', $captions ) ) {
+			$caption_desc = $captions['override_desc'];
+		} else if ( array_key_exists( 'desc', $captions ) ) {
+			$caption_desc = $captions['desc'];
+		}
+
+		if ( !empty( $caption_title ) || !empty( $caption_desc ) ) {
+			$html = '<figcaption class="fg-caption"><div class="fg-caption-inner">';
+
+			if ( !empty( $caption_title ) ) {
+				$html .= '<div class="fg-caption-title">' . $caption_title . '</div>';
+			}
+			if ( !empty( $caption_desc ) ) {
+				$html .= '<div class="fg-caption-desc">' . $caption_desc . '</div>';
+			}
+
+			$html .= '</div></figcaption>';
+		}
+	}
+
+    return apply_filters( 'foogallery_attachment_html_caption', $html, $foogallery_attachment, $args );
+}
+
+/**
+ * Returns the attachment item opening HTML
+ *
+ * @param FooGalleryAttachment $foogallery_attachment
+ * @param array $args
+ *
+ * @since 1.4.0
+ *
+ * @return string
+ */
+function foogallery_attachment_html_item_opening($foogallery_attachment, $args = array() ) {
+
+	$classes[] = 'fg-item';
+
+	//set the type of an item
+	$classes['type'] = 'fg-type-' . $foogallery_attachment->type;
+
+	//let others add to the item classes
+	$classes = apply_filters( 'foogallery_attachment_html_item_classes', $classes, $foogallery_attachment, $args );
+
+	$class_list = '';
+	if ( is_array( $classes ) ) {
+        $class_list = implode( ' ', $classes );
+    }
+
+    $attachment_item_figure_class = apply_filters( 'foogallery_attachment_html_item_figure_class', 'fg-item-inner', $foogallery_attachment, $args );
+	
+	$html_args = apply_filters( 'foogallery_attachment_html_item_attributes', array(
+		'class' => $class_list,
+	), $foogallery_attachment, $args );
+
+	$html = foogallery_html_opening_tag( 'div', $html_args );
+	
+	$html .= '<figure class="'. esc_attr( $attachment_item_figure_class ) . '">';
+	return apply_filters( 'foogallery_attachment_html_item_opening', $html, $foogallery_attachment, $args );
+}
+
+/**
+ * Returns generic html for an attachment
+ *
+ * @param FooGalleryAttachment $foogallery_attachment
+ * @param array $args
+ *
+ * @since 1.4.0
+ *
+ * @return string
+ */
+function foogallery_attachment_html( $foogallery_attachment, $args = array() ) {
+
+    //check if no arguments were passed in, and build them up if so
+    if ( empty( $args ) ) {
+        $args = foogallery_gallery_template_arguments();
+    }
+
+    //allow width and height arguments to be overridden
+    $override_width = foogallery_gallery_template_setting( 'override_width', false );
+    if ( $override_width !== false && intval( $override_width ) > 0 ) {
+        $args['width'] = $override_width;
+    }
+    $override_height = foogallery_gallery_template_setting( 'override_height', false );
+    if ( $override_height !== false && intval( $override_height ) > 0 ) {
+        $args['height'] = $override_height;
+    }
+
+    $caption = foogallery_attachment_html_caption( $foogallery_attachment, $args );
+
+    $html = foogallery_attachment_html_item_opening( $foogallery_attachment, $args );
+    $html .= foogallery_attachment_html_anchor_opening( $foogallery_attachment, $args );
+    $html .= '<span class="fg-image-wrap">';
+    $html .= foogallery_attachment_html_image( $foogallery_attachment, $args );
+	$html .= '</span>';
+	$html .= '<span class="fg-image-overlay"></span>';
+    $html .= '</a>';
+    $html .= $caption;
+    $html .= '</figure><div class="fg-loader"></div></div>';
+    return $html;
+}
+
+/**
+ * Get the foogallery template arguments for the current foogallery that is being output to the frontend
+ *
+ * @return array
+ */
+function foogallery_gallery_template_arguments() {
+    global $current_foogallery_template;
+
+    return apply_filters( 'foogallery_gallery_template_arguments-' . $current_foogallery_template, array() );
+}
+
+/**
+ * Build up an object that will be encoded to JSON for a FooGallery Attachment
+ *
+ * @param FooGalleryAttachment $foogallery_attachment
+ * @param array                $args
+ *
+ * @since 1.6.0
+ *
+ * @returns string
+ * @return string
+ */
+function foogallery_build_json_object_from_attachment( $foogallery_attachment, $args = array() ) {
+	if ( isset( $foogallery_attachment ) ) {
+
+		//check if no arguments were passed in, and build them up if so
+		if ( empty( $args ) ) {
+			$args = foogallery_gallery_template_arguments();
+		}
+
+		$captions          = foogallery_build_attachment_html_caption( $foogallery_attachment, $args );
+		$anchor_attributes = foogallery_build_attachment_html_anchor_attributes( $foogallery_attachment, $args );
+		$image_attributes  = foogallery_build_attachment_html_image_attributes( $foogallery_attachment, $args );
+
+		if ( array_key_exists( 'data-src-fg', $image_attributes ) ) {
+			$src = $image_attributes['data-src-fg'];
+		} else if (array_key_exists( 'src', $image_attributes ) ) {
+			$src = $image_attributes['src'];
+		}
+
+		if ( array_key_exists( 'data-srcset-fg', $image_attributes ) ) {
+			$srcset = $image_attributes['data-srcset-fg'];
+		} else if ( array_key_exists( 'srcset', $image_attributes ) ) {
+			$srcset = $image_attributes['srcset'];
+		}
+
+		$json_object       = new stdClass();
+
+		if ( array_key_exists( 'href', $anchor_attributes ) ) {
+			$json_object->href = $anchor_attributes['href'];
+		}
+		if ( array_key_exists( 'data-type', $anchor_attributes ) ) {
+			$json_object->type = $anchor_attributes['data-type'];
+		}
+		if ( isset( $src ) ) {
+			$json_object->src = $src;
+		}
+		if ( isset( $srcset ) ) {
+			$json_object->srcset = $srcset;
+		}
+		if ( array_key_exists( 'width', $image_attributes ) ) {
+			$json_object->width = $image_attributes['width'];
+		}
+		if ( array_key_exists( 'height', $image_attributes ) ) {
+			$json_object->height = $image_attributes['height'];
+		}
+
+		$json_object->alt = $foogallery_attachment->alt;
+
+		if ( $foogallery_attachment->ID > 0 ) {
+			$json_object->id = $foogallery_attachment->ID;
+		}
+
+		if ( $captions !== false ) {
+			if ( array_key_exists( 'title', $captions ) ) {
+				$json_object->caption = $json_object->title = $captions['title'];
+			}
+			if ( array_key_exists( 'desc', $captions ) ) {
+				$json_object->description = $captions['desc'];
+			}
+		}
+
+		$json_object->attr         = new stdClass();
+		$json_object->attr->anchor = foogallery_create_anchor_for_json_object( $anchor_attributes );
+
+		$json_object = apply_filters( 'foogallery_build_attachment_json', $json_object, $foogallery_attachment, $args, $anchor_attributes, $image_attributes, $captions );
+
+		return $json_object;
+	}
+
+	return false;
+}
+
+/**
+ * Build up the anchor object that is used within the json object
+ *
+ * @param $anchor_attributes
+ *
+ * @return stdClass
+ */
+function foogallery_create_anchor_for_json_object( $anchor_attributes ) {
+	//unset a number of keys in the array that are already set on the high-level item
+	unset( $anchor_attributes['href'] );
+	unset( $anchor_attributes['data-type'] );
+
+	//create the anchor object
+	$object = new stdClass();
+
+	//loop through the anchor attributes and set them on the object
+	foreach ( $anchor_attributes as $key => $value ) {
+		$object->{$key} = $value;
+	}
+	return $object;
+}
+
+/**
+ * Build up a JSON string for a FooGallery Attachment
+ *
+ * @param FooGalleryAttachment $foogallery_attachment
+ * @param array                $args
+ *
+ * @since 1.4.9
+ *
+ * @returns string
+ * @return string
+ */
+function foogallery_build_json_from_attachment( $foogallery_attachment, $args = array() ) {
+	if ( isset( $foogallery_attachment ) ) {
+
+		$json_object = foogallery_build_json_object_from_attachment( $foogallery_attachment, $args );
+
+		return foogallery_json_encode( $json_object, true );
+	}
+
+	return '';
+}
+
+/**
+ * Renders a script block with the JSON output for the attachments in a gallery
+ *
+ * @param $gallery FooGallery
+ * @param $attachments FooGalleryAttachment[]
+ */
+function foogallery_render_script_block_for_json_items( $gallery, $attachments ) {
+	if ( count( $attachments ) > 0 ) {
+		$attachments_json = array_map( 'foogallery_build_json_from_attachment', $attachments );
+		echo '<script type="text/javascript">';
+		echo '  window["' . esc_js( $gallery->container_id() ) . '_items"] = [';
+		echo implode( ', ', $attachments_json ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON data
+		echo '  ];';
+		echo '</script>';
+	}
+}
+
+/**
+ * Renders a noscript fallback for JSON-paginated attachments.
+ *
+ * @param FooGallery             $gallery The gallery being rendered.
+ * @param FooGalleryAttachment[] $attachments The attachments omitted from the initial HTML.
+ */
+function foogallery_render_noscript_block_for_json_items( $gallery, $attachments ) {
+	if ( count( $attachments ) <= 0 ) {
+		return;
+	}
+
+	$enabled = apply_filters( 'foogallery_paging_noscript_fallback_enabled', true, $gallery, $attachments );
+	if ( ! $enabled ) {
+		return;
+	}
+
+	echo '<noscript><div class="foogallery-noscript" data-gallery-id="' . esc_attr( $gallery->ID ) . '">';
+
+	foreach ( $attachments as $attachment ) {
+		$item = foogallery_build_json_object_from_attachment( $attachment );
+		if ( false === $item || empty( $item->src ) ) {
+			continue;
+		}
+
+		$href = ! empty( $item->href ) ? $item->href : $item->src;
+
+		$image_attributes = array(
+			'src'      => $item->src,
+			'alt'      => isset( $item->alt ) ? $item->alt : '',
+			'loading'  => 'lazy',
+			'decoding' => 'async',
+		);
+
+		if ( ! empty( $item->srcset ) ) {
+			$image_attributes['srcset'] = $item->srcset;
+		}
+
+		if ( ! empty( $item->width ) ) {
+			$image_attributes['width'] = absint( $item->width );
+		}
+
+		if ( ! empty( $item->height ) ) {
+			$image_attributes['height'] = absint( $item->height );
+		}
+
+		echo '<figure class="fg-noscript-item">';
+		echo '<a class="fg-noscript-link" href="' . esc_url( $href ) . '">';
+		echo foogallery_html_opening_tag( 'img', $image_attributes ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Attributes escaped by foogallery_html_opening_tag().
+		echo '</a>';
+
+		$caption     = isset( $item->caption ) ? $item->caption : ( isset( $item->title ) ? $item->title : '' );
+		$description = isset( $item->description ) ? $item->description : '';
+
+		if ( ! empty( $caption ) || ! empty( $description ) ) {
+			echo '<figcaption class="fg-noscript-caption">';
+			if ( ! empty( $caption ) ) {
+				echo '<div class="fg-noscript-title">' . wp_kses_post( $caption ) . '</div>';
+			}
+			if ( ! empty( $description ) ) {
+				echo '<div class="fg-noscript-description">' . wp_kses_post( $description ) . '</div>';
+			}
+			echo '</figcaption>';
+		}
+
+		echo '</figure>';
+	}
+
+	echo '</div></noscript>';
+}
+
+/**
+ * Generates the HTML for a tag
+ *
+ * @param string $tag        Tag name.
+ * @param array  $attributes Tag attributes.
+ *
+ * @return string
+ */
+function foogallery_html_opening_tag( $tag, $attributes ) {
+	if ( ! is_string( $tag ) || ! is_array( $attributes ) ) {
+		return '';
+	}
+
+	$tag = strtolower( trim( $tag ) );
+	$allowed_tags = array(
+		'a',
+		'div',
+		'img',
+	);
+	if ( ! in_array( $tag, $allowed_tags, true ) ) {
+		return '';
+	}
+
+	$html = '<' . $tag;
+	foreach ( $attributes as $name => $value ) {
+		$name = is_string( $name ) ? trim( $name ) : '';
+		if ( ! foogallery_is_safe_html_attribute_key( $name ) || ! is_scalar( $value ) || empty( $value ) ) {
+			continue;
+		}
+
+		$html .= ' ' . $name . '="' . foogallery_esc_attr( (string) $value ) . '"';
+	}
+	$html .= '>';
+	return $html;
+}

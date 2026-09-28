@@ -150,6 +150,17 @@ class Gutenberg_Hooks {
 		wp_enqueue_script( SRFM_SLUG . $form_editor_script, SRFM_URL . 'assets/build/formEditor.js', $script_info['dependencies'], $script_info['version'], true );
 		wp_localize_script( SRFM_SLUG . $form_editor_script, 'scIcons', [ 'path' => SRFM_URL . 'assets/build/icon-assets' ] );
 
+		// Deep-link (#3030): the "Finish setting up" Thank You notice CTA opens this
+		// editor with ?srfm_focus=… to auto-open a settings tab. Gutenberg strips
+		// unrecognised query args client-side before the editor bundle can read them,
+		// so surface the value from the server — where it is never stripped — as a
+		// global the bundle reads at evaluation time. Validated to a known allowlist.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only deep-link hint on an authenticated editor screen; no state change.
+		$srfm_focus = isset( $_GET['srfm_focus'] ) ? sanitize_key( wp_unslash( $_GET['srfm_focus'] ) ) : '';
+		if ( in_array( $srfm_focus, [ 'thankyou', 'notifications' ], true ) ) {
+			wp_add_inline_script( SRFM_SLUG . $form_editor_script, 'window.srfmDeepLinkFocus = ' . wp_json_encode( $srfm_focus ) . ';', 'before' );
+		}
+
 		// Enqueue the code editor for the Custom CSS Editor in SureForms.
 		wp_enqueue_code_editor( [ 'type' => 'text/css' ] );
 		wp_enqueue_script( 'wp-theme-plugin-editor' );
@@ -203,7 +214,10 @@ class Gutenberg_Hooks {
 				'current_screen'                    => $screen,
 				'smart_tags_array'                  => Smart_Tags::smart_tag_list(),
 				'smart_tags_array_email'            => Smart_Tags::email_smart_tag_list(),
-				'srfm_form_markup_nonce'            => wp_create_nonce( 'srfm_form_markup' ),
+				// No srfm_form_markup nonce: the generate-form-markup route is gated by a
+				// capability check, not by holding a nonce. It used to be minted here for
+				// every editor user and read from the query string, which is precisely how
+				// that route ended up with no real authorization (#2995).
 				'get_form_markup_url'               => 'sureforms/v1/generate-form-markup',
 				'is_pro_active'                     => Helper::has_pro(),
 				'srfm_default_dynamic_block_option' => wp_parse_args( Helper::get_array_value( get_option( 'srfm_default_dynamic_block_option', [] ) ), Helper::default_dynamic_block_option() ),

@@ -7,7 +7,6 @@ import {
 	Input,
 	Text,
 	DatePicker,
-	TextArea,
 } from '@bsf/force-ui';
 import {
 	editorValueToString,
@@ -16,6 +15,10 @@ import {
 } from '@Functions/utils';
 import { Trash, Plus, Info, Calendar } from 'lucide-react';
 import { generateUUID } from '@AdminComponents/schema-utils/utils';
+import {
+	jsonLdToEditorState,
+	editorStateToJsonLdString,
+} from '@AdminComponents/schema-utils/custom-json-ld';
 import { SeoPopupTooltip } from '@AdminComponents/tooltip';
 import FloatingPopover from '@AdminComponents/floating-popover';
 import { useState, useMemo } from '@wordpress/element';
@@ -233,8 +236,24 @@ export const renderCloneableGroupField = ( {
 	fieldItemIds,
 	setFieldItemIds,
 	renderHelpTextFunction = null,
+	remountVersion = 0,
 } ) => {
 	let existingValues = getFieldValue( field.id ) || [];
+
+	// Seed a legacy scalar value (saved before the field became a group) into
+	// the subfield named by the definition's legacyScalarField, instead of discarding it.
+	if (
+		typeof existingValues === 'string' &&
+		existingValues.trim() !== '' &&
+		field.legacyScalarField
+	) {
+		existingValues = [
+			{
+				...createDefaultItem( field.fields ),
+				[ field.legacyScalarField ]: existingValues,
+			},
+		];
+	}
 
 	// Ensure existingValues is always an array
 	if ( ! Array.isArray( existingValues ) ) {
@@ -473,6 +492,7 @@ export const renderCloneableGroupField = ( {
 																			index,
 																		parentFieldId:
 																			field.id,
+																		remountVersion,
 																	}
 																) }
 															</div>
@@ -522,6 +542,7 @@ export const renderCloneableGroupField = ( {
 											renderAsGroupComponent: false,
 											itemIndex: index,
 											parentFieldId: field.id,
+											remountVersion,
 										} ) }
 									</div>
 									{ renderHelpTextFunction &&
@@ -553,6 +574,7 @@ export const GroupFieldRenderer = ( {
 	getFieldValue,
 	onFieldChange,
 	variableSuggestions,
+	remountVersion = 0,
 } ) => {
 	const groupType = field.fields?.find( ( f ) => f.id === '@type' )
 		? getFieldValue( '@type', field.id )
@@ -616,6 +638,7 @@ export const GroupFieldRenderer = ( {
 										),
 									variableSuggestions,
 									renderAsGroupComponent: false,
+									remountVersion,
 								} ) }
 							</div>
 						</div>
@@ -632,6 +655,7 @@ export const renderCloneableField = ( {
 	onFieldChange,
 	variableSuggestions,
 	placeholder = '',
+	remountVersion = 0,
 } ) => {
 	const existingValues = getFieldValue( field.id ) || {};
 
@@ -670,6 +694,7 @@ export const renderCloneableField = ( {
 						variableSuggestions,
 						placeholder,
 						renderAsGroupComponent: false,
+						remountVersion,
 					} ) }
 					<Button
 						variant="ghost"
@@ -710,16 +735,23 @@ export function renderFieldCommon( {
 	renderAsGroupComponent = false,
 	itemIndex = null,
 	parentFieldId = null,
+	remountVersion = 0,
 } ) {
 	if ( ! field ) {
 		return null;
 	}
 
 	const currentFieldValue = getFieldValue( field.id ) || field.std || '';
+	const isCustomJsonLdField = field?.id === 'custom_json_ld';
 
-	const uniqueKey = parentFieldId
+	const baseKey = parentFieldId
 		? `${ parentFieldId }-${ itemIndex }-${ field.id }`
 		: field.id; // PREVENT KEY COLLISIONS IN NESTED RENDERING
+
+	// Uncontrolled widgets (EditorInput, Title Input) read defaultValue only
+	// on mount; bumping remountVersion remounts just those leaf inputs when
+	// their store value changes externally (e.g. Reset to Global).
+	const uniqueKey = `${ baseKey }-v${ remountVersion }`;
 
 	switch ( field.type ) {
 		case 'Select': {
@@ -812,6 +844,7 @@ export function renderFieldCommon( {
 						getFieldValue={ getFieldValue }
 						onFieldChange={ onFieldChange }
 						variableSuggestions={ variableSuggestions }
+						remountVersion={ remountVersion }
 					/>
 				);
 			}
@@ -898,7 +931,7 @@ export function renderFieldCommon( {
 			return (
 				<div className="w-full">
 					<Input
-						key={ field.id }
+						key={ uniqueKey }
 						by="label"
 						placeholder={ placeholder }
 						defaultValue={ currentFieldValue }
@@ -915,18 +948,63 @@ export function renderFieldCommon( {
 		}
 
 		case 'Textarea': {
+			if ( isCustomJsonLdField ) {
+				return (
+					<div className="w-full">
+						<EditorInput
+							key={ uniqueKey }
+							by="label"
+							trigger="@"
+							// Allow the "@" trigger after a space OR a double
+							// quote so smart tags can be inserted directly
+							// inside quoted JSON values (e.g. "@site_name")
+							// without a leading blank space.
+							triggerRegex={ /(^|[\s("])(@(\w{0,75}))$/ }
+							options={ variableSuggestions }
+							placeholder={ placeholder }
+							defaultValue={ jsonLdToEditorState(
+								currentFieldValue,
+								variableSuggestions
+							) }
+							onChange={ ( editorState ) => {
+								onFieldChange(
+									field.id,
+									editorStateToJsonLdString(
+										editorState.toJSON()
+									)
+								);
+							} }
+							className="whitespace-pre-wrap break-words font-mono text-sm min-h-72 max-h-96 overflow-y-auto"
+							wrapperClassName="items-start [&>ul>li]:capitalize"
+						/>
+					</div>
+				);
+			}
+
+			// Same editor as the default branch, just taller to start. Textarea
+			// fields hold prose, so they get variable suggestions too, and the
+			// editor grows past the initial height as content is added.
 			return (
 				<div className="w-full">
-					<TextArea
+					<EditorInput
 						key={ uniqueKey }
-						value={ currentFieldValue }
-						onChange={ ( value ) =>
-							onFieldChange( field.id, value )
-						}
-						rows={ field.rows || 8 }
-						size="md"
-						className="w-full font-mono text-sm"
+						by="label"
+						trigger="@"
+						options={ variableSuggestions }
 						placeholder={ placeholder }
+						defaultValue={ stringValueToFormatJSON(
+							currentFieldValue,
+							variableSuggestions,
+							'value'
+						) }
+						onChange={ ( editorState ) => {
+							onFieldChange(
+								field.id,
+								editorValueToString( editorState.toJSON() )
+							);
+						} }
+						className="flex-grow min-h-[4.5rem]"
+						wrapperClassName="items-start [&>ul>li]:capitalize"
 					/>
 				</div>
 			);
@@ -962,8 +1040,21 @@ export function renderFieldCommon( {
 }
 
 export function renderHelpText( field ) {
-	if ( field?.type !== 'Text' ) {
+	const isCustomJsonLdField = field?.id === 'custom_json_ld';
+
+	if ( field?.type !== 'Text' && ! isCustomJsonLdField ) {
 		return null;
+	}
+
+	if ( field?.type === 'Textarea' ) {
+		return (
+			<Text size={ 14 } weight={ 400 } color="help">
+				{ __(
+					'Type @ to view variable suggestions. Smart tags work only inside quoted JSON string values.',
+					'surerank'
+				) }
+			</Text>
+		);
 	}
 
 	return (
@@ -1001,6 +1092,7 @@ export const renderFieldSwitch = ( field, options ) => {
 		fieldItemIds,
 		setFieldItemIds,
 		renderAsGroupComponent = true,
+		remountVersion = 0,
 	} = options;
 
 	if ( field.type === 'Group' && field.cloneable ) {
@@ -1014,6 +1106,7 @@ export const renderFieldSwitch = ( field, options ) => {
 					variableSuggestions,
 					fieldItemIds,
 					setFieldItemIds,
+					remountVersion,
 				} ) }
 			</div>
 		);
@@ -1027,6 +1120,7 @@ export const renderFieldSwitch = ( field, options ) => {
 				getFieldValue={ getFieldValue }
 				onFieldChange={ onFieldChange }
 				variableSuggestions={ variableSuggestions }
+				remountVersion={ remountVersion }
 			/>
 		);
 	}
@@ -1041,6 +1135,7 @@ export const renderFieldSwitch = ( field, options ) => {
 					onFieldChange,
 					variableSuggestions,
 					renderAsGroupComponent,
+					remountVersion,
 				} ) }
 			</div>
 		);
@@ -1055,6 +1150,7 @@ export const renderFieldSwitch = ( field, options ) => {
 				onFieldChange,
 				variableSuggestions,
 				renderAsGroupComponent,
+				remountVersion,
 			} ) }
 		</div>
 	);

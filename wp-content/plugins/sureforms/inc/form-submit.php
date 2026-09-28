@@ -54,6 +54,23 @@ class Form_Submit {
 	 */
 	public function __construct() {
 		add_action( 'rest_api_init', [ $this, 'register_custom_endpoint' ] );
+		// One submission getting through retires the failure notice. srfm_form_submit
+		// fires only on the success path.
+		add_action( 'srfm_form_submit', [ Client_Logger::class, 'reset_fault_streak' ] );
+
+		/**
+		 * Fired when an integration fails to receive a submission.
+		 *
+		 * Pro's webhooks and native integrations write their outcome to the entry's
+		 * own log, which nobody reads until a ticket is already open. Firing this
+		 * as well surfaces it on the dashboard.
+		 *
+		 * @since 2.12.6
+		 *
+		 * @param int    $form_id Form the submission belongs to.
+		 * @param string $reason  Short description of what failed.
+		 */
+		add_action( 'srfm_integration_failed', [ $this, 'record_integration_failure' ], 10, 2 );
 		add_action( 'wp_ajax_validation_ajax_action', [ $this, 'field_unique_validation' ] );
 		add_action( 'wp_ajax_nopriv_validation_ajax_action', [ $this, 'field_unique_validation' ] );
 		// for quick action bar.
@@ -77,6 +94,136 @@ class Form_Submit {
 				'permission_callback' => [ $this, 'submit_form_permissions_check' ],
 			]
 		);
+
+		register_rest_route(
+			$this->namespace,
+			'/log-client-error',
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'handle_client_error_log' ],
+				'permission_callback' => [ $this, 'client_error_log_permissions_check' ],
+			]
+		);
+	}
+
+	/**
+	 * Record an integration failure against the form it happened on.
+	 *
+	 * Hooked - srfm_integration_failed.
+	 *
+	 * @param int    $form_id Form the submission belongs to.
+	 * @param string $reason  Short description of what failed.
+	 * @since 2.12.6
+	 * @return void
+	 */
+	public function record_integration_failure( $form_id = 0, $reason = '' ) {
+		$form_id = absint( $form_id );
+
+		Client_Logger::append(
+			Client_Logger::sanitize_entry(
+				[
+					'type'       => 'message',
+					'form_id'    => $form_id,
+					'form_title' => $form_id ? Helper::get_string_value( get_the_title( $form_id ) ) : '',
+					'message'    => 'Integration failed. ' . Helper::get_string_value( $reason ),
+				]
+			)
+		);
+
+		Client_Logger::record_failure(
+			'integration',
+			$form_id,
+			$form_id ? Helper::get_string_value( get_the_title( $form_id ) ) : ''
+		);
+	}
+
+	/**
+	 * Gate the client error log route.
+	 *
+	 * Order matters. The enabled check runs first and returns 404 rather than 403,
+	 * because it is the only thing that actually stops logging: the frontend flag
+	 * is baked into cached HTML and can be a full cache TTL out of date, so
+	 * switching the setting off does not stop already-cached pages from posting.
+	 *
+	 * The submit token is then required for consistency with /submit-form, but be
+	 * clear about what it buys. It is per-form, not per-visitor, valid for up to
+	 * 48 hours, and readable from one GET of any public page carrying the form. It
+	 * filters undirected scanners and costs nothing; it is not visitor
+	 * authentication. The controls that carry real weight here are the fixed
+	 * payload schema in Client_Logger::sanitize_entry() and the rate limit below.
+	 *
+	 * @param \WP_REST_Request $request Incoming REST request.
+	 * @since 2.12.6
+	 * @return WP_Error|bool
+	 */
+	public function client_error_log_permissions_check( $request ) {
+		if ( ! Client_Logger::is_enabled() ) {
+			return new WP_Error(
+				'srfm_rest_no_route',
+				__( 'Not found.', 'sureforms' ),
+				[ 'status' => 404 ]
+			);
+		}
+
+		$token   = Helper::get_string_value( $request->get_header( 'X-WP-Submit-Token' ) );
+		$form_id = absint( $request->get_param( 'form_id' ) );
+
+		if ( ! Submit_Token::verify( $token, $form_id ) ) {
+			return new WP_Error(
+				'srfm_token_invalid',
+				__( 'Security verification failed.', 'sureforms' ),
+				[ 'status' => 403 ]
+			);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Record one client-reported form submission failure.
+	 *
+	 * Always answers 204, whether or not a line was written. The browser has
+	 * nothing useful to do with a failure here, and a response that distinguishes
+	 * "written" from "dropped" would report back whether logging is on, whether
+	 * the log is full, and whether the caller is being throttled.
+	 *
+	 * @param \WP_REST_Request $request Incoming REST request.
+	 * @since 2.12.6
+	 * @return \WP_REST_Response
+	 */
+	public function handle_client_error_log( $request ) {
+		$response = new \WP_REST_Response( null, 204 );
+
+		$form_id = absint( $request->get_param( 'form_id' ) );
+
+		if ( $this->is_rate_limited( 'srfm_cl_', $form_id ) ) {
+			return $response;
+		}
+
+		$entries = $request->get_param( 'entries' );
+
+		if ( ! is_array( $entries ) ) {
+			return $response;
+		}
+
+		// Cap the batch as well as each entry: a single request must not be able to
+		// consume the whole file and evict the failure someone is trying to capture.
+		foreach ( array_slice( $entries, 0, 10 ) as $raw ) {
+			if ( ! is_array( $raw ) ) {
+				continue;
+			}
+
+			$raw['form_id'] = $form_id;
+
+			// Resolved here rather than sent by the browser: the title is what makes
+			// a log line identifiable at a glance, and taking it from the request
+			// would let a caller label an entry as any form it liked.
+			$raw['form_title'] = $form_id ? Helper::get_string_value( get_the_title( $form_id ) ) : '';
+
+			Client_Logger::append( Client_Logger::sanitize_entry( $raw ) );
+		}
+
+		return $response;
 	}
 
 	/**
@@ -282,6 +429,11 @@ class Form_Submit {
 				]
 			);
 		}
+
+		// Drop submitted keys this form does not define before anything consumes them.
+		// Runs on SUBMISSION only, so historical entries whose keys no longer match a
+		// rebuilt form (see #2665) stay fully readable on the read/export paths.
+		$form_data = Field_Validation::strip_unknown_field_keys( $form_data, $current_form_id );
 
 		$validated_form_data = Field_Validation::validate_form_data( $form_data, $current_form_id );
 
@@ -601,14 +753,16 @@ class Form_Submit {
 			'device_name'    => $device_name,
 			'submission_url' => $submission_url,
 		];
-		// Prefer the language the visitor saw at form-render time (captured in a
-		// hidden srfm-form-language input), since WPML's language detection on the
-		// REST submit endpoint frequently falls back to the default. The hidden
-		// input is client-supplied, so:
+		// Resolve the language the visitor saw at form-render time (captured in a
+		// hidden srfm-form-language input) so the confirmation message and email
+		// notifications below can be rendered in it — WPML's language detection on
+		// the REST submit endpoint frequently falls back to the default. This value
+		// is used only to switch_language() at submit time; it is not persisted. The
+		// hidden input is client-supplied, so:
 		// 1. Validate shape with a BCP-47 regex.
 		// 2. Cross-check against the active multilingual provider's known
-		// languages (active + default) so a crafted request can't pollute
-		// the column with codes the site doesn't support.
+		// languages (active + default) so a crafted request can't switch rendering
+		// to a code the site doesn't support.
 		// 3. Fall back to the provider's current_language() on either failure.
 		$entry_language     = Multilingual_Manager::get_instance()->provider()->current_language();
 		$submitted_language = isset( $form_data['srfm-form-language'] ) ? sanitize_text_field( Helper::get_string_value( $form_data['srfm-form-language'] ) ) : '';
@@ -620,12 +774,15 @@ class Form_Submit {
 			'form_id'         => $id,
 			'form_data'       => $submission_data,
 			'submission_info' => $submission_info,
-			'language'        => $entry_language,
 			'created_at'      => current_time( 'mysql' ),
 		];
-		if ( is_user_logged_in() ) {
-			// If user is logged in then save their user id.
-			$entries_data['user_id'] = get_current_user_id();
+		// Resolved via Helper rather than get_current_user_id() directly: this runs on
+		// a REST request that carries no nonce, which core de-authenticates before
+		// dispatch, so the plain call returns 0 even for a signed-in submitter and the
+		// entry would lose its attribution. Returns 0 when genuinely anonymous.
+		$submitting_user_id = Helper::get_submitting_user_id();
+		if ( $submitting_user_id ) {
+			$entries_data['user_id'] = $submitting_user_id;
 		}
 
 		$entries_data = apply_filters(
@@ -647,16 +804,30 @@ class Form_Submit {
 			// in the language the visitor saw at submit time. The REST submit
 			// endpoint doesn't carry the ?lang= URL parameter, so without this
 			// switch the provider would return strings in its default language
-			// even though the entry itself is correctly tagged.
+			// even though the visitor filled the form in another language.
 			$provider = Multilingual_Manager::get_instance()->provider();
 			if ( $provider->is_active() && '' !== $entry_language ) {
 				$provider->switch_language( $entry_language );
 			}
 
+			// Entries::add() has stored the logs collected so far. Start the instance
+			// empty so the update below writes only what send_email() records --
+			// Entries::update() merges with the stored logs, so anything left here
+			// would be written twice.
+			$entries_db_instance = Entries::get_instance();
+			$entries_db_instance->reset_logs();
+
 			// Send email after entry creation so {entry_id} is available when smart tags are processed.
 			$send_email = $this->send_email( $id, $submission_data, $form_data );
 			if ( $send_email ) {
 				$emails = $send_email['emails'];
+			}
+
+			// send_email() logs to the in-memory instance; the entry already exists,
+			// so the log only reaches it through an update.
+			$notification_logs = $entries_db_instance->get_logs();
+			if ( ! empty( $notification_logs ) ) {
+				Entries::update( Helper::get_integer_value( $entry_id ), [ 'logs' => $notification_logs ] );
 			}
 
 			$confirmation_message = Generate_Form_Markup::get_confirmation_markup( $form_data, $submission_data );
@@ -666,6 +837,8 @@ class Form_Submit {
 				$provider->restore_language();
 			}
 
+			$after_submit_nonce = wp_create_nonce( 'srfm_after_submission_' . Helper::get_string_value( $entry_id ) );
+
 			$response = [
 				'success'      => true,
 				'message'      => $confirmation_message,
@@ -673,7 +846,18 @@ class Form_Submit {
 					'name'               => $name,
 					'submission_id'      => $entry_id,
 					'after_submit'       => true,
-					'after_submit_nonce' => wp_create_nonce( 'srfm_after_submission_' . Helper::get_string_value( $entry_id ) ),
+					'after_submit_nonce' => $after_submit_nonce,
+					// Built here rather than assembled in JS. rest_url() already knows
+					// whether the route is a path or a `?rest_route=` query arg, and
+					// add_query_arg() knows whether the nonce needs `?` or `&` — the
+					// client has no way to get either right without reimplementing
+					// both, and concatenating produced a URL that did not route at all
+					// on plain-permalink sites.
+					'after_submit_url'   => add_query_arg(
+						'after_submit_nonce',
+						$after_submit_nonce,
+						rest_url( 'sureforms/v1/after-submission/' . Helper::get_integer_value( $entry_id ) )
+					),
 				],
 				'redirect_url' => $redirect_url,
 			];
@@ -860,6 +1044,12 @@ class Form_Submit {
 	public static function send_email( $id, $submission_data, $form_data = [] ) {
 		$email_notification = get_post_meta( intval( $id ), '_srfm_email_notification' );
 		$is_mail_sent       = false;
+		// Any recipient failing counts as a failure for the whole submission, so
+		// these are set inside the loop and only read after it.
+		$notification_failed = false;
+		// Whether any recipient's "success" came from the mail() fallback, which
+		// reports true for a message the local MTA accepted and will bounce.
+		$used_mail_fallback = false;
 		$emails             = [];
 
 		// Filter to determine whether the email notification should be sent.
@@ -930,8 +1120,19 @@ class Form_Submit {
 						if ( ! $sent ) {
 							// Fallback to default PHP mail if for some reasons wp_mail fails.
 							$sent = mail( $parsed['to'], $parsed['subject'], $parsed['message'], $parsed['headers'] );
+
+							if ( $sent ) {
+								// Accepted by the local MTA, not delivered. Good
+								// enough to avoid recording a fault, not good
+								// enough to retire one.
+								$used_mail_fallback = true;
+							}
 						}
 						$email_report = ob_get_clean(); // Catch any printed notice/errors/message for reports.
+
+						if ( true !== $sent ) {
+							$notification_failed = true;
+						}
 
 						if ( is_int( $log_key ) ) {
 							if ( true === $sent ) {
@@ -967,6 +1168,30 @@ class Form_Submit {
 									]
 								);
 
+								// Also record it in the debug log. The submission itself
+								// succeeded, so the visitor saw nothing wrong and nobody
+								// looks at the entry's own log until a ticket is already
+								// open. The recipient address is not included -- the log
+								// is downloadable and must not carry personal data.
+								Client_Logger::append(
+									Client_Logger::sanitize_entry(
+										[
+											'type'       => 'message',
+											'form_id'    => intval( $id ),
+											'form_title' => Helper::get_string_value( get_the_title( intval( $id ) ) ),
+											'message'    => 'Email notification failed to send. ' . $reason,
+										]
+									)
+								);
+
+								// Its own category: the entry saved, so this is not a
+								// submission failure. The site owner is simply not being
+								// told about entries they did receive.
+								Client_Logger::record_failure(
+									'notification',
+									intval( $id ),
+									Helper::get_string_value( get_the_title( intval( $id ) ) )
+								);
 							}
 						}
 
@@ -988,6 +1213,37 @@ class Form_Submit {
 			if ( empty( $emails ) ) {
 				$entries_db_instance->reset_logs();
 				$entries_db_instance->add_log( __( 'No emails were sent.', 'sureforms' ) );
+			}
+
+			// The notification fault clears when notifications work again. Nothing
+			// else retired it: Client_Logger::clear_category() had a single caller
+			// hardcoded to 'submission', and the notice is deliberately not
+			// dismissible, so a site that had fixed its SMTP kept an undismissable
+			// banner on every admin page until somebody opened a support ticket.
+			// Held until the loop is done because one recipient succeeding while
+			// another fails is still a failure.
+			//
+			// Scoped to the form the fault was recorded against. send_email() runs
+			// on the public submit path and the counter is per category, not per
+			// form, so without this an anonymous submission of a working form
+			// wipes a different form's standing fault -- once per admin page load,
+			// by anyone. The notice names a form, so the granularity is visible
+			// now that this clears as well as records.
+			//
+			// wp_mail() only. The mail() fallback above returns true when the local
+			// MTA merely accepts a message it will later bounce, which is the
+			// broken configuration rather than the fixed one.
+			//
+			// is_int( $log_key ) mirrors the recording guard: record_failure() sits
+			// inside it, so without it an install where add_log() returns a
+			// non-int would never record a notification fault but would still
+			// clear one.
+			$open_failures = Client_Logger::get_failures();
+
+			if ( ! empty( $emails ) && ! $notification_failed && is_int( $log_key )
+				&& ! $used_mail_fallback
+				&& intval( $id ) === Helper::get_integer_value( $open_failures['notification']['form_id'] ?? 0 ) ) {
+				Client_Logger::clear_category( 'notification' );
 			}
 		}
 
@@ -1029,6 +1285,13 @@ class Form_Submit {
 			wp_send_json_error( [ 'error' => __( 'Too many requests. Please try again shortly.', 'sureforms' ) ], 429 );
 		}
 
+		// SECURITY INVARIANT — only the fields the form itself marks unique may be
+		// probed through this unauthenticated handler. The allowlist is what keeps the
+		// lookup scoped to values a site owner opted into checking, rather than to
+		// stored submission data generally. A form with no unique fields therefore
+		// matches nothing and always answers with an empty set.
+		$unique_block_ids = $this->get_unique_field_block_ids( $form_id );
+
 		// Extract and validate field values from POST data.
 		$skip_keys  = [ 'action', 'token', 'id' ];
 		$duplicates = [];
@@ -1047,6 +1310,13 @@ class Form_Submit {
 			}
 
 			if ( '' === $value ) {
+				continue;
+			}
+
+			// The key must resolve to a block this form configured as unique.
+			$block_id = Helper::get_block_id_from_key( $field_key );
+
+			if ( '' === $block_id || ! isset( $unique_block_ids[ $block_id ] ) ) {
 				continue;
 			}
 
@@ -1324,6 +1594,130 @@ class Form_Submit {
 	}
 
 	/**
+	 * Collect the block IDs of the fields a form configures as unique.
+	 *
+	 * Derived from the stored form, never from the request — the whole point is that
+	 * the client cannot nominate which fields are probeable. The frontend already
+	 * sends only inputs rendered with data-unique="true", which comes from the same
+	 * isUnique attribute, so this is the server-side mirror of what the client does.
+	 *
+	 * @param int $form_id Form ID.
+	 *
+	 * @since 2.12.3
+	 * @return array<string,true> Unique field block IDs, keyed by block ID.
+	 */
+	private function get_unique_field_block_ids( $form_id ) {
+		$form = get_post( $form_id );
+
+		if ( ! $form instanceof \WP_Post || '' === $form->post_content ) {
+			return [];
+		}
+
+		$visited_refs = [];
+		$block_ids    = $this->collect_unique_field_block_ids( parse_blocks( $form->post_content ), $visited_refs );
+
+		/**
+		 * Filters the block IDs treated as unique fields for the AJAX uniqueness check.
+		 *
+		 * Lets add-ons whose fields a static parse of the form cannot see contribute
+		 * their own unique fields.
+		 *
+		 * @since 2.12.3
+		 *
+		 * @param array<string,true> $block_ids Unique field block IDs, keyed by block ID.
+		 *                                     A plain list of IDs is accepted too and is
+		 *                                     normalised to this shape.
+		 * @param int                $form_id   Form ID.
+		 */
+		$filtered = apply_filters( 'srfm_unique_field_block_ids', $block_ids, $form_id );
+
+		// Normalise rather than trust: the lookup is isset( $set[ $block_id ] ), so an
+		// add-on returning a plain list would silently disable uniqueness for the form
+		// instead of adding to it. A non-array return keeps the derived set.
+		return is_array( $filtered ) ? self::normalize_block_id_set( $filtered ) : $block_ids;
+	}
+
+	/**
+	 * Normalise a block-ID collection to a block ID => true map.
+	 *
+	 * Accepts both the documented map shape and a plain list of IDs.
+	 *
+	 * @param array<mixed> $block_ids Block IDs as a map or a list.
+	 *
+	 * @since 2.12.3
+	 * @return array<string,true> Block IDs keyed by block ID.
+	 */
+	private static function normalize_block_id_set( $block_ids ) {
+		$normalized = [];
+
+		foreach ( $block_ids as $key => $value ) {
+			// List entry: the ID is the value. Map entry: the ID is the key.
+			$block_id = is_int( $key ) ? $value : $key;
+
+			if ( is_string( $block_id ) && '' !== $block_id ) {
+				$normalized[ $block_id ] = true;
+			}
+		}
+
+		return $normalized;
+	}
+
+	/**
+	 * Recursively collect block IDs of blocks whose isUnique attribute is enabled.
+	 *
+	 * Recurses into innerBlocks (repeater/container children) and expands
+	 * reusable/synced patterns, mirroring Form_Styling::collect_form_block_ids().
+	 *
+	 * Note: parse_blocks() does NOT apply block.json defaults, unlike the render path.
+	 * Every field block therefore has to keep isUnique defaulting to false — a block
+	 * that defaults it to true would be serialised without the attribute and would be
+	 * missed here while still rendering data-unique="true".
+	 *
+	 * @param array<mixed>     $blocks       Parsed blocks from parse_blocks().
+	 * @param array<int, true> $visited_refs Reusable-block post IDs already expanded,
+	 *                                       keyed by ID — guards against reference cycles.
+	 *
+	 * @since 2.12.3
+	 * @return array<string,true> Unique field block IDs, keyed by block ID.
+	 */
+	private function collect_unique_field_block_ids( $blocks, &$visited_refs = [] ) {
+		$block_ids = [];
+
+		foreach ( $blocks as $block ) {
+			if ( ! is_array( $block ) ) {
+				continue;
+			}
+
+			$attrs = isset( $block['attrs'] ) && is_array( $block['attrs'] ) ? $block['attrs'] : [];
+
+			if ( ! empty( $attrs['isUnique'] ) && ! empty( $attrs['block_id'] ) && is_scalar( $attrs['block_id'] ) ) {
+				$block_ids[ Helper::get_string_value( $attrs['block_id'] ) ] = true;
+			}
+
+			// Reusable/synced pattern: expand the referenced wp_block post so a field
+			// living inside a pattern is seen like an inline block.
+			if ( isset( $block['blockName'] ) && 'core/block' === $block['blockName'] && ! empty( $attrs['ref'] ) && is_scalar( $attrs['ref'] ) ) {
+				$ref = absint( $attrs['ref'] );
+
+				if ( $ref && ! isset( $visited_refs[ $ref ] ) ) {
+					$visited_refs[ $ref ] = true;
+					$ref_post             = get_post( $ref );
+
+					if ( $ref_post instanceof \WP_Post && 'wp_block' === $ref_post->post_type && 'publish' === $ref_post->post_status && '' !== $ref_post->post_content ) {
+						$block_ids += $this->collect_unique_field_block_ids( parse_blocks( $ref_post->post_content ), $visited_refs );
+					}
+				}
+			}
+
+			if ( ! empty( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {
+				$block_ids += $this->collect_unique_field_block_ids( $block['innerBlocks'], $visited_refs );
+			}
+		}
+
+		return $block_ids;
+	}
+
+	/**
 	 * Check if the current request is rate-limited for unique validation.
 	 *
 	 * Uses transients keyed by IP + form ID to throttle requests.
@@ -1334,13 +1728,28 @@ class Form_Submit {
 	 * @return bool True if rate-limited (should block), false if allowed.
 	 */
 	private function is_unique_validation_rate_limited( $form_id ) {
+		return $this->is_rate_limited( 'srfm_uv_', $form_id );
+	}
+
+	/**
+	 * Throttle a public endpoint to 10 requests per minute per IP per form.
+	 *
+	 * Shared by the uniqueness check and the client log route rather than
+	 * duplicated, so a change to the window applies to both.
+	 *
+	 * @param string $prefix  Transient key prefix, unique per endpoint.
+	 * @param int    $form_id The form ID the request relates to.
+	 * @since 2.12.6
+	 * @return bool True if rate-limited (should block), false if allowed.
+	 */
+	private function is_rate_limited( $prefix, $form_id ) {
 		$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
 
 		if ( empty( $ip ) || ! filter_var( $ip, FILTER_VALIDATE_IP ) ) {
 			return true; // Fail closed if IP cannot be determined.
 		}
 
-		$transient_key = 'srfm_uv_' . md5( $ip . '_' . $form_id );
+		$transient_key = $prefix . md5( $ip . '_' . $form_id );
 		$attempts      = get_transient( $transient_key );
 
 		if ( false === $attempts ) {

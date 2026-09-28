@@ -8,7 +8,6 @@ use ImageOptimization\Modules\Optimization\Classes\{
 };
 
 use Throwable;
-use WP_REST_Request;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -26,6 +25,12 @@ class Get_Bulk_Optimization_Images extends Route_Base {
 	}
 
 	public function GET() {
+		$error = $this->verify_capability();
+
+		if ( $error ) {
+			return $error;
+		}
+
 		try {
 			$images = Bulk_Optimization_Controller::get_processed_images();
 

@@ -49,6 +49,23 @@ class ST_WXR_Importer {
 	private $wxr_post_ids = array();
 
 	/**
+	 * Whether this request is the one running the WXR import.
+	 * Guard requests never set this, so their SSE pings don't refresh the heartbeat.
+	 *
+	 * @since 1.1.39
+	 * @var bool
+	 */
+	private $is_importing = false;
+
+	/**
+	 * Timestamp of the last heartbeat write, used to throttle transient updates.
+	 *
+	 * @since 1.1.39
+	 * @var int
+	 */
+	private $last_heartbeat = 0;
+
+	/**
 	 * Initiator of this class.
 	 *
 	 * @since 1.0.0
@@ -278,12 +295,18 @@ class ST_WXR_Importer {
 	/**
 	 * Remap SureMembers access-group relations to the imported IDs.
 	 *
-	 * Two directions need fixing once the import completes:
+	 * Five directions need fixing once the import completes:
 	 * 1. Rule metas on each imported access group (include/exclude/drips/rules)
 	 *    hold rule strings such as "post-{id}-|", "postchild-{id}-|" and
 	 *    "tax-{term_id}-single-{taxonomy}" that still carry source-site IDs.
 	 * 2. Restricted posts carry the source access-group IDs in their
 	 *    "suremembers_post_access_group" meta.
+	 * 3. The restriction rules describing what a blocked visitor gets still
+	 *    point at the source site.
+	 * 4. URL-restriction patterns exported as absolute demo URLs can never
+	 *    match a URL on the imported site.
+	 * 5. The priority meta the restriction query joins on never survives the
+	 *    import.
 	 *
 	 * Runs on `import_end`, when the post/term/group ID maps captured during
 	 * the WXR import are complete. Each object is remapped only once (guarded
@@ -332,10 +355,134 @@ class ST_WXR_Importer {
 				}
 			}
 
+			$this->remap_suremembers_restriction_rules( $new_group_id, $post_id_map );
+			$this->remap_suremembers_restricted_url( $new_group_id );
+			$this->restore_suremembers_plan_priority( $new_group_id );
+
 			update_post_meta( $new_group_id, '_astra_sites_suremembers_remapped', true );
 		}
 
 		$this->remap_suremembers_post_access_groups( $access_group_id_map );
+	}
+
+	/**
+	 * Remap the source-site references inside an access group's restriction rules.
+	 *
+	 * The "suremembers_plan_rules" meta describes what a blocked visitor gets.
+	 * Its "restrict" block survives the import still pointing at the source
+	 * site in two ways:
+	 * - "restrict_page_post" — a "post-{id}-|" reference to the page rendered
+	 *   in place of the restricted content. A stale ID either renders nothing
+	 *   or, worse, serves whatever unrelated post now holds that ID.
+	 * - Demo-site URLs in any string value: "redirect_url" (sends blocked
+	 *   visitors off the imported site) as well as "preview_content" and
+	 *   "preview_button", which are rendered to every blocked visitor and can
+	 *   carry demo-site links.
+	 *
+	 * @since 1.1.42
+	 *
+	 * @param int                    $group_id    Imported access group ID.
+	 * @param array<int|string, int> $post_id_map Old → new post IDs.
+	 * @return void
+	 */
+	public function remap_suremembers_restriction_rules( $group_id, $post_id_map ) {
+		$rules = get_post_meta( $group_id, 'suremembers_plan_rules', true );
+
+		if ( ! is_array( $rules ) ) {
+			return;
+		}
+
+		$original = $rules;
+
+		if ( ! empty( $rules['restrict'] ) && is_array( $rules['restrict'] ) ) {
+			$restrict = $rules['restrict'];
+
+			if ( ! empty( $restrict['restrict_page_post'] ) && is_string( $restrict['restrict_page_post'] ) ) {
+				$remapped = preg_replace_callback(
+					'/^post-(\d+)-/',
+					static function ( $matches ) use ( $post_id_map ) {
+						$old_id = (int) $matches[1];
+						$new_id = isset( $post_id_map[ $old_id ] ) ? (int) $post_id_map[ $old_id ] : $old_id;
+						return 'post-' . $new_id . '-';
+					},
+					$restrict['restrict_page_post']
+				);
+
+				if ( null !== $remapped ) {
+					$restrict['restrict_page_post'] = $remapped;
+				}
+			}
+
+			// Scrub demo-site URLs from every string in the block — covers
+			// redirect_url, preview_content and preview_button in one pass.
+			// restrict_page_post carries no URL, so this is a no-op for it.
+			$rules['restrict'] = ST_Importer_Helper::replace_source_site_url( $restrict );
+		}
+
+		// The group mirrors its own ID inside the rules; keep it in sync.
+		if ( isset( $rules['id'] ) ) {
+			$rules['id'] = (string) $group_id;
+		}
+
+		if ( $rules !== $original ) {
+			update_post_meta( $group_id, 'suremembers_plan_rules', $rules );
+		}
+	}
+
+	/**
+	 * Restore the access-group priority meta dropped during the WXR import.
+	 *
+	 * SureMembers writes an empty string to "suremembers_plan_priority" when no
+	 * priority is set on the membership, and the WXR parser skips postmeta
+	 * carrying an empty value, so the row never reaches the imported group.
+	 * Its restriction lookup INNER JOINs the postmeta table on that exact meta
+	 * key, so a missing row drops the group out of every restriction check —
+	 * the protected content stays public until the membership is saved again,
+	 * which is what recreates the row.
+	 *
+	 * The value is intentionally left empty: that is what SureMembers itself
+	 * stores for an unset priority, and its ordering treats it as zero.
+	 *
+	 * @since 1.1.42
+	 *
+	 * @param int $group_id Imported access group ID.
+	 * @return void
+	 */
+	public function restore_suremembers_plan_priority( $group_id ) {
+		if ( metadata_exists( 'post', $group_id, 'suremembers_plan_priority' ) ) {
+			return;
+		}
+
+		add_post_meta( $group_id, 'suremembers_plan_priority', '' );
+	}
+
+	/**
+	 * Rewrite demo-site URLs inside an access group's URL-restriction meta.
+	 *
+	 * The "suremembers_restricted_url" meta holds the URL patterns a group
+	 * restricts, matched by substring (or regex) against the visited URL.
+	 * A pattern exported as an absolute demo URL can never match a URL on
+	 * the imported site, so the restriction silently protects nothing.
+	 * Rewriting the demo base to the imported site's URL keeps the tail
+	 * path intact, which is what the substring match keys on.
+	 *
+	 * @since 1.1.42
+	 *
+	 * @param int $group_id Imported access group ID.
+	 * @return void
+	 */
+	public function remap_suremembers_restricted_url( $group_id ) {
+		$restricted_url = get_post_meta( $group_id, 'suremembers_restricted_url', true );
+
+		if ( empty( $restricted_url ) ) {
+			return;
+		}
+
+		$scrubbed = ST_Importer_Helper::replace_source_site_url( $restricted_url );
+
+		if ( $scrubbed !== $restricted_url ) {
+			update_post_meta( $group_id, 'suremembers_restricted_url', $scrubbed );
+		}
 	}
 
 	/**
@@ -476,7 +623,16 @@ class ST_WXR_Importer {
 	 * @since 1.1.24
 	 */
 	public function wxr_import_transient_start() {
-		set_transient( $this->wxr_import_progress_key, 'ongoing', 300 ); // 5 minutes.
+		$this->is_importing   = true;
+		$this->last_heartbeat = time();
+		set_transient(
+			$this->wxr_import_progress_key,
+			array(
+				'status'    => 'ongoing',
+				'heartbeat' => $this->last_heartbeat,
+			),
+			300
+		); // 5 minutes.
 	}
 
 	/**
@@ -485,7 +641,32 @@ class ST_WXR_Importer {
 	 * @since 1.1.24
 	 */
 	public function wxr_import_transient_cleanup() {
+		$this->is_importing = false;
 		set_transient( $this->wxr_import_progress_key, 'completed', 30 ); // 30 seconds.
+	}
+
+	/**
+	 * Refresh the WXR import heartbeat so concurrent requests can tell the
+	 * importing worker is still alive. Throttled to one write per 10 seconds.
+	 * Only the request that started the import (via `import_start`) writes it.
+	 *
+	 * @since 1.1.39
+	 * @return void
+	 */
+	public function refresh_wxr_import_heartbeat() {
+		if ( ! $this->is_importing || ( time() - $this->last_heartbeat ) < 10 ) {
+			return;
+		}
+
+		$this->last_heartbeat = time();
+		set_transient(
+			$this->wxr_import_progress_key,
+			array(
+				'status'    => 'ongoing',
+				'heartbeat' => $this->last_heartbeat,
+			),
+			300
+		);
 	}
 
 	/**
@@ -507,8 +688,18 @@ class ST_WXR_Importer {
 				'error'  => false,
 			);
 		} else {
+			// An import is marked ongoing — make sure its worker is still alive.
+			// A missing or stale heartbeat means the worker died before cleanup
+			// ran (uncatchable fatal or killed connection); clear the lock so the
+			// import can restart instead of leaving the client reconnecting forever.
+			$heartbeat = is_array( $wxr_progress ) && isset( $wxr_progress['heartbeat'] ) ? (int) $wxr_progress['heartbeat'] : 0;
+			if ( ( time() - $heartbeat ) > 2 * MINUTE_IN_SECONDS ) {
+				delete_transient( $this->wxr_import_progress_key );
+				return false;
+			}
+
 			$data = array(
-				'action' => 'updatedDelta',
+				'action' => 'in_progress',
 				'type'   => 'status',
 				'delta'  => 1,
 			);
@@ -587,8 +778,16 @@ class ST_WXR_Importer {
 
 		// Check for existing progress to prevent duplicate content.
 		if ( $this->is_wxr_import_in_progress() ) {
+			if ( wp_doing_ajax() ) {
+				exit;
+			}
 			return;
 		}
+
+		// Take the lock right away — `import_start` fires only once the importer
+		// begins, leaving validation and the WXR prescan unlocked otherwise.
+		// Every failure path below releases it via wxr_import_transient_cleanup().
+		$this->wxr_import_transient_start();
 
 		// Enhanced XML file validation.
 		if ( empty( $xml_url ) ) {
@@ -666,6 +865,16 @@ class ST_WXR_Importer {
 		if ( function_exists( 'set_time_limit' ) ) {
 			\set_time_limit( 0 ); // phpcs:ignore Generic.PHP.ForbiddenFunctions.FoundWithAlternative -- Required for long-running import process.
 		}
+
+		// Keep the import running even if the SSE connection drops — flush() on a
+		// dead connection would otherwise kill PHP mid-import and leave the
+		// progress lock stale.
+		ignore_user_abort( true ); // phpcs:ignore Generic.PHP.ForbiddenFunctions.FoundWithAlternative -- Deliberate: the import must keep running if the SSE client disconnects, otherwise the progress lock is left stale.
+
+		// Uncatchable fatals (OOM, hard timeout) bypass the try/catch below —
+		// release the progress lock and notify the client on shutdown instead of
+		// leaving the client reconnecting against a stale lock.
+		register_shutdown_function( array( $this, 'handle_import_shutdown' ) );
 
 		// Ensure we're not buffered.
 		wp_ob_end_flush_all();
@@ -821,6 +1030,10 @@ class ST_WXR_Importer {
 		if ( is_multisite() && $has_content_filter ) {
 			add_filter( 'content_save_pre', 'wp_filter_post_kses' );
 		}
+
+		// Release the lock on every exit path — a WP_Error returned before
+		// `import_start` fired would otherwise leave the early lock held.
+		$this->wxr_import_transient_cleanup();
 
 		$this->emit_sse_message( $complete );
 		if ( wp_doing_ajax() ) {
@@ -1016,6 +1229,10 @@ class ST_WXR_Importer {
 	 */
 	public function pre_process_post( $data, $meta, $comments, $terms ) {
 
+		// Mark the import alive before this item is processed — attachment
+		// downloads can take longer than the heartbeat staleness window.
+		$this->refresh_wxr_import_heartbeat();
+
 		// Skip orphaned attachments whose post_parent references a post ID that
 		// does not exist in the WXR file. These are template catalog screenshots
 		// from other templates that leaked into the demo site's media library.
@@ -1061,7 +1278,22 @@ class ST_WXR_Importer {
 		/**
 		 * Setting the publish date to current date.
 		 */
-		if ( isset( $data['post_date'] ) ) {
+		$post_type = isset( $data['post_type'] ) ? $data['post_type'] : '';
+
+		$preserve_post_date = in_array( $post_type, self::get_preserved_post_date_post_types(), true );
+
+		// Never preserve a future source date: wp_insert_post() demotes a
+		// `publish` post to `future` when its post_date_gmt is ahead of now,
+		// and SureMembers' restriction queries only see `publish` groups.
+		// The positive-epoch check rejects the "0000-00-00 00:00:00" zero
+		// date drafts ship with, which strtotime() parses to a negative
+		// timestamp rather than failing.
+		if ( $preserve_post_date ) {
+			$post_date_gmt      = isset( $data['post_date_gmt'] ) && is_string( $data['post_date_gmt'] ) ? strtotime( $data['post_date_gmt'] ) : false;
+			$preserve_post_date = false !== $post_date_gmt && $post_date_gmt > 0 && $post_date_gmt < time();
+		}
+
+		if ( isset( $data['post_date'] ) && ! $preserve_post_date ) {
 			$post_modified         = current_time( 'mysql' );
 			$post_modified_gmt     = current_time( 'mysql', 1 );
 			$data['post_date']     = $post_modified;
@@ -1069,6 +1301,40 @@ class ST_WXR_Importer {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Post types whose original publish date drives behaviour, not just display.
+	 *
+	 * Imported content is normally re-dated to the import time so a fresh site
+	 * does not look years old. That is wrong for post types where the publish
+	 * date is read as data: SureMembers orders the access groups restricting a
+	 * request by `post_date` whenever their priorities tie, so collapsing every
+	 * group onto the same import timestamp leaves the winner — and therefore
+	 * which restriction a blocked visitor gets — down to MySQL's undefined tie
+	 * order.
+	 *
+	 * @since 1.1.42
+	 *
+	 * @return array<int, string> Post types imported with their original dates.
+	 */
+	public static function get_preserved_post_date_post_types() {
+		// SureMembers access group ( SUREMEMBERS_POST_TYPE ), kept as a literal
+		// because the constant is unavailable when the plugin is not active.
+		$post_types = array( 'wsm_access_group' );
+
+		/**
+		 * Filters the post types that keep their original publish date on import.
+		 *
+		 * @since 1.1.42
+		 *
+		 * @param array<int, string> $post_types Post types to import as-dated.
+		 */
+		$post_types = apply_filters( 'astra_sites_preserve_post_date_post_types', $post_types );
+
+		// Cast rather than trust the filter: this feeds in_array() once per
+		// imported post, and a non-array return would fatal the whole import.
+		return (array) $post_types;
 	}
 
 	/**
@@ -1876,6 +2142,8 @@ class ST_WXR_Importer {
 	 * @param mixed $data Data to be JSON-encoded and sent in the message.
 	 */
 	public function emit_sse_message( $data ) {
+		// Progress events double as the import's liveness signal.
+		$this->refresh_wxr_import_heartbeat();
 
 		if ( wp_doing_ajax() ) {
 			echo "event: message\n";
@@ -1886,6 +2154,45 @@ class ST_WXR_Importer {
 		}
 
 		flush();
+	}
+
+	/**
+	 * Release the import lock and notify the client when the import dies on an
+	 * uncatchable fatal (out of memory, hard timeout). Registered as a shutdown
+	 * function in sse_import(); a no-op unless this request owns a still-running
+	 * import and PHP is dying on a fatal error.
+	 *
+	 * @since 1.1.39
+	 * @return void
+	 */
+	public function handle_import_shutdown() {
+		if ( ! $this->is_importing ) {
+			return;
+		}
+
+		$error = error_get_last();
+		if ( empty( $error ) || ! in_array( $error['type'], array( E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR ), true ) ) {
+			return;
+		}
+
+		ST_Importer_Log::add(
+			'fatal',
+			'Uncatchable fatal error during WXR import: ' . $error['message'],
+			array(
+				'error_type' => $error['type'],
+				'error_file' => $error['file'],
+				'error_line' => $error['line'],
+			)
+		);
+
+		$this->wxr_import_transient_cleanup();
+		$this->emit_sse_message(
+			array(
+				'action'    => 'complete',
+				'error'     => $this->get_contextual_import_error_message( $error['message'] ),
+				'technical' => $error['message'],
+			)
+		);
 	}
 	/**
 	 * Track Imported Post

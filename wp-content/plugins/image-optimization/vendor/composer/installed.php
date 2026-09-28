@@ -3,7 +3,7 @@
         'name' => 'elementor/image-optimizer',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'b4ba189a6277d5ef26e72aa0ceca592307008e4e',
+        'reference' => '40f5380a0f47676fd369fb5f679f713941f5a557',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'elementor/image-optimizer' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'b4ba189a6277d5ef26e72aa0ceca592307008e4e',
+            'reference' => '40f5380a0f47676fd369fb5f679f713941f5a557',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

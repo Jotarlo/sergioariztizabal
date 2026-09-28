@@ -106,10 +106,25 @@ class Frontend_Assets {
 		// Scripts.
 		foreach ( self::$js_assets as $handle => $name ) {
 			if ( 'form-submit' === $handle ) {
+				// No 'wp-api-fetch' dependency: the script talks to the REST API via a
+				// plain fetch() against the URLs localized below, not wp.apiFetch(),
+				// so submissions no longer depend on that second script having loaded
+				// and executed correctly. See the wp_localize_script() call below for
+				// why wp.apiFetch's middleware (root-URL resolution, nonce injection)
+				// isn't needed for either endpoint this script calls.
+				//
+				// 'wp-i18n' and 'wp-hooks' ARE required and must stay. The bundle imports
+				// __() and applyFilters(), which @wordpress/scripts externalises to the
+				// wp.i18n / window.wp.hooks globals instead of inlining — the generated
+				// assets/build/formSubmit.asset.php is the authority on this list. They
+				// used to arrive for free because 'wp-api-fetch' pulled them in through
+				// its own dependency graph; dropping that above removed them, and an
+				// undeclared wp.hooks is undefined under a JS-combining optimizer, which
+				// kills every submission with the same TypeError this change prevents.
 				wp_register_script(
 					SRFM_SLUG . '-' . $handle,
 					SRFM_URL . 'assets/build/' . $name . '.js',
-					[ 'wp-api-fetch' ],
+					[ 'wp-i18n', 'wp-hooks' ],
 					SRFM_VER,
 					true
 				);
@@ -144,11 +159,33 @@ class Frontend_Assets {
 			[
 				'site_url'          => site_url(),
 				'nonce'             => wp_create_nonce( 'wp_rest' ),
+				// Fully resolved REST endpoint URL, so the frontend can call it with a
+				// plain fetch() instead of wp.apiFetch(). rest_url() already accounts
+				// for pretty vs. plain permalinks (the latter needs a `?rest_route=`
+				// query var rather than a path segment), subdirectory installs, and
+				// multisite domain mapping — the same resolution wp.apiFetch's root-URL
+				// middleware would otherwise do from a second, independently-loaded
+				// script. submit-form's auth does not depend on that script either: it
+				// is guarded by the X-WP-Submit-Token header (Submit_Token::verify()).
+				//
+				// The after-submission URL is deliberately NOT localized. It needs the
+				// submission id and a per-submission nonce, so it is built server-side
+				// and returned in the submit response instead (see Form_Submit). A base
+				// URL here invited the client to concatenate those on, which silently
+				// produced an unroutable URL wherever rest_url() returns a
+				// `?rest_route=` form.
+				'submit_form_url'   => esc_url_raw( rest_url( 'sureforms/v1/submit-form' ) ),
 				'messages'          => $validation_messages,
 				'is_rtl'            => $is_rtl,
 				// Resolved RFC 5321 email limits so the client honors the
 				// srfm_email_field_char_limits filter instead of hardcoding 64/255.
 				'email_char_limits' => Field_Validation::get_email_char_limits(),
+				// Hint only. This value is baked into cached HTML and can be a full
+				// cache TTL out of date, so the server re-checks on every write --
+				// see Form_Submit::client_error_log_permissions_check(). Its job is
+				// to keep the browser from posting when logging is plainly off.
+				'logging_enabled'   => Client_Logger::is_enabled(),
+				'log_error_url'     => esc_url_raw( rest_url( 'sureforms/v1/log-client-error' ) ),
 			]
 		);
 
@@ -511,6 +548,8 @@ class Frontend_Assets {
 			return $template;
 		}
 
+		self::reset_printed_assets();
+
 		$file_name = 'single-form.php';
 		$template  = locate_template( $file_name );
 
@@ -520,6 +559,44 @@ class Frontend_Assets {
 		 * @since 0.0.1
 		 */
 		return apply_filters( 'srfm_form_template', $template ? $template : SRFM_DIR . '/templates/' . $file_name );
+	}
+
+	/**
+	 * Let the Instant Form template print assets a discarded render already claimed.
+	 *
+	 * `page_template()` runs on `template_include` at PHP_INT_MAX and returns the
+	 * Instant Form template regardless of what earlier filters returned. A page
+	 * builder that renders the whole page inside its own `template_include`
+	 * filter has therefore already run `wp_head()` and `wp_footer()` into an
+	 * output buffer that is about to be thrown away.
+	 *
+	 * The buffer goes, but `WP_Styles::$done` and `WP_Scripts::$done` still hold
+	 * every handle it claimed, so `do_items()` skips them when `single-form.php`
+	 * calls `wp_head()` and `wp_footer()` for real. The form arrives with no
+	 * stylesheets, and -- because `srfm-form-submit` is registered for the footer
+	 * -- no submit handler either.
+	 *
+	 * Clearing both `done` lists wholesale is the right scope rather than an
+	 * over-broad one: only the render that begins after this filter returns
+	 * reaches the browser, so nothing recorded before it was ever delivered. The
+	 * handles are re-enqueued by the second `wp_enqueue_scripts` pass, so they
+	 * print normally once `done` stops shadowing them.
+	 *
+	 * Guarded on `wp_head` having already fired, so this is inert on the ordinary
+	 * path where no builder rendered first and nothing has been printed yet.
+	 *
+	 * @since 2.12.7
+	 * @return void
+	 */
+	private static function reset_printed_assets() {
+		// No earlier wp_head() means no discarded render, so there is nothing to
+		// forget. Deny is the fallthrough: act only on the state this repairs.
+		if ( ! did_action( 'wp_head' ) ) {
+			return;
+		}
+
+		wp_styles()->done  = [];
+		wp_scripts()->done = [];
 	}
 
 }

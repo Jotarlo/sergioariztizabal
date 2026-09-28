@@ -2,9 +2,9 @@
 Contributors: brainstormforce
 Tags: forms, ai forms, contact form, form builder, payment form
 Requires at least: 6.4
-Tested up to: 7.0.2
+Tested up to: 7.1.2
 Requires PHP: 7.4
-Stable tag: 2.12.2
+Stable tag: 2.12.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -426,24 +426,25 @@ Visit the [SureForms features page](https://sureforms.com/features/?utm_source=w
 You can report security issues through our [Bug Bounty Program](https://brainstormforce.com/bug-bounty-program/). We collaborate with Patchstack to validate, triage, and handle security reports.
 
 == Changelog ==
-= 2.12.2 - 20th July 2026 =
-* New: Added a Payment History widget for Elementor and Bricks.
-* Fix: Custom CSS now applies correctly on the single form view.
-= 2.12.1 - 8th July 2026 =
-* New: Added an AI-powered quick draft flow on the dashboard to generate forms faster, with built-in usage tracking.
-* Improvement: Email fields now enforce standard RFC 5321 length limits (a 64-character local part and 255-character domain) to prevent oversized submissions, with a filter to customize the limits.
-* Fix: Reset form option not working for some fields.
-* Fix: Resolved a Stripe one-time payment error that could cause card payments to fail with an HTTP 400 response.
-* Fix: Restored bullet point visibility in the rich text admin editor so formatted lists display correctly.
-= 2.12.0 - 24th June 2026 =
-* New: Added action hooks around payment success, cancellation, and refund events so plugins such as SureMembers, LMS, and CRMs can grant or revoke access for both Stripe and PayPal.
-* Fix: Cancel Subscription now routes through the correct payment gateway so PayPal subscriptions cancel properly instead of always calling Stripe.
-* Fix: Forms with multiple Cloudflare Turnstile widgets now submit correctly instead of silently failing with a generic error.
-* Fix: Resolved an issue where the Stripe Payment Element failed to render on live accounts that have Bacs Direct Debit, Link, Cash App, or BNPL enabled.
-* Fix: Restored the form editor on WordPress 6.x sites running plugins that register older-style blocks such as ThirstyAffiliates, Ninja Forms, and Gravity Forms.
+= 2.12.8 - 25th September 2026 =
+* Improvement: The debug log no longer records routine validation stops, such as an empty required field, keeping it focused on real failures.
+* Fix: Entry Logs now record the email notification sent when a form is submitted.
+* Fix: Resolved an editor crash that prevented forms containing a Register block from opening.
+= 2.12.7 - 12th September 2026 =
+* Improvement: Submission failure notices now offer View details, so you can read and copy the full diagnostics before contacting support.
+* Improvement: The Form Checks panel now appears only when something genuinely needs attention, with clearer wording, keeping the sidebar focused.
+* Fix: After-submission actions now complete reliably when a form redirects on success.
+* Fix: Form pages now keep their styles and submit script on sites using page builders that buffer page output, such as Breakdance.
+* Fix: Form submissions no longer drop fields when a caching plugin serves an older copy of the page, so every submitted field is saved to the entry.
+* Fix: The conversion rate no longer counts submissions made by site editors while previewing a form.
+* Fix: The Edit Form icon is no longer oversized in Divi.
+* Fix: This update addressed a security bug. Props to nh4tvd from Patchstack for reporting it responsibly to our team.
+= 2.12.6 - 2nd September 2026 =
+* New: Added an Enable Logs option that records form submission failures to a downloadable file, making it easier to diagnose issues on a live site.
+* New: Added Views and Conversion Rate columns to the Forms list, so you can see how each form is performing at a glance.
+* New: SureForms now detects a missing entries database table and offers a one-click repair, so submissions start saving again without manual database work.
+* Fix: The Edit Form button no longer overlaps form fields on the front end.
+* Fix: This update addressed a security bug. Props to Patchstack for reporting it responsibly to our team.
 The full changelog is available [here](https://sureforms.com/whats-new/?utm_source=wordpress.org&utm_medium=whats_new).
 
 == Upgrade Notice ==
-
-= 2.12.2 =
-Recommended update with Payment History support for Elementor and Bricks, along with form styling fixes.

@@ -24,6 +24,12 @@ class Get_Stats extends Route_Base {
 	}
 
 	public function GET() {
+		$error = $this->verify_capability();
+
+		if ( $error ) {
+			return $error;
+		}
+
 		try {
 			return $this->respond_success_json( Stats::calculate_global_stats() );
 		} catch ( Throwable $t ) {

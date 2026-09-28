@@ -24,6 +24,12 @@ class Optimization_Status extends Route_Base {
 	}
 
 	public function POST( WP_REST_Request $request ) {
+		$error = $this->verify_capability();
+
+		if ( $error ) {
+			return $error;
+		}
+
 		try {
 			$body = json_decode( $request->get_body() );
 			$image_ids = $body->image_ids ?? null;

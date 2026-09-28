@@ -145,7 +145,8 @@ class Dashboard {
 			'mcp_rest_url'             => esc_url_raw( trailingslashit( rest_url() ) ),
 			'mcp_username'             => wp_get_current_user()->user_login,
 			'mcp_adapter_installed'    => Abilities_Registrar::is_adapter_available(),
-			'mcp_app_password_url'     => esc_url_raw( admin_url( 'profile.php' ) . '#application-passwords-section' ),
+			// Core's authorization flow pre-fills the app name and shows the generated password once.
+			'mcp_app_password_url'     => esc_url_raw( add_query_arg( 'app_name', 'SureRank MCP', admin_url( 'authorize-application.php' ) ) ),
 			'mcp_adapter_download_url' => esc_url_raw(
 				apply_filters( 'surerank_mcp_adapter_download_url', 'https://github.com/WordPress/mcp-adapter/releases/latest/download/mcp-adapter.zip' )
 			),
@@ -487,6 +488,7 @@ class Dashboard {
 				'wp_schema_pro_active'       => Helper::is_wp_schema_pro_active(),
 				'home_page_static'           => get_option( 'show_on_front', 'posts' ),
 				'page_on_front'              => (int) get_option( 'page_on_front', 0 ),
+				'author_email_notice'        => (bool) get_option( \SureRank\Inc\Upgrades\Author_Email_Cleanup::NOTICE_OPTION ),
 			]
 		);
 	}

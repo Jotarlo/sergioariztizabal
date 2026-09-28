@@ -3,7 +3,7 @@
         'name' => 'elementor/pojo-accessibility',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '44c29d85dab65a2b431b4bcf3b22dee18609e943',
+        'reference' => '1d8474c0c033b0a882df3bdfb035932dc8a0e215',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'elementor/pojo-accessibility' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '44c29d85dab65a2b431b4bcf3b22dee18609e943',
+            'reference' => '1d8474c0c033b0a882df3bdfb035932dc8a0e215',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

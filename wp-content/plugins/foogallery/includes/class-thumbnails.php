@@ -1,0 +1,363 @@
+<?php
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/*
+ * FooGallery Thumbnail Resizing class
+ */
+
+if ( !class_exists( 'FooGallery_Thumbnails' ) ) {
+
+	class FooGallery_Thumbnails {
+
+		function __construct() {
+			add_filter( 'foogallery_attachment_resize_thumbnail', array( $this, 'resize' ), 10, 3 );
+
+			add_filter( 'foogallery_test_thumb_url', array( $this, 'override_test_thumb_url' ) );
+
+			add_filter( 'foogallery_thumbnail_resize_args', array( $this, 'check_for_force_original_thumb') );
+		}
+
+		function check_for_force_original_thumb( $args ){
+			global $current_foogallery;
+
+			if ( isset( $current_foogallery ) ) {
+				$args['force_use_original_thumb'] = $current_foogallery->force_use_original_thumbs;
+			}
+
+			return $args;
+		}
+
+		function resize( $original_image_src, $args, $thumbnail_object ) {
+			global $current_foogallery;
+		    global $foogallery_last_generated_thumb_url;
+
+			$arg_defaults = array(
+				'width'                   => 0,
+				'height'                  => 0,
+				'crop'                    => true,
+				'jpeg_quality'            => foogallery_thumbnail_jpeg_quality(),
+				'thumb_resize_animations' => true,
+				'foogallery_attachment_id'=> $thumbnail_object->ID
+			);
+
+			if ( isset( $current_foogallery ) ) {
+				$arg_defaults['foogallery_id'] = $current_foogallery->ID;
+			}
+
+			$args = wp_parse_args( $args, $arg_defaults );
+
+			//allow for plugins to change the thumbnail creation args
+			$args = apply_filters( 'foogallery_thumbnail_resize_args', $args, $original_image_src, $thumbnail_object );
+
+			//check the current arguments passed in by the shortcode
+			global $current_foogallery_arguments;
+			if ( isset( $current_foogallery_arguments ) && isset( $current_foogallery_arguments['template'] ) ) {
+				$thumbnail_args = apply_filters( 'foogallery_calculate_thumbnail_dimensions-' . $current_foogallery_arguments['template'], $args, $current_foogallery_arguments );
+				$args = wp_parse_args( $thumbnail_args, $args );
+			}
+
+			//allow for plugins to change the thumbnail creation args one final time
+			$args = apply_filters( 'foogallery_thumbnail_resize_args_final', $args, $original_image_src, $thumbnail_object );
+			$requires_image_processing = ! empty( $args['watermark_options'] );
+
+			$width  = (int)$args['width'];
+			$height = (int)$args['height'];
+			$crop   = (bool)$args['crop'];
+
+			if ( 0 === $width && 0 === $height && ! $requires_image_processing ) {
+				return $original_image_src;
+			}
+
+			//we can force the use of the originally uploaded full-size image
+			$force_use_original_image = isset( $args['force_use_original_image'] ) && true === $args['force_use_original_image'];
+
+			if ( ! $requires_image_processing && $thumbnail_object->ID > 0 && $force_use_original_image ) {
+				$fullsize = wp_get_attachment_image_src( $thumbnail_object->ID, 'fullsize' );
+
+				return $fullsize[0];
+			}
+
+			//we can force the use of the original WP icon or WP-generated thumb by passing through args individually
+			$force_use_original_thumb = isset( $args['force_use_original_thumb'] ) && true === $args['force_use_original_thumb'];
+
+			if ( ! $requires_image_processing && $thumbnail_object->ID > 0 && $force_use_original_thumb ) {
+				$thumbnail_icon = wp_get_attachment_image_src( $thumbnail_object->ID, array( $width, $height ) );
+
+				return $thumbnail_icon[0];
+			}
+
+			//we can force the use of original WP thumbs by passing through args individually, or by saved settings
+			$use_original_thumbs = ( isset( $args['use_original_thumbs'] ) && true === $args['use_original_thumbs'] ) || 'on' === foogallery_get_setting( 'use_original_thumbs' );
+
+			if ( ! $requires_image_processing && $use_original_thumbs ) {
+
+				$option_thumbnail_size_w = get_option( 'thumbnail_size_w' );
+				$option_thumbnail_size_h = get_option( 'thumbnail_size_h' );
+				$option_thumbnail_crop = get_option( 'thumbnail_crop' );
+
+				//check if we are trying to get back the default thumbnail that we already have
+				if ( $thumbnail_object->ID > 0 && $width == $option_thumbnail_size_w && $height == $option_thumbnail_size_h && $crop == $option_thumbnail_crop ) {
+					$thumbnail_attributes = wp_get_attachment_image_src( $thumbnail_object->ID );
+
+					return $thumbnail_attributes[0];
+				}
+			}
+
+			//remove invalid resize args
+			if ( array_key_exists( 'height', $args ) && 0 === $args['height'] ) {
+				unset( $args['height'] );
+			}
+
+			$force_resize = false;
+
+			//only worry about upscaling if we have supplied both a width and height for cropping
+			if ( array_key_exists( 'height', $args ) && $args['height'] > 0 &&
+			     array_key_exists( 'width', $args ) && $args['width'] > 0 ) {
+				//check if we must upscale smaller images
+				if ( 'on' === foogallery_get_setting( 'thumb_resize_upscale_small' ) ) {
+					$force_resize = true;
+					if ( !isset( $args['background_fill'] ) ) {
+						$color = foogallery_get_setting( 'thumb_resize_upscale_small_color', '' );
+						if ( $color !== 'auto' && $color !== 'transparent' ) {
+							$colors = foogallery_rgb_to_color_array( $color );
+							$color  = sprintf( "%03d%03d%03d000", $colors[0], $colors[1], $colors[2] );
+						}
+						$args['background_fill'] = $color;
+					}
+				}
+			}
+
+			//do some checks to see if the image is smaller
+			if ( $requires_image_processing || $force_resize || $this->should_resize( $thumbnail_object, $args ) ) {
+				/**
+				 * Filters the source URL immediately before the active thumbnail engine runs.
+				 *
+				 * @param string               $original_image_src Original image source URL.
+				 * @param array                $args               Final thumbnail generation arguments.
+				 * @param FooGalleryAttachment $thumbnail_object   Current attachment.
+				 */
+				$thumbnail_source = apply_filters( 'foogallery_thumbnail_resize_source', $original_image_src, $args, $thumbnail_object );
+
+				//save the generated thumb url to a global so that we can use it later if needed
+				$foogallery_last_generated_thumb_url = foogallery_thumb( $thumbnail_source, $args );
+			} else {
+				$foogallery_last_generated_thumb_url = apply_filters('foogallery_thumbnail_resize_small_image', $original_image_src, $args );
+			}
+
+            return $foogallery_last_generated_thumb_url;
+		}
+
+		function should_resize($thumbnail_object, $args) {
+			$original_width = $thumbnail_object->width;
+			$original_height = $thumbnail_object->height;
+
+			if ( $original_width === $original_height && $original_height === 0 ) {
+				//we do not have the original dimensions, so assume we must resize!
+				return true;
+			}
+
+			$new_width = isset( $args['width'] ) ? $args['width'] : 0;
+			$new_height = isset( $args['height'] ) ? $args['height'] : 0;
+
+			if ( $new_width > 0 && $new_height > 0 ) {
+				return $original_width > $new_width || $original_height > $new_height;
+			} else if ( $new_width > 0 ) {
+				return $original_width > $new_width;
+			}
+			return $original_height > $new_height;
+		}
+
+		function run_thumbnail_generation_tests() {
+			if ( !foogallery_thumb_active_engine()->requires_thumbnail_generation_tests() ) {
+				return array(
+					'success' => true
+				);
+			}
+
+            $test_image_url = foogallery_test_thumb_url();
+
+			//next, generate a thumbnail
+			$test_args = array(
+				'width'                   => 20,
+				'height'                  => 20,
+				'crop'                    => true,
+				'jpeg_quality'            => foogallery_thumbnail_jpeg_quality()
+			);
+
+			//first, clear any previous cached files
+			$engine = foogallery_thumb_active_engine();
+			$engine->clear_local_cache_for_file( $test_image_url );
+
+            $generated_thumb = $engine->generate( $test_image_url, $test_args );
+
+            $success = $test_image_url !== $generated_thumb;
+			$file_info = wp_check_filetype( $test_image_url );
+
+			$test_results = array(
+			    'success' => $success,
+				'thumb' => $generated_thumb,
+				'error' => $engine->get_last_error(),
+				'file_info' => $file_info
+			);
+
+            do_action( 'foogallery_thumbnail_generation_test', $test_results );
+
+            return $test_results;
+		}
+
+		function override_test_thumb_url( $test_thumb_url ) {
+			if ( 'on' !== foogallery_get_setting( 'override_thumb_test', false ) ) {
+				$image_url = $this->find_first_image_in_media_library();
+
+				if ( $image_url !== false ) {
+					return $image_url;
+				}
+			}
+
+			//if we get here, then either, we have set the override_thumb_test setting,
+			//or there are no good images to use from the media library
+			return $test_thumb_url;
+		}
+
+		/**
+		 * Finds a suitable image in the Media Library for thumbnail test pages.
+		 *
+		 * @param int   $min_width               Minimum image width.
+		 * @param int   $min_height              Minimum image height.
+		 * @param int[] $excluded_attachment_ids Attachment IDs that must not be selected.
+		 * @param array $excluded_image_urls     Image URLs that must not be selected.
+		 * @return string|false Image URL, or false when no suitable image exists.
+		 */
+		public static function find_first_image_in_media_library( $min_width = 50, $min_height = 50, $excluded_attachment_ids = array(), $excluded_image_urls = array() ) {
+			static $cached = array();
+
+			$min_width               = absint( $min_width );
+			$min_height              = absint( $min_height );
+			$excluded_attachment_ids = array_values( array_filter( array_map( 'absint', (array) $excluded_attachment_ids ) ) );
+			$excluded_image_urls     = array_values( array_filter( array_map( 'trim', (array) $excluded_image_urls ) ) );
+			$cache_key               = $min_width . 'x' . $min_height . ':' . wp_json_encode( array( $excluded_attachment_ids, $excluded_image_urls ) );
+			$excluded_image_paths    = array();
+			foreach ( $excluded_image_urls as $excluded_image_url ) {
+				$excluded_image_path = wp_parse_url( $excluded_image_url, PHP_URL_PATH );
+				if ( ! empty( $excluded_image_path ) ) {
+					$excluded_image_paths[] = rawurldecode( $excluded_image_path );
+				}
+			}
+
+			if ( array_key_exists( $cache_key, $cached ) ) {
+				return $cached[ $cache_key ];
+			}
+
+			// Try a small set of recent images with minimal query overhead.
+			$args = array(
+				'post_type'              => 'attachment',
+				'post_mime_type'         => 'image',
+				'post_status'            => 'inherit',
+				'posts_per_page'         => 25,
+				'orderby'                => 'date',
+				'order'                  => 'DESC',
+				'fields'                 => 'ids',
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+			);
+			if ( ! empty( $excluded_attachment_ids ) ) {
+				$args['post__not_in'] = $excluded_attachment_ids;
+			}
+
+			$query_images = new WP_Query( $args );
+			if ( empty( $query_images->posts ) ) {
+				$cached[ $cache_key ] = false;
+				return $cached[ $cache_key ];
+			}
+			foreach ( $query_images->posts as $image_id ) {
+				$local_path = get_attached_file( $image_id );
+				$image_url  = wp_get_attachment_url( $image_id );
+				$image_path = is_string( $image_url ) ? wp_parse_url( $image_url, PHP_URL_PATH ) : '';
+
+				if ( empty( $image_url )
+					|| ( ! empty( $image_path ) && in_array( rawurldecode( $image_path ), $excluded_image_paths, true ) )
+					|| ! self::image_meets_minimum_test_dimensions( $image_id, $local_path, $min_width, $min_height ) ) {
+					continue;
+				}
+
+				if ( $local_path && file_exists( $local_path ) ) {
+					$cached[ $cache_key ] = $image_url;
+					return $cached[ $cache_key ];
+				}
+
+				if ( ! empty( $image_url ) ) {
+					if ( self::image_file_exists( $image_url ) || self::image_file_exists( $image_url, true ) ) {
+						$cached[ $cache_key ] = $image_url;
+						return $cached[ $cache_key ];
+					}
+				}
+			}
+
+			$cached[ $cache_key ] = false;
+			return $cached[ $cache_key ];
+		}
+
+		/**
+		 * Checks whether an attachment is large enough to be useful for test pages.
+		 *
+		 * @param int         $image_id   Attachment ID.
+		 * @param string|bool $local_path Local file path.
+		 * @param int         $min_width  Minimum width.
+		 * @param int         $min_height Minimum height.
+		 *
+		 * @return bool
+		 */
+		static function image_meets_minimum_test_dimensions( $image_id, $local_path, $min_width, $min_height ) {
+			if ( $min_width <= 0 && $min_height <= 0 ) {
+				return true;
+			}
+
+			$metadata = wp_get_attachment_metadata( $image_id );
+			if ( isset( $metadata['width'], $metadata['height'] ) ) {
+				return intval( $metadata['width'] ) >= $min_width && intval( $metadata['height'] ) >= $min_height;
+			}
+
+			if ( $local_path && file_exists( $local_path ) ) {
+				// phpcs:ignore -- Compatibility is guarded by function_exists().
+				$size = function_exists( 'wp_getimagesize' ) ? wp_getimagesize( $local_path ) : @getimagesize( $local_path );
+
+				if ( isset( $size[0], $size[1] ) ) {
+					return intval( $size[0] ) >= $min_width && intval( $size[1] ) >= $min_height;
+				}
+			}
+
+			return true;
+		}
+
+		/**
+		 * Check if a remote image file exists.
+		 *
+		 * @param  string $url The url to the remote image.
+         * @param  bool   $force_https Whether to force the url to be https.
+         *
+		 * @return bool        Whether the remote image exists.
+		 */
+		static function image_file_exists( $url, $force_https = false ) {
+			if ( $force_https ) {
+				$url = str_replace( 'http://', 'https://', $url );
+			}
+
+			$response = wp_remote_head( $url, array(
+				'timeout'           => 2,
+				'redirection'       => 0,
+				'reject_unsafe_urls' => true,
+			) );
+
+			if ( is_wp_error( $response ) ) {
+				return false;
+			}
+
+			$code = wp_remote_retrieve_response_code( $response );
+			return ( $code >= 200 && $code < 400 ) || 403 === $code;
+		}
+	}
+}

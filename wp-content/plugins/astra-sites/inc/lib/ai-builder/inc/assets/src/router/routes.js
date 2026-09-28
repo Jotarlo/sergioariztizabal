@@ -2,7 +2,6 @@
 import { __ } from '@wordpress/i18n';
 import GetStarted from '../pages/authorize-account';
 import BusinessDetails from '../pages/business-details';
-import SiteGoals from '../pages/site-goals';
 import DescribeBusiness from '../pages/describe-business';
 import BusinessContact from '../pages/business-contact';
 import Images from '../pages/images';
@@ -31,6 +30,7 @@ const steps = [
 		component: BusinessDetails,
 		layoutConfig: {
 			stepNumber: 1,
+			stepSlug: 'type',
 			name: __( "Let's Start", 'ai-builder' ),
 			description: __( 'Name, language & type', 'ai-builder' ),
 			screen: 'type',
@@ -39,22 +39,11 @@ const steps = [
 		requiredStates: [ 'businessType', 'businessName' ],
 	},
 	{
-		path: '/goals',
-		component: SiteGoals,
-		layoutConfig: {
-			stepNumber: 2,
-			name: __( 'Goals', 'ai-builder' ),
-			description: __( 'What do you want to achieve', 'ai-builder' ),
-			screen: 'goals',
-			hideCredits: false,
-		},
-		requiredStates: [],
-	},
-	{
 		path: '/description',
 		component: DescribeBusiness,
 		layoutConfig: {
-			stepNumber: 3,
+			stepNumber: 2,
+			stepSlug: 'details',
 			name: __( 'Describe', 'ai-builder' ),
 			description: __( 'Some details please', 'ai-builder' ),
 			screen: 'details',
@@ -66,7 +55,8 @@ const steps = [
 		path: '/contact-details',
 		component: BusinessContact,
 		layoutConfig: {
-			stepNumber: 4,
+			stepNumber: 3,
+			stepSlug: 'contact-details',
 			name: __( 'Contact', 'ai-builder' ),
 			description: __( 'How can people get in touch', 'ai-builder' ),
 			screen: 'contact-details',
@@ -78,7 +68,8 @@ const steps = [
 		path: '/select-images',
 		component: Images,
 		layoutConfig: {
-			stepNumber: 5,
+			stepNumber: 4,
+			stepSlug: 'images',
 			name: __( 'Images', 'ai-builder' ),
 			description: __( 'Select relevant images as needed', 'ai-builder' ),
 			screen: 'images',
@@ -92,7 +83,8 @@ const steps = [
 		path: '/design',
 		component: SelectTemplate,
 		layoutConfig: {
-			stepNumber: 6,
+			stepNumber: 5,
+			stepSlug: 'design',
 			name: __( 'Design', 'ai-builder' ),
 			description: __(
 				'Choose a structure for your website',
@@ -112,7 +104,8 @@ const steps = [
 					path: '/features',
 					component: Features,
 					layoutConfig: {
-						stepNumber: 7,
+						stepNumber: 6,
+						stepSlug: 'select-features',
 						name: __( 'Features', 'ai-builder' ),
 						description: __(
 							'Select features as you need',
@@ -132,6 +125,7 @@ const steps = [
 		component: ImportAiSite,
 		layoutConfig: {
 			stepNumber: 9,
+			stepSlug: 'done',
 			name: __( 'Done', 'ai-builder' ),
 			description: __( 'Your website is ready!', 'ai-builder' ),
 			screen: 'done',
@@ -145,6 +139,7 @@ const steps = [
 		path: '/done',
 		component: BuildDone,
 		layoutConfig: {
+			stepSlug: 'done',
 			name: __( 'Done', 'ai-builder' ),
 			description: __(
 				'Congratulations! Your website is ready!',
@@ -161,5 +156,24 @@ const steps = [
 ];
 
 export const TOTAL_STEPS = steps.length;
+
+// Funnel-only steps recorded between the last wizard screen and 'done'. They have
+// no route of their own: 'provisioning_started' fires when the wizard moves on
+// from the features (or design) screen after ZipWP accepts the create-site
+// request, and 'site_building' fires on the first build-progress status ZipWP
+// reports.
+export const PROVISIONING_STARTED_STEP = {
+	stepNumber: 7,
+	slug: 'provisioning_started',
+};
+export const SITE_BUILDING_STEP = {
+	stepNumber: 8,
+	slug: 'site_building',
+};
+
+// Highest step number in the wizard; recording it marks a build attempt as completed.
+export const FINAL_STEP_NUMBER = Math.max(
+	...steps.map( ( step ) => step?.layoutConfig?.stepNumber ?? 0 )
+);
 
 export default Object.seal( steps );

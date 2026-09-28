@@ -115,16 +115,26 @@ abstract class Route {
 	 * get_permission_callback_method
 	 *
 	 * Returns a reference to the permission callback for the method if exists or the default one if it doesn't.
+	 * Looks up inherited methods so module Route_Base manage_options gates are honoured.
+	 *
 	 * @param string $method The REST method name
 	 *
-	 * @return callable If a method called (rest-method)_permission_callback exists, returns a reference to it, otherwise
-	 * returns a reference to the default member method /permission_callback/.
+	 * @return callable If a method called (rest-method)_permission_callback exists, returns a reference to it,
+	 * otherwise get_permission_callback when present, otherwise permission_callback.
 	 */
 	public function get_permission_callback_method( string $method ): callable {
 		$method_name = strtolower( $method );
 		$permission_callback_method = $method_name . '_permission_callback';
-		$permission_callback = $this->method_exists_in_current_class( $permission_callback_method ) ? $permission_callback_method : 'permission_callback';
-		return [ $this, $permission_callback ];
+
+		if ( method_exists( $this, $permission_callback_method ) ) {
+			return [ $this, $permission_callback_method ];
+		}
+
+		if ( method_exists( $this, 'get_permission_callback' ) ) {
+			return [ $this, 'get_permission_callback' ];
+		}
+
+		return [ $this, 'permission_callback' ];
 	}
 
 	/**
@@ -351,6 +361,15 @@ abstract class Route {
 		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $nonce ) ), $name ) ) {
 			return $this->respond_error_json([
 				'message' => esc_html__( 'Invalid nonce', 'image-optimization' ),
+				'code' => 'bad_request',
+			]);
+		}
+	}
+
+	public function verify_capability( $capability = 'manage_options' ) {
+		if ( ! current_user_can( $capability ) ) {
+			return $this->respond_error_json([
+				'message' => esc_html__( 'You do not have sufficient permissions to access this data.', 'image-optimization' ),
 				'code' => 'bad_request',
 			]);
 		}

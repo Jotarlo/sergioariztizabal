@@ -89,7 +89,7 @@ abstract class Base {
 	 * @var array<string>
 	 * @since 1.8.0
 	 */
-	private $allowed_where_operators = [ 'LIKE', 'IN', '=', '!=', '>', '<', '>=', '<=' ];
+	private $allowed_where_operators = [ 'LIKE', 'IN', 'NOT IN', '=', '!=', '>', '<', '>=', '<=' ];
 
 	/**
 	 * Init class.
@@ -229,6 +229,192 @@ abstract class Base {
 	}
 
 	/**
+	 * Whether this table currently exists in the database.
+	 *
+	 * Deliberately `SHOW TABLES LIKE` rather than the existing get_columns():
+	 * `SHOW COLUMNS FROM <missing table>` is a MySQL error, so it pollutes
+	 * $wpdb->last_error, prints under WP_DEBUG_DISPLAY, and cannot tell "the table
+	 * is gone" apart from "SHOW is denied". This returns a clean empty set instead.
+	 *
+	 * esc_like() matters because $wpdb->prefix contains `_`, which is a LIKE
+	 * wildcard — without it `wp_srfm_entries` would also match `wpXsrfm_entries`.
+	 * The comparison is against the real, unescaped name so the match stays exact.
+	 *
+	 * Fails safe: any DB-level error reports the table as present. A false "your
+	 * database needs updating" on a transient connection blip is worse than a
+	 * missed one, because the notice it drives asks the user to alter their schema.
+	 *
+	 * @since 2.12.6
+	 * @return bool True when the table exists, or when existence cannot be determined.
+	 */
+	public function table_exists() {
+		$wpdb  = $this->wpdb;
+		$table = $this->get_tablename();
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema lookup; the caller owns caching, and a cached answer here would defeat the check.
+		$found = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table ) ) );
+
+		if ( ! empty( $wpdb->last_error ) ) {
+			return true;
+		}
+
+		return $found === $table;
+	}
+
+	/**
+	 * A table holding this table's data under a different prefix, if there is one.
+	 *
+	 * Changing `$table_prefix` — a manual edit, a restored dump from a site with a
+	 * different prefix, or a security plugin that renames tables and misses the ones
+	 * it does not know about — leaves our data behind under the old name while the
+	 * plugin looks for the new one. Creating a fresh empty table there would strand
+	 * every stored entry, so look for the old one first and adopt it instead.
+	 *
+	 * Refuses to guess. Returns '' unless exactly one credible candidate exists, and
+	 * only when that candidate carries every column this table's schema declares —
+	 * an unrelated table that merely ends in the same words is never touched.
+	 *
+	 * On multisite, other blogs' tables are legitimate and belong to those blogs.
+	 * Anything matching the `{base_prefix}{digits}_` pattern, or the base prefix
+	 * itself, is excluded so a subsite can never adopt another subsite's data.
+	 *
+	 * @since 2.12.6
+	 * @return string Full table name to adopt, or '' when there is nothing safe to adopt.
+	 */
+	public function find_adoptable_table() {
+		$wpdb    = $this->wpdb;
+		$correct = $this->get_tablename();
+		$needle  = 'srfm_' . $this->table_suffix;
+
+		// Wildcard on the left only: the name must *end* at the suffix, so a
+		// deliberate copy such as `wp_srfm_entries_backup` is never a candidate.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema lookup; a cached answer would defeat the check.
+		$found = $wpdb->get_col( $wpdb->prepare( 'SHOW TABLES LIKE %s', '%' . $wpdb->esc_like( $needle ) ) );
+
+		if ( ! empty( $wpdb->last_error ) || ! is_array( $found ) ) {
+			return '';
+		}
+
+		$base       = $wpdb->base_prefix;
+		$blog_table = '/^' . preg_quote( $base, '/' ) . '\d+_' . preg_quote( $needle, '/' ) . '$/';
+		$candidates = [];
+
+		foreach ( $found as $table ) {
+			$table = (string) $table;
+
+			// The table we are looking for, another blog's table, or the network's
+			// main-site table — none of these are ours to rename.
+			if ( $table === $correct || $base . $needle === $table || preg_match( $blog_table, $table ) ) {
+				continue;
+			}
+
+			$candidates[] = $table;
+		}
+
+		// More than one and we cannot tell which holds the real data. Refuse rather
+		// than pick, and let the caller fall back to creating an empty table.
+		if ( 1 !== count( $candidates ) ) {
+			return '';
+		}
+
+		return $this->has_expected_columns( $candidates[0] ) ? $candidates[0] : '';
+	}
+
+	/**
+	 * Rename a differently-prefixed table into this table's expected name.
+	 *
+	 * RENAME rather than create-and-copy: it is atomic, needs no second copy of the
+	 * data, and cannot half-succeed and leave rows in two places.
+	 *
+	 * @param string $from Full name of the table to adopt.
+	 * @since 2.12.6
+	 * @return bool True when the table is in place afterwards.
+	 */
+	public function adopt_table( $from ) {
+		$wpdb = $this->wpdb;
+		$to   = $this->get_tablename();
+
+		if ( empty( $from ) || $from === $to ) {
+			return false;
+		}
+
+		// Never rename over an existing table; the one already in place wins.
+		if ( $this->table_exists() ) {
+			return true;
+		}
+
+		$query = $wpdb->prepare( 'RENAME TABLE %1s TO %2s', str_replace( '`', '', $from ), str_replace( '`', '', $to ) ); // phpcs:ignore -- Same complex-placeholder pattern as create(): identifiers must not be quoted, and both names come from SHOW TABLES / $wpdb->prefix.
+
+		if ( ! $query ) {
+			// prepare() returned nothing usable; do not fall through to a raw query.
+			return false;
+		}
+
+		$wpdb->query( $query ); // phpcs:ignore -- We are already using prepare above, and one-off DDL has nothing to cache.
+
+		if ( ! empty( $wpdb->last_error ) ) {
+			/** This action is documented in inc/database/base.php */
+			do_action( 'srfm_db_upgrade_query_failed', $wpdb->last_error, 'RENAME TABLE', $to );
+		}
+
+		return $this->table_exists();
+	}
+
+	/**
+	 * Stamp this site's owner signature onto a table's MySQL comment.
+	 *
+	 * Best-effort: a host that refuses ALTER simply leaves the table unstamped,
+	 * which later reads as "ownership unproven" — the safe direction.
+	 *
+	 * @param string $table Full table name; defaults to this table's own name.
+	 * @since 2.12.6
+	 * @return void
+	 */
+	public function stamp_owner_signature( $table = '' ) {
+		$wpdb  = $this->wpdb;
+		$table = '' === $table ? $this->get_tablename() : $table;
+
+		$query = $wpdb->prepare( 'ALTER TABLE %1s COMMENT = %s', str_replace( '`', '', $table ), $this->get_owner_signature() ); // phpcs:ignore -- Identifier must not be quoted; the comment value is a bound, quoted string.
+
+		if ( ! $query ) {
+			return;
+		}
+
+		$wpdb->query( $query ); // phpcs:ignore -- Prepared above; one-off DDL with nothing to cache.
+	}
+
+	/**
+	 * Whether a table carries this site's owner signature.
+	 *
+	 * Gates adoption: on shared hosting a different install's identically-named,
+	 * same-schema table can be the only candidate, and renaming it in would destroy
+	 * that site's data. Deny by default — anything but an exact signature match
+	 * (including a read error, an empty comment, or a legacy table stamped before
+	 * this plugin wrote signatures) returns false.
+	 *
+	 * @param string $table Full table name to inspect.
+	 * @since 2.12.6
+	 * @return bool
+	 */
+	public function table_belongs_to_site( $table ) {
+		$wpdb = $this->wpdb;
+		$bare = str_replace( '`', '', (string) $table );
+
+		if ( '' === $bare ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema lookup; a cached answer would defeat the check.
+		$comment = $wpdb->get_var( $wpdb->prepare( 'SELECT TABLE_COMMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s', $bare ) );
+
+		if ( ! empty( $wpdb->last_error ) || ! is_string( $comment ) || '' === $comment ) {
+			return false;
+		}
+
+		return hash_equals( $this->get_owner_signature(), $comment );
+	}
+
+	/**
 	 * Conditionally returns current database charset or collate.
 	 *
 	 * @since 0.0.10
@@ -287,6 +473,27 @@ abstract class Base {
 		if ( false === $result ) {
 			// Stop DB alteration if we have any error.
 			$this->db_upgradable = false;
+
+			/**
+			 * Fires when a table could not be created.
+			 *
+			 * Column changes have announced their failures since 2.11.0 but table
+			 * creation never did — so the one failure that leaves a site with no
+			 * table at all, a host denying CREATE TABLE, was the only silent one.
+			 * Same signature as the ALTER case so one listener can handle both.
+			 *
+			 * @param string $last_error The database error.
+			 * @param string $query      The query that failed.
+			 * @param string $table_name The table it was for.
+			 * @since 2.12.6
+			 */
+			do_action( 'srfm_db_upgrade_query_failed', $wpdb->last_error, $query, $this->get_tablename() );
+		}
+
+		if ( false !== $result ) {
+			// Stamp our own table so a future adoption can prove it belongs to this
+			// site before renaming it in. See stamp_owner_signature().
+			$this->stamp_owner_signature();
 		}
 
 		return $result;
@@ -583,7 +790,12 @@ abstract class Base {
 	 * @return int|false The number of rows deleted, or false on error.
 	 */
 	public function use_delete( $where, $where_format = null ) {
-		return $this->wpdb->delete( $this->get_tablename(), $where, $where_format );
+		$result = $this->wpdb->delete( $this->get_tablename(), $where, $where_format );
+
+		// Reset cache so subsequent queries in the same request exclude the deleted row.
+		$this->cache_reset();
+
+		return $result;
 	}
 
 	/**
@@ -622,8 +834,10 @@ abstract class Base {
 		$query = rtrim( trim( $query ), ';' ) . ';';
 
 		$cached_results = $this->cache_get( $query );
-		if ( $cached_results ) {
-			// Return the cached data if exists.
+		if ( null !== $cached_results ) {
+			// Return the cached data if exists. Tested against null rather than
+			// truthiness: an empty result set is a real answer, and re-running the
+			// query for it means every no-match lookup runs once per caller.
 			return Helper::get_array_value( $cached_results );
 		}
 
@@ -711,8 +925,10 @@ abstract class Base {
 		$query = rtrim( trim( $query ), ';' ) . ';';
 
 		$cached_results = $this->cache_get( $query );
-		if ( $cached_results ) {
-			// Return the cached data if exists.
+		if ( null !== $cached_results ) {
+			// Return the cached data if exists. Tested against null rather than
+			// truthiness: a count of zero is a real answer, and the editor exclusion
+			// makes zero the common case rather than the exception.
 			return Helper::get_integer_value( $cached_results );
 		}
 
@@ -721,6 +937,57 @@ abstract class Base {
 
 		// Execute the query and return the integer count.
 		return Helper::get_integer_value( $this->cache_set( $query, $results ) );
+	}
+
+	/**
+	 * The signature this plugin stamps on tables it owns on this site.
+	 *
+	 * A random per-site token, generated once and stored in options. Embedded in
+	 * the table's MySQL comment at creation time; the comment survives RENAME, so a
+	 * table that moved under a different prefix still carries it, while an unrelated
+	 * install sharing the same database carries a different one.
+	 *
+	 * @since 2.12.6
+	 * @return string
+	 */
+	protected function get_owner_signature() {
+		$token = get_option( 'srfm_db_owner_token' );
+
+		if ( ! is_string( $token ) || '' === $token ) {
+			$token = wp_generate_password( 20, false );
+			update_option( 'srfm_db_owner_token', $token, false );
+		}
+
+		return 'srfm-owner:' . $token;
+	}
+
+	/**
+	 * Whether a table carries every column this table's schema declares.
+	 *
+	 * Guards adoption: a same-named table from an unrelated source should never be
+	 * renamed into place just because its name matches.
+	 *
+	 * @param string $table Full table name to inspect.
+	 * @since 2.12.6
+	 * @return bool
+	 */
+	protected function has_expected_columns( $table ) {
+		$wpdb = $this->wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema lookup; a cached answer would defeat the check.
+		$columns = $wpdb->get_col( $wpdb->prepare( 'SHOW COLUMNS FROM %1s', str_replace( '`', '', $table ) ) ); // phpcs:ignore -- Same complex-placeholder pattern as create(): an identifier must not be quoted, and the name comes from SHOW TABLES on this connection.
+
+		if ( ! empty( $wpdb->last_error ) || ! is_array( $columns ) ) {
+			return false;
+		}
+
+		foreach ( array_keys( $this->get_schema() ) as $column ) {
+			if ( ! in_array( $column, $columns, true ) ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -794,6 +1061,7 @@ abstract class Base {
 	 *     }
 	 * }
 	 *
+	 * @since 2.12.7 -- Added support for "NOT IN" compare.
 	 * @since 1.1.1 -- Added support for "IN" compare.
 	 * @since 0.0.13
 	 * @return string The prepared SQL WHERE clause with placeholders, or an empty string if no clauses were provided.
@@ -820,8 +1088,17 @@ abstract class Base {
 					$clause_parts = [];
 					foreach ( $value as $_key => $_value ) {
 						if ( is_int( $_key ) ) {
+							// Normalised before the allowlist test. Payments'
+							// builder upper-cases and trims, this one compared
+							// strictly -- so a caller writing 'not in' was honoured
+							// by one and silently dropped by the other. A dropped
+							// condition used to be harmless; now that NOT IN is the
+							// exclusion primitive, dropping it disables the
+							// exclusion without a word.
+							$compare = strtoupper( trim( Helper::get_string_value( $_value['compare'] ) ) );
+
 							// Check if the operator is allowed.
-							if ( ! in_array( $_value['compare'], $this->allowed_where_operators, true ) ) {
+							if ( ! in_array( $compare, $this->allowed_where_operators, true ) ) {
 								continue;
 							}
 
@@ -830,21 +1107,56 @@ abstract class Base {
 								continue;
 							}
 
-							switch ( $_value['compare'] ) {
+							switch ( $compare ) {
 								case 'LIKE':
-									$clause_parts[] = $_value['key'] . ' ' . $_value['compare'] . ' "%%' . $this->get_format_by_datatype( Helper::get_string_value( $schema[ $_value['key'] ]['type'] ) ) . '%%"';
+									// Single quotes to match WP core. Under a MySQL session with
+									// ANSI_QUOTES set (not in WP's incompatible_modes list, which
+									// only names the compound ANSI mode) a double-quoted pattern
+									// parses as an identifier and the query hard-fails, taking out
+									// both the listing and its COUNT(*).
+									$clause_parts[] = $_value['key'] . ' ' . $compare . " '%%" . $this->get_format_by_datatype( Helper::get_string_value( $schema[ $_value['key'] ]['type'] ) ) . "%%'";
 									$values[]       = $_value['value'];
 									break;
 
 								case 'IN':
+								case 'NOT IN':
+									// A scalar is a caller bug, not an empty set, and it must
+									// surface. 'NOT IN' with value 5 -- a plausible typo for
+									// [ 5 ] -- would otherwise drop the condition and exclude
+									// nobody, with no error and a green test suite, while the
+									// same typo on 'IN' fails closed. On a primitive whose only
+									// job is scoping data, that asymmetry is a hazard.
+									if ( ! is_array( $_value['value'] ) ) {
+										_doing_it_wrong(
+											__METHOD__,
+											esc_html( "{$compare} requires an array value, received " . gettype( $_value['value'] ) . '.' ),
+											'2.12.7'
+										);
+										break;
+									}
+
+									// An empty list cannot be interpolated: "col IN ()" is a syntax
+									// error that fails the whole query, listing and COUNT alike.
+									// An empty IN matches nothing, so '1 = 0' says that in any
+									// relation. An empty NOT IN excludes nothing, but a literal
+									// would be '1 = 1', and that makes an enclosing OR group
+									// unconditionally true. Dropping the condition means the same
+									// thing under AND and stays fail-closed under OR.
+									if ( [] === $_value['value'] ) {
+										if ( 'IN' === $compare ) {
+											$clause_parts[] = '1 = 0';
+										}
+										break;
+									}
+
 									// Based on the number of values and datatype, it will create WHERE clause for $wpdb::prepare method. Eg: for ID with three values column: ID IN (%d, %d, %d).
 									$datatype       = $this->get_format_by_datatype( Helper::get_string_value( $schema[ $_value['key'] ]['type'] ) );
-									$clause_parts[] = $_value['key'] . ' ' . $_value['compare'] . ' (' . implode( ', ', array_fill( 0, count( $_value['value'] ), $datatype ) ) . ')';
+									$clause_parts[] = $_value['key'] . ' ' . $compare . ' (' . implode( ', ', array_fill( 0, count( $_value['value'] ), $datatype ) ) . ')';
 									$values         = array_merge( $values, $_value['value'] );
 									break;
 
 								default:
-									$clause_parts[] = $_value['key'] . ' ' . $_value['compare'] . ' ' . $this->get_format_by_datatype( Helper::get_string_value( $schema[ $_value['key'] ]['type'] ) );
+									$clause_parts[] = $_value['key'] . ' ' . $compare . ' ' . $this->get_format_by_datatype( Helper::get_string_value( $schema[ $_value['key'] ]['type'] ) );
 									$values[]       = $_value['value'];
 									break;
 							}
@@ -871,6 +1183,14 @@ abstract class Base {
 			}
 
 			$where = ' WHERE ' . implode( ' AND ', $groups );
+
+			if ( [] === $values ) {
+				// Every branch that builds a placeholder also pushes a value, so an
+				// empty list here means the only conditions were constant ones. There
+				// is nothing for prepare() to fill, and calling it with no placeholder
+				// trips _doing_it_wrong.
+				return $where;
+			}
 
 			// Prepare the query with placeholders.
 			// @phpstan-ignore-next-line -- We are already assigning non-literal string above using "get_format_by_datatype" methods.

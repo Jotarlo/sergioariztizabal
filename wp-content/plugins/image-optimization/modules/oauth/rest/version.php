@@ -4,10 +4,8 @@ namespace ImageOptimization\Modules\Oauth\Rest;
 
 use ImageOptimization\Modules\Oauth\{
 	Classes\Route_Base,
-	Components\Connect,
 };
 
-use Throwable;
 use WP_REST_Request;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -28,6 +26,12 @@ class Version extends Route_Base {
 	}
 
 	public function GET( WP_REST_Request $request ) {
+		$error = $this->verify_capability();
+
+		if ( $error ) {
+			return $error;
+		}
+
 		return $this->respond_success_json( [
 			'version' => 1,
 		] );

@@ -95,7 +95,7 @@ class WC_Payments_Utils {
 
 			// Check if the current token is in the map.
 			if ( isset( $element_map[ $token ] ) ) {
-				$map_matched = preg_match( '/^<(\w+)(\s.+?)?\/?>$/', $element_map[ $token ], $map_matches );
+				preg_match( '/^<(\w+)(\s.+?)?\/?>$/', $element_map[ $token ], $map_matches );
 				if ( ! $map_matches ) {
 					// Should not happen with the properly formatted html as map value. Return the whole string escaped.
 					return esc_html( $text );
@@ -831,6 +831,13 @@ class WC_Payments_Utils {
 	 * @return array<string, string> Map of error code/type to translated message.
 	 */
 	public static function get_localized_messages() {
+		/**
+		 * Filters the localized, customer-facing Stripe error messages.
+		 *
+		 * @since 10.7.0
+		 *
+		 * @param array<string, string> $messages Map of Stripe error code/type to translated message.
+		 */
 		return apply_filters(
 			'wcpay_localized_messages',
 			[
@@ -1096,6 +1103,13 @@ class WC_Payments_Utils {
 	 * @return boolean
 	 */
 	public static function should_use_new_onboarding_flow(): bool {
+		/**
+		 * Filters whether the new onboarding flow should be disabled.
+		 *
+		 * @since 8.1.0
+		 *
+		 * @param bool $disabled Whether the new onboarding flow is disabled.
+		 */
 		if ( apply_filters( 'wcpay_disable_new_onboarding', defined( 'WCPAY_DISABLE_NEW_ONBOARDING' ) && WCPAY_DISABLE_NEW_ONBOARDING ) ) {
 			return false;
 		}
@@ -1295,6 +1309,36 @@ class WC_Payments_Utils {
 			default:
 			case 'general':
 				return __( 'General', 'woocommerce-payments' );
+		}
+	}
+
+	/**
+	 * Returns a merchant-friendly description of an early fraud warning fraud type.
+	 *
+	 * This mapping is duplicated in client/payment-details/timeline/mappings.ts.
+	 *
+	 * @param string $fraud_type The fraud type reported by the card network.
+	 *
+	 * @return string The description, or an empty string for unknown fraud types.
+	 */
+	public static function get_early_fraud_warning_fraud_type_description( string $fraud_type ): string {
+		switch ( $fraud_type ) {
+			case 'card_never_received':
+				return __( 'Card never received', 'woocommerce-payments' );
+			case 'fraudulent_card_application':
+				return __( 'Fraudulent card application', 'woocommerce-payments' );
+			case 'made_with_counterfeit_card':
+				return __( 'Made with counterfeit card', 'woocommerce-payments' );
+			case 'made_with_lost_card':
+				return __( 'Made with lost card', 'woocommerce-payments' );
+			case 'made_with_stolen_card':
+				return __( 'Made with stolen card', 'woocommerce-payments' );
+			case 'misc':
+				return __( 'Other', 'woocommerce-payments' );
+			case 'unauthorized_use_of_card':
+				return __( 'Unauthorized use of card', 'woocommerce-payments' );
+			default:
+				return '';
 		}
 	}
 

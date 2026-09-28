@@ -1,0 +1,455 @@
+<?php
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+if ( !class_exists( 'FooGallery_Simple_Portfolio_Gallery_Template' ) ) {
+
+	define('FOOGALLERY_SIMPLE_PORTFOLIO_GALLERY_TEMPLATE_URL', plugin_dir_url( __FILE__ ));
+
+	class FooGallery_Simple_Portfolio_Gallery_Template {
+
+		const template_id = 'simple_portfolio';
+
+		/**
+		 * Wire up everything we need to run the extension
+		 */
+		function __construct() {
+			add_filter( 'foogallery_gallery_templates', array( $this, 'add_template' ) );
+			add_filter( 'foogallery_gallery_templates_files', array( $this, 'register_myself' ) );
+
+			//add extra fields to the templates
+			add_filter( 'foogallery_override_gallery_template_fields-simple_portfolio', array( $this, 'adjust_fields' ), 101, 2 );
+
+			//override specific settings when saving the gallery
+			add_filter( 'foogallery_save_gallery_settings-simple_portfolio', array( $this, 'override_settings'), 10, 3 );
+
+			//build up the thumb dimensions from some arguments
+			add_filter( 'foogallery_calculate_thumbnail_dimensions-simple_portfolio', array( $this, 'build_thumbnail_dimensions_from_arguments' ), 10, 2 );
+
+			//build up the thumb dimensions on save
+			add_filter( 'foogallery_template_thumbnail_dimensions-simple_portfolio', array( $this, 'get_thumbnail_dimensions' ), 10, 2 );
+
+            //build up the arguments needed for rendering this template
+            add_filter( 'foogallery_gallery_template_arguments-simple_portfolio', array( $this, 'build_gallery_template_arguments' ) );
+
+			add_filter( 'foogallery_build_class_attribute', array( $this, 'override_class_attributes' ), 99, 2 );
+
+			//remove preset choices from simple portfolio
+            add_filter( 'foogallery_override_gallery_template_fields-simple_portfolio', array( $this, 'remove_preset_choices_for_simple_portfolio' ), 10, 2 );
+
+			// Adjust the default settings for this layout
+			add_filter( 'foogallery_override_gallery_template_fields_defaults-simple_portfolio', array( $this, 'field_defaults' ), 10, 1 );
+
+			// add a style block for the gallery based on the field settings.
+			add_action( 'foogallery_template_style_block-simple_portfolio', array( $this, 'add_css' ), 10, 2 );
+        }
+
+		/**
+		 * Register myself so that all associated JS and CSS files can be found and automatically included
+		 * @param $extensions
+		 *
+		 * @return array
+		 */
+		function register_myself( $extensions ) {
+			$extensions[] = __FILE__;
+			return $extensions;
+		}
+
+		/**
+		 * Add our gallery template to the list of templates available for every gallery
+		 * @param $gallery_templates
+		 *
+		 * @return array
+		 */
+		function add_template( $gallery_templates ) {
+			$gallery_templates[self::template_id] = array(
+                'slug'        => self::template_id,
+                'name'        => __( 'Portfolio', 'foogallery' ),
+				'preview_support' => true,
+				'common_fields_support' => true,
+                'lazyload_support' => true,
+				'paging_support' => true,
+				'mandatory_classes' => 'fg-simple_portfolio',
+				'thumbnail_dimensions' => true,
+				'filtering_support' => true,
+                'enqueue_core' => true,
+				'icon' => '<svg viewBox="0 0 24 24">
+        <!-- top row -->
+        <rect x="3" y="3" width="8" height="5"/>
+        <rect x="13" y="3" width="8" height="5"/>
+        <!-- captions -->
+        <rect x="3" y="8" width="8" height="2"/>
+        <rect x="13" y="8" width="8" height="2"/>
+        <!-- bottom row -->
+        <rect x="3" y="13" width="8" height="5"/>
+        <rect x="13" y="13" width="8" height="5"/>
+        <!-- captions -->
+        <rect x="3" y="18" width="8" height="2"/>
+        <rect x="13" y="18" width="8" height="2"/>
+      </svg>',
+                'fields'	  => array(
+                    array(
+                        'id'	  => 'help',
+                        'section_id' => 'general',
+                        'type'	  => 'html',
+                        'help'	  => true,
+                        'desc'	  => __( 'The Portfolio template works best when you have <strong>captions and descriptions</strong> set for every attachment in the gallery. To change captions and descriptions, simply hover over the thumbnail above and click the "i" icon.', 'foogallery' ),
+                    ),
+                    array(
+                        'id'      => 'thumbnail_dimensions',
+                        'title'   => __( 'Thumbnail Size', 'foogallery' ),
+	                        'desc'    => __( 'Choose the size of your thumbnails. On mobile, set the display width in pixels, or use 0 for the desktop width. Height scales proportionally.', 'foogallery' ),
+	                        'section_id' => 'general',
+	                        'alias'   => 'thumbnail_size',
+	                        'type'    => 'thumb_size_no_crop',
+						'for'     => 'thumbnail_dimensions_width',
+                        'default' => array(
+                            'width' => 250,
+                            'height' => 200
+                        ),
+						'mobile' => array(
+							'width_only' => true,
+							'for'        => 'mobile_thumbnail_dimensions_width',
+							'default'    => array( 'width' => 0 ),
+						),
+						'row_data'=> array(
+							'data-foogallery-change-selector' => 'input',
+							'data-foogallery-preview' => 'shortcode'
+						)
+                    ),
+                    array(
+                        'id'      => 'thumbnail_link',
+                        'title'   => __( 'Thumbnail Link', 'foogallery' ),
+                        'section_id' => 'general',
+                        'default' => 'image',
+                        'type'    => 'thumb_link',
+                    ),
+                    array(
+                        'id'      => 'lightbox',
+                        'type'    => 'lightbox',
+                        'section_id' => 'lightbox',
+                    ),
+                    array(
+                        'id'      => 'gutter',
+                        'title'   => __( 'Thumbnail Gap', 'foogallery' ),
+                        'desc'    => __( 'The spacing or gap between each thumbnail in the gallery.', 'foogallery' ),
+						'section_id' => 'general',
+                        'type'    => 'slider',
+                        'default' => 5,
+                        'step'    => 1,
+                        'min'     => 0,
+                        'max'     => 100,
+						'mobile'  => true,
+						'row_data'=> array(
+							'data-foogallery-change-selector' => 'range-input',
+							'data-foogallery-preview' => 'shortcode',
+						)
+                    ),
+                    array(
+                        'id'      => 'align',
+                        'title'   => __( 'Alignment', 'foogallery' ),
+                        'desc'    => __( 'The horizontal alignment of the thumbnails inside the gallery.', 'foogallery' ),
+                        'section_id' => 'general',
+                        'type'    => 'radio',
+                        'default' => 'center',
+                        'choices' => array(
+                            'left' => __( 'Left', 'foogallery' ),
+                            'center' => __( 'Center', 'foogallery' ),
+                            'right' => __( 'Right', 'foogallery' ),
+                        ),
+                        'row_data'=> array(
+                            'data-foogallery-change-selector' => 'input:radio',
+                            'data-foogallery-value-selector' => 'input:checked',
+                            'data-foogallery-preview' => 'shortcode',
+                        )
+                    )
+                ),
+			);
+
+			return $gallery_templates;
+		}
+
+		/**
+		 * Add thumbnail fields to the gallery template
+		 *
+		 * @uses "foogallery_override_gallery_template_fields"
+		 * @param $fields
+		 * @param $template
+		 *
+		 * @return array
+		 */
+		function adjust_fields( $fields, $template ) {
+			$new_fields[] = array(
+				'id'      => 'caption_position',
+				'title' => __('Caption Position', 'foogallery'),
+				'desc' => __('Where the captions are displayed in relation to the thumbnail.', 'foogallery'),
+				'section_id' => 'captions',
+				'default' => '',
+				'type'    => 'radio',
+				'choices' => array(
+					'' => __( 'Below', 'foogallery' ),
+					'fg-captions-top' => __( 'Above', 'foogallery' )
+				),
+				'row_data'=> array(
+					'data-foogallery-change-selector' => 'input:radio',
+					'data-foogallery-value-selector' => 'input:checked',
+					'data-foogallery-preview' => 'shortcode'
+				)
+			);
+
+			$index_of_captions_field = 0;
+			$index = 0;
+
+			//update specific fields
+			foreach ( $fields as &$field ) {
+				$field         = foogallery_normalize_gallery_setting_field_sections( $field );
+				$field_section = $field['section_id'];
+
+				if ( $index_of_captions_field === 0 && 'captions' === $field_section ) {
+					$index_of_captions_field = $index;
+				}
+
+				++$index;
+
+				if ( 'hover_effect_caption_visibility' === $field['id'] 
+					|| 'caption_visibility_no_hover_effect' === $field['id'] ) {
+					$field['choices'] = array(
+						'fg-caption-always' => __( 'Always Visible', 'foogallery' ),
+					);
+					$field['row_data'] = array(
+						'data-foogallery-change-selector' => 'input:radio',
+						'data-foogallery-hidden' => true,
+						'data-foogallery-preview' => 'shortcode'
+					);
+				} else if ( 'hover_effect_help' == $field['id'] ||
+                            'captions_help' == $field['id']) {
+					$field['row_data'] = array(
+						'data-foogallery-hidden' => true
+					);
+				} else if ( 'theme' === $field['id'] ) {
+					$field['choices'] = array(
+						'fg-light'  => __( 'Light', 'foogallery' ),
+						'fg-dark'   => __( 'Dark', 'foogallery' ),
+						'fg-transparent' => __( 'Transparent', 'foogallery' ),
+						'fg-custom' => __( 'Custom', 'foogallery' )
+					);
+				}
+			}
+
+			array_splice( $fields, $index_of_captions_field, 0, $new_fields );
+
+			return $fields;
+		}
+
+		/**
+		 * Override specific settings so that the gallery template will always work
+		 *
+		 * @param $settings
+		 * @param $post_id
+		 * @param $form_data
+		 *
+		 * @return mixed
+		 */
+		function override_settings($settings, $post_id, $form_data) {
+			$settings['simple_portfolio_hover_effect_caption_visibility'] = 'fg-caption-always';
+
+			return $settings;
+		}
+
+		/**
+		 * Builds thumb dimensions from arguments
+		 *
+		 * @param array $dimensions
+		 * @param array $arguments
+		 *
+		 * @return mixed
+		 */
+		function build_thumbnail_dimensions_from_arguments( $dimensions, $arguments ) {
+            if ( array_key_exists( 'thumbnail_dimensions', $arguments) ) {
+				$dimensions = array(
+                    'height' => intval($arguments['thumbnail_dimensions']['height']),
+                    'width' => intval($arguments['thumbnail_dimensions']['width']),
+                    'crop' => '1'
+                );
+
+				if ( 'on' === foogallery_get_setting('enable_legacy_thumb_cropping') ) {
+					$dimensions['crop'] = '0';
+				}
+
+				return $dimensions;
+            }
+            return null;
+		}
+
+		/**
+		 * Get the thumb dimensions arguments saved for the gallery for this gallery template
+		 *
+		 * @param array $dimensions
+		 * @param FooGallery $foogallery
+		 *
+		 * @return mixed
+		 */
+		function get_thumbnail_dimensions( $dimensions, $foogallery ) {
+			$dimensions = $foogallery->get_meta( 'simple_portfolio_thumbnail_dimensions', array(
+				'width' => 250,
+				'height' => 200,
+				'crop' => true
+			) );
+
+			if ( 'on' === foogallery_get_setting('enable_legacy_thumb_cropping') ) {
+				$dimensions['crop'] = false;
+			} else {
+				$dimensions['crop'] = true;
+			}
+			return $dimensions;
+		}
+
+        /**
+         * Build up the arguments needed for rendering this gallery template
+         *
+         * @param $args
+         * @return array
+         */
+        function build_gallery_template_arguments( $args ) {
+            $args = foogallery_gallery_template_setting( 'thumbnail_dimensions', array() );
+            $args['crop'] = '1'; //we now force thumbs to be cropped
+			if ( 'on' === foogallery_get_setting('enable_legacy_thumb_cropping') ) {
+				$args['crop'] = '0';
+			}
+            $args['link'] = foogallery_gallery_template_setting( 'thumbnail_link', 'image' );
+            $args['image_attributes'] = array(
+                'class'  => 'bf-img',
+                'height' => $args['height']
+            );
+            $args['link_attributes'] = array( 'class' => 'foogallery-thumb' );
+
+            return $args;
+        }
+
+		/**
+		 * Override the classes for the captions visibility
+		 *
+		 * @param $classes array
+		 * @param $gallery FooGallery
+		 *
+		 * @return array
+		 */
+		function override_class_attributes( $classes, $gallery ) {
+			if ( self::template_id === $gallery->gallery_template ) {
+				if ( ( $key = array_search( 'fg-caption-hover', $classes ) ) !== false) {
+					unset( $classes[$key] );
+				}
+
+				$classes[] = 'fg-caption-always';
+			}
+
+			return $classes;
+		}
+
+		/**
+		 * @param $gallery
+		 *
+		 * @return bool|mixed|void
+		 */
+		function is_simple_portfolio_gallery_template( $gallery ) {
+			if ( self::template_id === $gallery->gallery_template ) {
+				return true;
+			}
+
+			return apply_filters( 'foogallery_is_simple_portfolio_gallery_template', false, $gallery );
+		}
+
+		/**
+		 * Add css to the page for the gallery
+		 *
+		 * @param $gallery FooGallery
+		 */
+		function add_css( $css, $gallery ) {
+			$id = $gallery->container_id();
+			$gutter = intval( foogallery_gallery_template_setting( 'gutter', 5 ) );
+			$alignment = foogallery_gallery_template_setting( 'align', 'center' );
+			if ( $alignment === 'left' ) {
+				$alignment = 'flex-start';
+			} else if ( $alignment === 'right' ) {
+				$alignment = 'flex-end';
+			}
+			$thumb_width = 250;
+			$thumbnail_dimensions = foogallery_gallery_template_setting( 'thumbnail_dimensions', array() );
+			if ( array_key_exists( 'width', $thumbnail_dimensions ) ) {
+				$thumb_width = intval( $thumbnail_dimensions['width'] );
+			}
+			$css[] = '#' . $id . '.fg-simple_portfolio { justify-content: ' . $alignment . '; --fg-gutter: ' . $gutter . 'px; }';
+			$css[] = '#' . $id . '.fg-simple_portfolio .fg-item { flex-basis: ' . $thumb_width . 'px; }';
+
+			$mobile_dimensions = foogallery_gallery_template_mobile_setting( 'mobile_thumbnail_dimensions', null );
+			$mobile_width      = is_array( $mobile_dimensions ) ? ( $mobile_dimensions['width'] ?? null ) : null;
+			if ( is_scalar( $mobile_width ) && is_numeric( trim( (string) $mobile_width ) ) && intval( $mobile_width ) > 0 ) {
+				$mobile_rule = '#' . $id . '.fg-simple_portfolio .fg-item { flex-basis: ' . intval( $mobile_width ) . 'px; }';
+				$css[]       = '@media only screen and (max-width: ' . foogallery_get_mobile_size() . 'px) { ' . $mobile_rule . ' }';
+				$css[]       = '.foogallery-preview-wrapper.viewport-mobile ' . $mobile_rule;
+			}
+
+			$mobile_gutter = foogallery_gallery_template_mobile_setting( 'mobile_gutter', null );
+			if ( is_scalar( $mobile_gutter ) && is_numeric( trim( (string) $mobile_gutter ) ) ) {
+				$mobile_gutter = max( 0, min( 100, intval( $mobile_gutter ) ) );
+				$mobile_rule   = '#' . $id . '.fg-simple_portfolio { --fg-gutter: ' . $mobile_gutter . 'px; }';
+				$css[]         = '@media only screen and (max-width: ' . foogallery_get_mobile_size() . 'px) { ' . $mobile_rule . ' }';
+				$css[]         = '.foogallery-preview-wrapper.viewport-mobile ' . $mobile_rule;
+			}
+			return $css;
+		}
+
+		/**
+         * Remove the preset choices from the simple portfolio template
+         *
+         * @uses "foogallery_override_gallery_template_fields"
+         * @param $fields
+         * @param $template
+         *
+         * @return array
+         */
+        function remove_preset_choices_for_simple_portfolio( $fields, $template ) {
+            foreach ($fields as &$field) {
+                if ( 'hover_effect_type' === $field['id'] ) {
+                    $new_choices = $field['choices'];
+                    foreach ($field['choices'] as $choice => $choice_name) {
+                        if ( 'preset' === $choice ) {
+                            unset( $new_choices[$choice] );
+                        }
+                    }
+                    $field['choices'] = $new_choices;
+                }
+            }
+
+            return $fields;
+        }
+
+		/**
+		 * Return an array of field defaults for the template
+		 *
+		 * @param $field_defaults
+		 *
+		 * @return string[]
+		 */
+		function field_defaults( $field_defaults ) {
+			return array_merge( $field_defaults, array(
+				'theme' => 'fg-dark',
+				'hover_effect_caption_visibility' => 'fg-caption-always',
+				'caption_visibility_no_hover_effect' => 'fg-caption-always',
+				'border_size' => 'fg-border-medium',
+				'rounded_corners' => '',
+				'drop_shadow' => '',
+				'inner_shadow' => '',
+				'loaded_effect' => 'fg-loaded-swing-down',
+				'hover_effect_icon' => 'fg-hover-plus3',
+				'hover_effect_scale' => '',
+				'hover_effect_transition' => 'fg-hover-slide-down',
+				'captions_limit_length' => 'clamp',
+				'caption_title_clamp' => '2',
+				'caption_desc_clamp' => '2',
+			) );
+		}
+	}
+}

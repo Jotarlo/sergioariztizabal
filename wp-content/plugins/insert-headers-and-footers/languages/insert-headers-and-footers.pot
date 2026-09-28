@@ -2,32 +2,36 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WPCode Lite 2.3.8\n"
+"Project-Id-Version: WPCode Lite 2.3.9\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/insert-headers-and-footers\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-23T12:10:11+00:00\n"
+"POT-Creation-Date: 2026-08-27T07:42:29+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.5.0\n"
+"X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: insert-headers-and-footers\n"
 
 #. Plugin Name of the plugin
+#: ihaf.php
 msgid "WPCode Lite"
 msgstr ""
 
 #. Plugin URI of the plugin
 #. Author URI of the plugin
+#: ihaf.php
 msgid "https://www.wpcode.com/"
 msgstr ""
 
 #. Description of the plugin
+#: ihaf.php
 msgid "Easily add code snippets in WordPress. Insert scripts to the header and footer, add PHP code snippets with conditional logic, insert ads pixel, custom content, and more."
 msgstr ""
 
 #. Author of the plugin
+#: ihaf.php
 #: includes/admin/pages/class-wpcode-admin-page-live-preview.php:138
 #: includes/class-wpcode-library.php:603
 msgid "WPCode"
@@ -48,6 +52,7 @@ msgstr ""
 
 #. Translators: %2$s is the action that they were trying to perform, either activated or deactivated. %1$s is the error message why the action failed.
 #: includes/admin/admin-ajax-handlers.php:63
+#, php-format
 msgid "Snippet not %2$s, the following error was encountered: %1$s"
 msgstr ""
 
@@ -69,6 +74,7 @@ msgstr ""
 
 #. Translators: this an auto-generated title for when a snippet is saved from the generator.
 #: includes/admin/admin-ajax-handlers.php:234
+#, php-format
 msgid "Generated Snippet %s"
 msgstr ""
 
@@ -91,6 +97,7 @@ msgstr ""
 
 #. Translators: %d is the post id.
 #: includes/admin/admin-ajax-handlers.php:463
+#, php-format
 msgid "Untitled (#%d)"
 msgstr ""
 
@@ -364,11 +371,13 @@ msgstr ""
 
 #. Translators: Placeholder for the category name.
 #: includes/admin/class-wpcode-docs.php:164
+#, php-format
 msgid "View All %s Docs"
 msgstr ""
 
 #. translators: %1$s and %2$s are strong HTML tags, %3$s and %4$s are links.
 #: includes/admin/class-wpcode-features-notices.php:53
+#, php-format
 msgid "%1$sPro Tip:%2$s Did you know all WPCode premium plans include access to a private snippet library? Moving snippets from one site to another has never been easier. %3$sUpgrade today with a special discount%4$s."
 msgstr ""
 
@@ -407,6 +416,7 @@ msgstr ""
 
 #. Translators: Human-Readable time to display.
 #: includes/admin/class-wpcode-notifications.php:287
+#, php-format
 msgid "%1$s ago"
 msgstr ""
 
@@ -433,6 +443,7 @@ msgstr ""
 
 #. translators: %d snippet count.
 #: includes/admin/class-wpcode-packs-view.php:188
+#, php-format
 msgid "%d snippet bundled into this pack."
 msgid_plural "%d snippets bundled into this pack."
 msgstr[0] ""
@@ -440,6 +451,7 @@ msgstr[1] ""
 
 #. translators: %d more snippets count.
 #: includes/admin/class-wpcode-packs-view.php:221
+#, php-format
 msgid "+%d more"
 msgstr ""
 
@@ -472,6 +484,7 @@ msgstr ""
 
 #. translators: %d snippet count.
 #: includes/admin/class-wpcode-packs-view.php:334
+#, php-format
 msgid "%d snippet"
 msgid_plural "%d snippets"
 msgstr[0] ""
@@ -479,6 +492,7 @@ msgstr[1] ""
 
 #. translators: %s install date.
 #: includes/admin/class-wpcode-packs-view.php:345
+#, php-format
 msgid "Installed %s"
 msgstr ""
 
@@ -488,6 +502,7 @@ msgstr ""
 
 #. translators: %1$d active, %2$d total.
 #: includes/admin/class-wpcode-packs-view.php:366
+#, php-format
 msgid "%1$d of %2$d active"
 msgstr ""
 
@@ -501,6 +516,7 @@ msgstr ""
 
 #. translators: %s: comma-separated list of other packs that also include this snippet.
 #: includes/admin/class-wpcode-packs-view.php:408
+#, php-format
 msgid "Shared with %s"
 msgstr ""
 
@@ -515,18 +531,22 @@ msgid "Remove pack"
 msgstr ""
 
 #: includes/admin/class-wpcode-packs-view.php:456
+#, php-format
 msgid "Install %s?"
 msgstr ""
 
 #: includes/admin/class-wpcode-packs-view.php:457
+#, php-format
 msgid "Installing %s…"
 msgstr ""
 
 #: includes/admin/class-wpcode-packs-view.php:458
+#, php-format
 msgid "%s installed"
 msgstr ""
 
 #: includes/admin/class-wpcode-packs-view.php:459
+#, php-format
 msgid "%1$d snippets · %2$s · Free in Lite"
 msgstr ""
 
@@ -539,6 +559,7 @@ msgid "Creating snippets in your library…"
 msgstr ""
 
 #: includes/admin/class-wpcode-packs-view.php:462
+#, php-format
 msgid "All %d snippets activated"
 msgstr ""
 
@@ -548,6 +569,7 @@ msgstr ""
 
 #. translators: %1$d: number activated, %2$d: total in the pack.
 #: includes/admin/class-wpcode-packs-view.php:465
+#, php-format
 msgid "%1$d of %2$d snippets activated"
 msgstr ""
 
@@ -572,6 +594,7 @@ msgid "Open pack dashboard"
 msgstr ""
 
 #: includes/admin/class-wpcode-packs-view.php:472
+#, php-format
 msgid "Remove %1$s? This will delete all %2$d snippets it created."
 msgstr ""
 
@@ -634,18 +657,21 @@ msgstr ""
 
 #. translators: $1$s - WPCode plugin name; $2$s - WP.org review link; $3$s - WP.org review link.
 #: includes/admin/class-wpcode-review.php:193
+#, php-format
 msgid "Please rate %1$s <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">&#9733;&#9733;&#9733;&#9733;&#9733;</a> on <a href=\"%3$s\" target=\"_blank\" rel=\"noopener\">WordPress.org</a> to help us spread the word. Thank you from the WPCode team!"
 msgstr ""
 
 #. Translators: Support link tag starts with url and Support link tag ends.
 #: includes/admin/class-wpcode-skin-legacy.php:92
 #: includes/admin/class-wpcode-skin.php:92
+#, php-format
 msgid "There was an error installing the addon. Please try again. If you are still having issues, please %1$scontact our support%2$s team."
 msgstr ""
 
 #. Translators: The name of the addon that can't be installed, Support link tag starts with url and Support link tag ends.
 #: includes/admin/class-wpcode-skin-legacy.php:105
 #: includes/admin/class-wpcode-skin.php:106
+#, php-format
 msgid "There was an error installing the addon, %1$s. Please try again. If you are still having issues, please %2$scontact our support%3$s team. "
 msgstr ""
 
@@ -809,6 +835,7 @@ msgstr ""
 
 #. translators: %s: The error message from the API.
 #: includes/admin/pages/class-wpcode-admin-page-click.php:175
+#, php-format
 msgid "We encountered the following error loading your snippet: %s"
 msgstr ""
 
@@ -826,6 +853,7 @@ msgstr ""
 
 #. Translators: %s: The snippet name.
 #: includes/admin/pages/class-wpcode-admin-page-click.php:199
+#, php-format
 msgid "Snippet title: %s"
 msgstr ""
 
@@ -859,6 +887,7 @@ msgstr ""
 
 #. Translators: %d - Trashed snippets count.
 #: includes/admin/pages/class-wpcode-admin-page-code-snippets.php:369
+#, php-format
 msgid "%d snippet was successfully moved to Trash."
 msgid_plural "%d snippets were successfully moved to Trash."
 msgstr[0] ""
@@ -866,6 +895,7 @@ msgstr[1] ""
 
 #. translators: %d - Restored from trash snippets count.
 #: includes/admin/pages/class-wpcode-admin-page-code-snippets.php:377
+#, php-format
 msgid "%d snippet was successfully restored."
 msgid_plural "%d snippet were successfully restored."
 msgstr[0] ""
@@ -873,6 +903,7 @@ msgstr[1] ""
 
 #. translators: %d - Deleted snippets count.
 #: includes/admin/pages/class-wpcode-admin-page-code-snippets.php:385
+#, php-format
 msgid "%d snippet was successfully permanently deleted."
 msgid_plural "%d snippets were successfully permanently deleted."
 msgstr[0] ""
@@ -880,6 +911,7 @@ msgstr[1] ""
 
 #. translators: %d - Activated snippets count.
 #: includes/admin/pages/class-wpcode-admin-page-code-snippets.php:395
+#, php-format
 msgid "%d snippet was successfully activated."
 msgid_plural "%d snippets were successfully activated."
 msgstr[0] ""
@@ -887,6 +919,7 @@ msgstr[1] ""
 
 #. translators: %d - Failed to activate snippets count.
 #: includes/admin/pages/class-wpcode-admin-page-code-snippets.php:404
+#, php-format
 msgid "%d snippet was not activated due to an error."
 msgid_plural "%d snippets were not activated due to errors."
 msgstr[0] ""
@@ -894,6 +927,7 @@ msgstr[1] ""
 
 #. translators: %d - Deactivated snippets count.
 #: includes/admin/pages/class-wpcode-admin-page-code-snippets.php:413
+#, php-format
 msgid "%d snippet was successfully deactivated."
 msgid_plural "%d snippets were successfully deactivated."
 msgstr[0] ""
@@ -1014,18 +1048,21 @@ msgstr ""
 #. translators: %s is the plugin name.
 #: includes/admin/pages/class-wpcode-admin-page-duplicator.php:116
 #: includes/admin/pages/class-wpcode-admin-page-search-replace.php:114
+#, php-format
 msgid "Install and Activate %s"
 msgstr ""
 
 #. translators: %s is the plugin name.
 #: includes/admin/pages/class-wpcode-admin-page-duplicator.php:125
 #: includes/admin/pages/class-wpcode-admin-page-search-replace.php:123
+#, php-format
 msgid "Install %s from the WordPress.org plugin repository."
 msgstr ""
 
 #. translators: %s is the plugin name.
 #: includes/admin/pages/class-wpcode-admin-page-duplicator.php:138
 #: includes/admin/pages/class-wpcode-admin-page-search-replace.php:136
+#, php-format
 msgid "Install %s"
 msgstr ""
 
@@ -1039,6 +1076,7 @@ msgstr ""
 
 #. Translators: %s is the name of the file.
 #: includes/admin/pages/class-wpcode-admin-page-file-editor.php:81
+#, php-format
 msgid "%s Editor"
 msgstr ""
 
@@ -1048,11 +1086,13 @@ msgstr ""
 
 #. Translators: %s is the name of the file.
 #: includes/admin/pages/class-wpcode-admin-page-file-editor.php:107
+#, php-format
 msgid "Use this area to edit your %s file."
 msgstr ""
 
 #. Translators: %1$s is the opening link tag, %2$s is the closing link tag.
 #: includes/admin/pages/class-wpcode-admin-page-file-editor.php:116
+#, php-format
 msgid "The file contents above will be used to generated a dynamic file. There is no physical file created on your server. %1$sLearn more%2$s."
 msgstr ""
 
@@ -1085,6 +1125,7 @@ msgstr ""
 
 #. translators: %1$s and %2$s are <u> tags.
 #: includes/admin/pages/class-wpcode-admin-page-file-editor.php:244
+#, php-format
 msgid "With this powerful tool, you can easily customize crucial files like %1$sads.txt%2$s, %1$sapp-ads.txt%2$s, %1$srobots.txt%2$s, and %1$sservice-worker.js%2$s right from your WordPress admin."
 msgstr ""
 
@@ -1125,11 +1166,13 @@ msgstr ""
 
 #. Translators: gets replaced with the snippet title.
 #: includes/admin/pages/class-wpcode-admin-page-generator.php:104
+#, php-format
 msgid "You are now editing the generated snippet: \"%s\". Updating the snippet will override any edits you made to the code."
 msgstr ""
 
 #. Translators: gets replaced with the generator name.
 #: includes/admin/pages/class-wpcode-admin-page-generator.php:117
+#, php-format
 msgid "%s Generator"
 msgstr ""
 
@@ -1197,16 +1240,19 @@ msgstr ""
 
 #. translators: %s: The `<head>` tag
 #: includes/admin/pages/class-wpcode-admin-page-headers-footers.php:158
+#, php-format
 msgid "These scripts will be printed in the %s section."
 msgstr ""
 
 #. translators: %s: The `<head>` tag
 #: includes/admin/pages/class-wpcode-admin-page-headers-footers.php:163
+#, php-format
 msgid "These scripts will be printed just below the opening %s tag."
 msgstr ""
 
 #. translators: %s: The `</body>` tag
 #: includes/admin/pages/class-wpcode-admin-page-headers-footers.php:168
+#, php-format
 msgid "These scripts will be printed above the closing %s tag."
 msgstr ""
 
@@ -1383,6 +1429,7 @@ msgstr ""
 
 #. translators: %1$s and %2$s are <u> tags.
 #: includes/admin/pages/class-wpcode-admin-page-pixel.php:68
+#, php-format
 msgid "While you can always add pixels manually using code snippets, our Conversion Pixels addon helps you %1$ssave time%2$s while %1$sreducing errors%2$s. It lets you properly implement Facebook, Google, Pinterest, TikTok, Snapchat and OpenAI ads tracking with deep integrations for eCommerce events, interaction measurement, and more. This addon is available on WPCode Plus plan or higher."
 msgstr ""
 
@@ -1445,6 +1492,7 @@ msgstr ""
 
 #. translators: %1$s and %2$s are the opening and closing anchor tags.
 #: includes/admin/pages/class-wpcode-admin-page-pixel.php:143
+#, php-format
 msgid "You can find your Facebook Pixel ID in the Facebook Ads Manager. %1$sRead our step by step directions%2$s. "
 msgstr ""
 
@@ -1494,6 +1542,7 @@ msgstr ""
 
 #. translators: %1$s and %2$s are the opening and closing anchor tags.
 #: includes/admin/pages/class-wpcode-admin-page-pixel.php:205
+#, php-format
 msgid "You can find your Google Analytics ID in the Google Analytics Admin panel. %1$sRead our step by step directions%2$s. "
 msgstr ""
 
@@ -1503,6 +1552,7 @@ msgstr ""
 
 #. translators: %1$s and %2$s are the opening and closing anchor tags.
 #: includes/admin/pages/class-wpcode-admin-page-pixel.php:219
+#, php-format
 msgid "You can find your Google Ads Tag ID in the Google Ads Settings under Google Tag. %1$sRead our step by step directions%2$s. "
 msgstr ""
 
@@ -1512,6 +1562,7 @@ msgstr ""
 
 #. translators: %1$s and %2$s are the opening and closing anchor tags.
 #: includes/admin/pages/class-wpcode-admin-page-pixel.php:233
+#, php-format
 msgid "Add your Google Ads Conversion Label for tracking conversion events. %1$sLearn More%2$s."
 msgstr ""
 
@@ -1537,6 +1588,7 @@ msgstr ""
 
 #. translators: %1$s and %2$s are the opening and closing anchor tags.
 #: includes/admin/pages/class-wpcode-admin-page-pixel.php:285
+#, php-format
 msgid "You can find your Tag id in your Pinterest Business account. %1$sRead our step by step directions%2$s. "
 msgstr ""
 
@@ -1546,6 +1598,7 @@ msgstr ""
 
 #. translators: %1$s and %2$s are the opening and closing anchor tags.
 #: includes/admin/pages/class-wpcode-admin-page-pixel.php:299
+#, php-format
 msgid "You can find your Ad Account ID in your Pinterest Business account. %1$sRead more%2$s. "
 msgstr ""
 
@@ -1555,6 +1608,7 @@ msgstr ""
 
 #. translators: %1$s and %2$s are the opening and closing anchor tags.
 #: includes/admin/pages/class-wpcode-admin-page-pixel.php:313
+#, php-format
 msgid "You can find your Conversion Access Token under Ads > Conversions > Conversion access token. %1$sRead more%2$s. "
 msgstr ""
 
@@ -1568,6 +1622,7 @@ msgstr ""
 
 #. translators: %1$s and %2$s are the opening and closing anchor tags.
 #: includes/admin/pages/class-wpcode-admin-page-pixel.php:349
+#, php-format
 msgid "You can find your Pixel id in your TikTok Business Account. %1$sRead our step by step directions%2$s."
 msgstr ""
 
@@ -1577,6 +1632,7 @@ msgstr ""
 
 #. translators: %1$s and %2$s are the opening and closing anchor tags.
 #: includes/admin/pages/class-wpcode-admin-page-pixel.php:363
+#, php-format
 msgid "You can generate an access token in the Pixel Settings under Access Token Generation. %1$sRead more%2$s"
 msgstr ""
 
@@ -1590,6 +1646,7 @@ msgstr ""
 
 #. translators: %1$s and %2$s are the opening and closing anchor tags.
 #: includes/admin/pages/class-wpcode-admin-page-pixel.php:399
+#, php-format
 msgid "You can find your Snapchat Pixel ID in the Snapchat Ads Manager. %1$sRead our step by step directions%2$s. "
 msgstr ""
 
@@ -1760,11 +1817,13 @@ msgstr ""
 
 #. translators: %s is the name of the eCommerce provider.
 #: includes/admin/pages/class-wpcode-admin-page-pixel.php:730
+#, php-format
 msgid "%s Tracking Enabled"
 msgstr ""
 
 #. translators: %s a html break.
 #: includes/admin/pages/class-wpcode-admin-page-pixel.php:736
+#, php-format
 msgid "Advanced eCommerce tracking is available for WooCommerce, Easy Digital Downloads and MemberPress. %s These plugins are detected automatically and when available you can toggle individual events using the options below."
 msgstr ""
 
@@ -1830,6 +1889,7 @@ msgstr ""
 
 #. Translators: %1$s is the opening link tag, %2$s is the closing link tag
 #: includes/admin/pages/class-wpcode-admin-page-pixel.php:833
+#, php-format
 msgid "Use this section to add custom click events to your site. You can add as many as you like. Each event can have multiple pixels and each pixel can have a custom event name and value. Read more about how to configure these settings in %1$sthis article%2$s"
 msgstr ""
 
@@ -1839,6 +1899,7 @@ msgstr ""
 
 #. Translators: %1$s is an opening anchor tag, %2$s is a closing anchor tag.
 #: includes/admin/pages/class-wpcode-admin-page-pixel.php:849
+#, php-format
 msgid "Define the HTML element that triggers the event upon clicking (button, link, etc). Input the appropriate CSS selector here. %1$sLearn more%2$s"
 msgstr ""
 
@@ -1918,6 +1979,7 @@ msgstr ""
 
 #. Translators: Placeholders make the text bold.
 #: includes/admin/pages/class-wpcode-admin-page-settings.php:130
+#, php-format
 msgid "%1$sNOTE:%2$s Please use this setting with caution. It will disable all custom snippets that you add using the new snippet management interface."
 msgstr ""
 
@@ -2007,6 +2069,7 @@ msgstr ""
 
 #. Translators: %1$s - Opening anchor tag, do not translate. %2$s - Closing anchor tag, do not translate.
 #: includes/admin/pages/class-wpcode-admin-page-settings.php:442
+#, php-format
 msgid "To unlock more features consider %1$supgrading to PRO%2$s."
 msgstr ""
 
@@ -2061,6 +2124,7 @@ msgstr ""
 
 #. Translators: %1$s: opening anchor tag, %2$s: closing anchor tag. Link to docs about error notifications.
 #: includes/admin/pages/class-wpcode-admin-page-settings.php:559
+#, php-format
 msgid "Send email notifications when snippets throw errors? %1$sLearn more%2$s"
 msgstr ""
 
@@ -2084,6 +2148,7 @@ msgstr ""
 
 #. Translators: %1$s: opening anchor tag, %2$s: closing anchor tag. Link to docs about error notifications.
 #: includes/admin/pages/class-wpcode-admin-page-settings.php:600
+#, php-format
 msgid "Send an email when a snippet gets automatically deactivated? %1$sLearn more%2$s"
 msgstr ""
 
@@ -2097,16 +2162,19 @@ msgstr ""
 
 #. Translators: %1$s: opening anchor tag, %2$s: closing anchor tag.
 #: includes/admin/pages/class-wpcode-admin-page-settings.php:648
+#, php-format
 msgid "Log errors thrown by snippets? %1$sView Logs%2$s"
 msgstr ""
 
 #. Translators: %1$s - Opening anchor tag. %2$s - Closing anchor tag.
 #: includes/admin/pages/class-wpcode-admin-page-settings.php:670
+#, php-format
 msgid "Select the user roles that are allowed to manage different types of snippets or parts of WPCode. By default, all permissions are provided only to administrator users. Please see our %1$sAccess Control documentation%2$s for more details."
 msgstr ""
 
 #. translators: %1$s and %2$s are <u> tags.
 #: includes/admin/pages/class-wpcode-admin-page-settings.php:706
+#, php-format
 msgid "Improve the way you and your team manage your snippets with the WPCode Access Control settings. Enable other users on your site to manage different types of snippets or configure Conversion Pixels settings and update configuration files. This feature is available on the %1$sWPCode Pro%2$s plan or higher."
 msgstr ""
 
@@ -2148,15 +2216,16 @@ msgstr ""
 
 #. Translators: %1$s: opening anchor tag, %2$s: closing anchor tag.
 #: includes/admin/pages/class-wpcode-admin-page-settings.php:814
+#, php-format
 msgid "Solve common email deliverability issues for good. %1$sGet WP Mail SMTP%2$s!"
 msgstr ""
 
 #. Translators: This adds the name of the plugin "WPCode".
 #: includes/admin/pages/class-wpcode-admin-page-snippet-manager.php:91
+#, php-format
 msgid "Add %s Snippet"
 msgstr ""
 
-#. Translators: This adds the name of the plugin "WPCode".
 #: includes/admin/pages/class-wpcode-admin-page-snippet-manager.php:92
 #: includes/admin/pages/class-wpcode-admin-page-snippet-manager.php:149
 msgid "Add Snippet"
@@ -2213,6 +2282,7 @@ msgstr ""
 
 #. translators: %s: Error message.
 #: includes/admin/pages/class-wpcode-admin-page-snippet-manager.php:230
+#, php-format
 msgid "Error message: %s"
 msgstr ""
 
@@ -2222,6 +2292,7 @@ msgstr ""
 
 #. Translators: this changes the edit page title to show the snippet title.
 #: includes/admin/pages/class-wpcode-admin-page-snippet-manager.php:297
+#, php-format
 msgid "Edit snippet \"%s\""
 msgstr ""
 
@@ -2271,6 +2342,7 @@ msgstr ""
 
 #. Translators: The placeholders add links to create a new custom snippet or the suggest-a-snippet form.
 #: includes/admin/pages/class-wpcode-admin-page-snippet-manager.php:431
+#, php-format
 msgid "To speed up the process you can select from one of our pre-made library, or you can start with a %1$sblank snippet%2$s and %1$screate your own%2$s. Have a suggestion for new snippet? %3$sWe’d love to hear it!%4$s"
 msgstr ""
 
@@ -2467,6 +2539,7 @@ msgstr ""
 
 #. Translators: %1$s is the opening link tag, %2$s is the closing link tag.
 #: includes/admin/pages/class-wpcode-admin-page-snippet-manager.php:1430
+#, php-format
 msgid "For your protection, we blocked the addition of certain types of code that could compromise your website's security. If you believe this is in error or need assistance, please %1$scontact our support team%2$s."
 msgstr ""
 
@@ -2555,6 +2628,7 @@ msgstr ""
 
 #. Translators: %1$s Opening anchor tag. %2$s Closing anchor tag.
 #: includes/admin/pages/class-wpcode-admin-page-snippet-manager.php:1948
+#, php-format
 msgid "For better results using conditional logic with PHP snippets we automatically switched the auto-insert location to \"Frontend Conditional Logic\" that runs later. If you want to run the snippet earlier please switch back to \"Run Everywhere\" but note not all conditional logic options will be available. %1$sRead more%2$s"
 msgstr ""
 
@@ -2567,7 +2641,6 @@ msgstr ""
 msgid "This snippet is currently being edited by "
 msgstr ""
 
-#. Translators: The name of the user that is currently editing the snippet is appended at the end.
 #: includes/admin/pages/class-wpcode-admin-page-snippet-manager.php:1969
 msgid "AI Snippet Generation is a Pro Feature"
 msgstr ""
@@ -2607,6 +2680,7 @@ msgstr ""
 
 #. Translators: %1$s is the opening <code> tag, %2$s is the closing </code> tag.
 #: includes/admin/pages/class-wpcode-admin-page-snippet-manager.php:2096
+#, php-format
 msgid "Use this field to define the attribute name for your shortcode and click Add Attribute. Attributes added here will be available to use as smart tags and as variables inside snippets. E.g. an attribute named \"keyword\" will be available in a PHP snippet as %1$s$keyword%2$s. %3$sLearn more%4$s."
 msgstr ""
 
@@ -2616,6 +2690,7 @@ msgstr ""
 
 #. Translators: Link to the documentation article for files as snippets. %1$s is the opening anchor tag, %2$s is the closing anchor tag.
 #: includes/admin/pages/class-wpcode-admin-page-snippet-manager.php:2189
+#, php-format
 msgid "If enabled, this snippet will be loaded as a physical file instead of being inserted in the source of the page. %1$sLearn more%2$s."
 msgstr ""
 
@@ -2651,6 +2726,7 @@ msgstr ""
 
 #. Translators: %1$s and %2$s are HTML tags for a link to the documentation article.
 #: includes/admin/pages/class-wpcode-admin-page-snippet-manager.php:2282
+#, php-format
 msgid "Looking for more scheduling options? %1$sClick here%2$s to read more about all the available options."
 msgstr ""
 
@@ -2701,6 +2777,7 @@ msgstr ""
 
 #. Translators: The placeholder gets replaced with the display name of the user currently editing the snippet.
 #: includes/admin/pages/class-wpcode-admin-page-snippet-manager.php:2508
+#, php-format
 msgid "Notice: %1$s is also editing this snippet. Please be aware that your changes could be overwritten."
 msgstr ""
 
@@ -2710,11 +2787,13 @@ msgstr ""
 
 #. Translators: The placeholder gets replaced with the time passed since the snippet was deactivated.
 #: includes/admin/pages/class-wpcode-admin-page-snippet-manager.php:2547
+#, php-format
 msgid "This snippet was automatically deactivated due to an error at %1$s on %2$s (%3$s ago)."
 msgstr ""
 
 #. Translators: The placeholder gets replaced with the time passed since the snippet was deactivated.
 #: includes/admin/pages/class-wpcode-admin-page-snippet-manager.php:2559
+#, php-format
 msgid "This snippet first threw an error at %1$s on %2$s (%3$s ago)."
 msgstr ""
 
@@ -2725,16 +2804,19 @@ msgstr ""
 
 #. Translators: The placeholders make the text bold and add the line number.
 #: includes/admin/pages/class-wpcode-admin-page-snippet-manager.php:2579
+#, php-format
 msgid "The error occurred on %1$sline %3$d%2$s of this snippet's code (highlighted below)."
 msgstr ""
 
 #. Translators: The placeholder is replaced with the URL where the error happened.
 #: includes/admin/pages/class-wpcode-admin-page-snippet-manager.php:2593
+#, php-format
 msgid "The error was triggered at the following URL: %1$s"
 msgstr ""
 
 #. Translators: The placeholders are for the link to the error logs.
 #: includes/admin/pages/class-wpcode-admin-page-snippet-manager.php:2604
+#, php-format
 msgid "You can %1$sview the error log%2$s to get more details about the error that caused this. The error will also be in a snippet-specific log whose name starts with snippet-%3$d (the id of this snippet)."
 msgstr ""
 
@@ -2760,6 +2842,7 @@ msgstr ""
 
 #. Translators: Adds a link to the snippets list in the admin.
 #: includes/admin/pages/class-wpcode-admin-page-tools.php:94
+#, php-format
 msgid "Import was successfully finished. You can go and check %1$syour snippets%2$s."
 msgstr ""
 
@@ -2877,11 +2960,13 @@ msgstr ""
 
 #. Translators: These add markup to display which snippet out of the total from the provider name.
 #: includes/admin/pages/class-wpcode-admin-page-tools.php:332
+#, php-format
 msgid "Importing %1$s of %2$s snippets from %3$s."
 msgstr ""
 
 #. Translators: this adds the total snippets count that have been completed.
 #: includes/admin/pages/class-wpcode-admin-page-tools.php:350
+#, php-format
 msgid "Congrats, the import process has finished! We have successfully imported %s snippets. You can review the results below."
 msgstr ""
 
@@ -2943,6 +3028,7 @@ msgstr ""
 
 #. translators: %1$s: opening anchor tag, %2$s: closing anchor tag.
 #: includes/admin/pages/class-wpcode-admin-page-tools.php:992
+#, php-format
 msgid "No logs found. You can enable logging from the %1$ssettings panel%2$s."
 msgstr ""
 
@@ -3013,11 +3099,13 @@ msgstr ""
 
 #. Translators: Placeholder for the number of active notifications.
 #: includes/admin/pages/class-wpcode-admin-page.php:305
+#, php-format
 msgid "New Notifications (%s)"
 msgstr ""
 
 #. Translators: Placeholder for the number of dismissed notifications.
 #: includes/admin/pages/class-wpcode-admin-page.php:316
+#, php-format
 msgid "Notifications (%s)"
 msgstr ""
 
@@ -3047,6 +3135,7 @@ msgstr ""
 
 #. translators: %s is the title of the metabox.
 #: includes/admin/pages/class-wpcode-admin-page.php:613
+#, php-format
 msgid "Collapse Metabox %s"
 msgstr ""
 
@@ -3080,6 +3169,7 @@ msgstr ""
 
 #. translators: %d - snippets count.
 #: includes/admin/pages/class-wpcode-admin-page.php:1297
+#, php-format
 msgid "Get Access to Our Library of %d FREE Snippets"
 msgstr ""
 
@@ -3090,11 +3180,13 @@ msgstr ""
 #. Translators: This is the format for displaying the date in the admin list, [date] at [time].
 #: includes/admin/pages/class-wpcode-code-snippets-table.php:145
 #: includes/admin/pages/class-wpcode-code-snippets-table.php:154
+#, php-format
 msgid "%1$s at %2$s"
 msgstr ""
 
 #. Translators: The tag by which to filter the list of snippets in the admin.
 #: includes/admin/pages/class-wpcode-code-snippets-table.php:187
+#, php-format
 msgid "Filter snippets by tag: %s"
 msgstr ""
 
@@ -3104,6 +3196,7 @@ msgstr ""
 
 #. Translators: %1$s is the time since the snippet was deactivated, %2$s is the date and time of deactivation.
 #: includes/admin/pages/class-wpcode-code-snippets-table.php:266
+#, php-format
 msgid "This snippet was automatically deactivated because of a fatal error at %2$s on %3$s (%1$s ago)"
 msgstr ""
 
@@ -3118,6 +3211,7 @@ msgstr ""
 
 #. translators: %s: User display name
 #: includes/admin/pages/class-wpcode-code-snippets-table.php:373
+#, php-format
 msgid "%s is currently editing"
 msgstr ""
 
@@ -3127,11 +3221,13 @@ msgstr ""
 
 #. translators: %s - third-party library author name like "WPForms"
 #: includes/admin/pages/class-wpcode-code-snippets-table.php:401
+#, php-format
 msgid "Imported from the WPCode Library (by %s)"
 msgstr ""
 
 #. translators: %s - the user's WPCode.com account username
 #: includes/admin/pages/class-wpcode-code-snippets-table.php:411
+#, php-format
 msgid "Imported from your private library (%s)"
 msgstr ""
 
@@ -3204,6 +3300,7 @@ msgstr ""
 
 #. Translators: %s: the number of items.
 #: includes/admin/pages/class-wpcode-code-snippets-table.php:1093
+#, php-format
 msgid "%s item"
 msgid_plural "%s items"
 msgstr[0] ""
@@ -3265,11 +3362,13 @@ msgstr ""
 
 #. Translators: time since the revision has been updated.
 #: includes/admin/pages/trait-wpcode-revisions-display.php:106
+#, php-format
 msgid "Updated %s ago"
 msgstr ""
 
 #. Translators: The placeholder gets replaced with the extra number of revisions available.
 #: includes/admin/pages/trait-wpcode-revisions-display.php:129
+#, php-format
 msgid "%d Other Revisions"
 msgstr ""
 
@@ -3605,6 +3704,7 @@ msgstr ""
 
 #. translators: %d is the total number of global scripts.
 #: includes/class-wpcode-admin-bar-info.php:196
+#, php-format
 msgid "Global Scripts (%d)"
 msgstr ""
 
@@ -4113,6 +4213,7 @@ msgstr ""
 
 #. translators: %s: Snippet title and ID used in the error log for clarity.
 #: includes/class-wpcode-snippet.php:777
+#, php-format
 msgid "Snippet %s was automatically deactivated due to a fatal error."
 msgstr ""
 
@@ -4688,6 +4789,7 @@ msgstr ""
 
 #. Translators: Placeholders add links to the wordpress.org references.
 #: includes/generator/class-wpcode-generator-cronjob.php:57
+#, php-format
 msgid "This generator makes it easy to generate a snippet that will schedule a recurring event using %1$swp_schedule_event%2$s."
 msgstr ""
 
@@ -4795,6 +4897,7 @@ msgstr ""
 
 #. Translators: Placeholders add links to the wordpress.org references.
 #: includes/generator/class-wpcode-generator-hooks.php:1289
+#, php-format
 msgid "Using this generator you can safely add custom %1$shooks%2$s using either %3$sadd_action%4$s or %5$sadd_filter%6$s."
 msgstr ""
 
@@ -5308,6 +5411,7 @@ msgstr ""
 
 #. Translators: Placeholders add a link to the wp.org documentation page.
 #: includes/generator/class-wpcode-generator-post-type.php:449
+#, php-format
 msgid "Should this post type be %1$svisible to authors%2$s?"
 msgstr ""
 
@@ -5382,6 +5486,7 @@ msgstr ""
 
 #. Translators: Placeholder adds a link to the dashicons page.
 #: includes/generator/class-wpcode-generator-post-type.php:505
+#, php-format
 msgid "Icon used next to the post type label in the admin menu. Use either a %1$sdashicon%2$s name or a full URL to an image file."
 msgstr ""
 
@@ -5407,6 +5512,7 @@ msgstr ""
 
 #. Translators: Placeholders add link to wp.org docs.
 #: includes/generator/class-wpcode-generator-post-type.php:547
+#, php-format
 msgid "Enable frontend requests using the query variable. %1$sSee Documentation.%2$s"
 msgstr ""
 
@@ -5416,6 +5522,7 @@ msgstr ""
 
 #. Translators: Placeholders add link to wp.org docs.
 #: includes/generator/class-wpcode-generator-post-type.php:562
+#, php-format
 msgid "Key used for querying posts in the frontend. %1$sSee Documentation.%2$s"
 msgstr ""
 
@@ -5434,6 +5541,7 @@ msgstr ""
 
 #. Translators: Placeholder adds a link to the dashicons page.
 #: includes/generator/class-wpcode-generator-post-type.php:577
+#, php-format
 msgid "The custom query variable to use for this post type. %1$sSee documentation%2$s."
 msgstr ""
 
@@ -5448,6 +5556,7 @@ msgstr ""
 
 #. Translators: Placeholders add link to wp.org docs.
 #: includes/generator/class-wpcode-generator-post-type.php:594
+#, php-format
 msgid "Use the default permalink structure, disable permalinks for this post type or use custom options. %1$sSee Documentation.%2$s"
 msgstr ""
 
@@ -5503,6 +5612,7 @@ msgstr ""
 
 #. Translators: Placeholders add link to wp.org docs.
 #: includes/generator/class-wpcode-generator-post-type.php:662
+#, php-format
 msgid "User capabilities in relation to this post type. %1$sSee Documentation.%2$s"
 msgstr ""
 
@@ -5578,6 +5688,7 @@ msgstr ""
 
 #. Translators: Placeholders add link to wp.org docs.
 #: includes/generator/class-wpcode-generator-post-type.php:753
+#, php-format
 msgid "Add the post type to the WordPress wp-json API. %1$sSee Documentation.%2$s"
 msgstr ""
 
@@ -5588,6 +5699,7 @@ msgstr ""
 
 #. Translators: Placeholders add link to wp.org docs.
 #: includes/generator/class-wpcode-generator-post-type.php:768
+#, php-format
 msgid "The base slug that this post type will use in the REST API. %1$sSee Documentation.%2$s"
 msgstr ""
 
@@ -5598,6 +5710,7 @@ msgstr ""
 
 #. Translators: Placeholders add link to wp.org docs.
 #: includes/generator/class-wpcode-generator-post-type.php:779
+#, php-format
 msgid "The name of a custom Rest Controller class instead of WP_REST_Posts_Controller. %1$sSee Documentation.%2$s"
 msgstr ""
 
@@ -5611,6 +5724,7 @@ msgstr ""
 
 #. Translators: Placeholders add links to the wordpress.org references.
 #: includes/generator/class-wpcode-generator-query.php:82
+#, php-format
 msgid "This generator makes it easy for you to create custom queries using %1$sWP_Query%2$s which you can then extend to display posts or similar."
 msgstr ""
 
@@ -8450,6 +8564,7 @@ msgstr ""
 
 #. Translators: the placeholders add a link to getboostrap.com.
 #: includes/generator/class-wpcode-generator-script.php:80
+#, php-format
 msgid "You can use this to load external scripts or even scripts from a theme or plugin. For example, you could load %1$sbootstrap%2$s from a cdn."
 msgstr ""
 
@@ -8460,30 +8575,35 @@ msgstr ""
 
 #. Translators: placeholders add links to documentation on wordpress.org.
 #: includes/generator/class-wpcode-generator-script.php:110
+#, php-format
 msgid "Hook used to add the scripts: %1$sfrontend%2$s, %3$sadmin%4$s, %5$slogin%6$s or %7$sembed%8$s."
 msgstr ""
 
 #. Translators: placeholder adds the hook name.
 #: includes/generator/class-wpcode-generator-script.php:124
 #: includes/generator/class-wpcode-generator-style.php:124
+#, php-format
 msgid "Frontend (%s)"
 msgstr ""
 
 #. Translators: placeholder adds the hook name.
 #: includes/generator/class-wpcode-generator-script.php:126
 #: includes/generator/class-wpcode-generator-style.php:126
+#, php-format
 msgid "Admin (%s)"
 msgstr ""
 
 #. Translators: placeholder adds the hook name.
 #: includes/generator/class-wpcode-generator-script.php:128
 #: includes/generator/class-wpcode-generator-style.php:128
+#, php-format
 msgid "Login (%s)"
 msgstr ""
 
 #. Translators: placeholder adds the hook name.
 #: includes/generator/class-wpcode-generator-script.php:130
 #: includes/generator/class-wpcode-generator-style.php:130
+#, php-format
 msgid "Embed (%s)"
 msgstr ""
 
@@ -8539,6 +8659,7 @@ msgstr ""
 
 #. Translators: Placeholders for wp.org docs link.
 #: includes/generator/class-wpcode-generator-script.php:202
+#, php-format
 msgid "Should the script be %1$sderegistered%2$s first? (for example, if you are replacing an existing script)."
 msgstr ""
 
@@ -8548,6 +8669,7 @@ msgstr ""
 
 #. Translators: Placeholders for wp.org docs link.
 #: includes/generator/class-wpcode-generator-script.php:220
+#, php-format
 msgid "Should the script be %1$senqueued%2$s or just registered? (select \"No\" only if you intend enqueueing it later."
 msgstr ""
 
@@ -8667,11 +8789,13 @@ msgstr ""
 
 #. Translators: the placeholders add a link to getboostrap.com.
 #: includes/generator/class-wpcode-generator-style.php:80
+#, php-format
 msgid "You can use this to load external styles or even styles from a theme or plugin. For example, you could load %1$sfontawesome%2$s from a cdn."
 msgstr ""
 
 #. Translators: placeholders add links to documentation on wordpress.org.
 #: includes/generator/class-wpcode-generator-style.php:110
+#, php-format
 msgid "Hook used to add the styles: %1$sfrontend%2$s, %3$sadmin%4$s, %5$slogin%6$s or %7$sembed%8$s."
 msgstr ""
 
@@ -8709,6 +8833,7 @@ msgstr ""
 
 #. Translators: placeholders add a link to the W3.org reference.
 #: includes/generator/class-wpcode-generator-style.php:189
+#, php-format
 msgid "Load the style %1$smedia type%2$s, usually \"all\"."
 msgstr ""
 
@@ -8718,6 +8843,7 @@ msgstr ""
 
 #. Translators: Placeholders for wp.org docs link.
 #: includes/generator/class-wpcode-generator-style.php:203
+#, php-format
 msgid "Should the style be %1$sderegistered%2$s first? (for example, if you are replacing an existing style)."
 msgstr ""
 
@@ -8727,6 +8853,7 @@ msgstr ""
 
 #. Translators: Placeholders for wp.org docs link.
 #: includes/generator/class-wpcode-generator-style.php:221
+#, php-format
 msgid "Should the style be %1$senqueued%2$s or just registered? (select \"No\" only if you intend enqueueing it later."
 msgstr ""
 
@@ -8828,6 +8955,7 @@ msgstr ""
 
 #. Translators: Placeholders add a link to the wp.org documentation page.
 #: includes/generator/class-wpcode-generator-taxonomy.php:317
+#, php-format
 msgid "Should this taxonomy be %1$svisible to authors%2$s?"
 msgstr ""
 
@@ -8893,6 +9021,7 @@ msgstr ""
 
 #. Translators: Placeholders add link to wp.org docs.
 #: includes/generator/class-wpcode-generator-taxonomy.php:443
+#, php-format
 msgid "User capabilities in relation to this taxonomy. %1$sSee Documentation.%2$s"
 msgstr ""
 
@@ -9202,16 +9331,19 @@ msgstr ""
 
 #. Translators: placeholder for the name of the section (header or footer).
 #: includes/lite/admin/class-wpcode-metabox-snippets-lite.php:171
+#, php-format
 msgid "Add scripts below to the %s section of this page."
 msgstr ""
 
 #. Translators: placeholder for the name of the section (header or footer).
 #: includes/lite/admin/class-wpcode-metabox-snippets-lite.php:182
+#, php-format
 msgid "Disable global %s scripts on this page"
 msgstr ""
 
 #. Translators: placeholder for the name of the section (header or footer).
 #: includes/lite/admin/class-wpcode-metabox-snippets-lite.php:193
+#, php-format
 msgid "%s - any device type"
 msgstr ""
 
@@ -9224,54 +9356,57 @@ msgid "Upgrade to WPCode Pro today and start tracking revisions and see exactly 
 msgstr ""
 
 #. Translators: more here is used in the sense of "get access to more snippets" and gets replaced with the number of snippets if the library items are loaded correctly.
-#: includes/lite/admin/notices.php:37
+#: includes/lite/admin/notices.php:40
 msgid "more"
 msgstr ""
 
 #. Translators: %1$s and %2$s add a link to the settings page. %3$s and %4$s make the text bold. %6$s is replaced with the number of snippets and %5$s adds a "new" icon.
-#: includes/lite/admin/notices.php:42
+#: includes/lite/admin/notices.php:45
+#, php-format
 msgid "%5$s%1$sConnect to the WPCode Library%2$s to get access to %3$s%6$s FREE snippets%4$s!"
 msgstr ""
 
 #. Translators: %1$s and %2$s add a link to the upgrade page. %3$s and %4$s make the text bold.
-#: includes/lite/admin/notices.php:88
+#: includes/lite/admin/notices.php:91
+#, php-format
 msgid "%3$sYou're using WPCode Lite%4$s. To unlock more features consider %1$supgrading to Pro%2$s."
 msgstr ""
 
-#: includes/lite/admin/notices.php:116
+#: includes/lite/admin/notices.php:119
 msgid "Get WPCode Pro and Unlock all the Powerful Features"
 msgstr ""
 
-#: includes/lite/admin/notices.php:119
+#: includes/lite/admin/notices.php:122
 msgid "Save & Reuse snippets in your private Cloud Library"
 msgstr ""
 
-#: includes/lite/admin/notices.php:120
+#: includes/lite/admin/notices.php:123
 msgid "Add page-specific scripts when editing a post/page."
 msgstr ""
 
-#: includes/lite/admin/notices.php:121
+#: includes/lite/admin/notices.php:124
 msgid "Track all snippet changes with Advanced Code Revisions"
 msgstr ""
 
-#: includes/lite/admin/notices.php:124
+#: includes/lite/admin/notices.php:127
 msgid "Load snippets by device (mobile/desktop) with 1-click."
 msgstr ""
 
-#: includes/lite/admin/notices.php:125
+#: includes/lite/admin/notices.php:128
 msgid "Easily insert and reuse content with Custom Shortcodes."
 msgstr ""
 
-#: includes/lite/admin/notices.php:126
+#: includes/lite/admin/notices.php:129
 msgid "Precisely track eCommerce conversions for WooCommerce and EDD."
 msgstr ""
 
-#: includes/lite/admin/notices.php:132
+#: includes/lite/admin/notices.php:135
 msgid "Get WPCode Pro Today and Unlock all the Powerful Features »"
 msgstr ""
 
 #. Translators: Placeholders make the text bold.
-#: includes/lite/admin/notices.php:137
+#: includes/lite/admin/notices.php:140
+#, php-format
 msgid "%1$sBonus:%2$s WPCode Lite users get %3$s$50 off regular price%4$s, automatically applied at checkout"
 msgstr ""
 

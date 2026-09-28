@@ -1,0 +1,397 @@
+<?php
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Class to handle all interactions for Gallery datasources
+ */
+
+if ( ! class_exists( 'FooGallery_Admin_Gallery_Datasources' ) ) {
+
+    class FooGallery_Admin_Gallery_Datasources {
+
+		const RECOVERY_DATASOURCE_FIELD = '_foogallery_datasource_recovery_original';
+		const RECOVERY_VALUE_FIELD      = '_foogallery_datasource_recovery_value';
+
+        /**
+         * Primary class constructor.
+         */
+        public function __construct() {
+            //render the datasource modal
+			add_action( 'foogallery_admin_enqueue_scripts', array( $this, 'enqueue_scripts_and_styles' ) );
+            add_action( 'admin_footer', array( $this, 'render_datasource_modal' ) );
+            add_action( 'foogallery_gallery_metabox_items', array( $this, 'add_datasources_hidden_inputs' ) );
+            add_action( 'foogallery_gallery_metabox_items_add', array( $this, 'add_datasources_button' ) );
+            add_action( 'wp_ajax_foogallery_load_datasource_content', array( $this, 'ajax_load_datasource_content' ) );
+            add_action( 'foogallery_before_save_gallery', array( $this, 'save_gallery_datasource' ), 8, 2 );
+            add_filter( 'foogallery_preview_arguments', array( $this, 'include_datasource_in_preview' ), 10, 3 );
+            add_filter( 'foogallery_render_template_argument_overrides', array( $this, 'override_datasource_arguments' ), 10, 2 );
+            add_action( 'foogallery_admin_datasource_modal_content', array( $this, 'render_datasource_modal_default_content' ) );
+        }
+
+		public function enqueue_scripts_and_styles( $hook ) {
+			wp_enqueue_style( 'foogallery.admin.datasources', FOOGALLERY_URL . 'css/foogallery.admin.datasources.css', array(), FOOGALLERY_VERSION );
+			wp_enqueue_script( 'foogallery.admin.datasources', FOOGALLERY_URL . 'js/foogallery.admin.datasources.js', array( 'jquery' ), FOOGALLERY_VERSION );
+		}
+
+        /**
+         * Include the datasource arguments for previews
+         *
+         * @param $args
+         * @param $form_post
+         * @param $template
+         * @return array
+         */
+        public function include_datasource_in_preview( $args, $form_post, $template ) {
+            if ( isset( $form_post['foogallery_datasource'] ) ) {
+                $args['datasource'] = $form_post['foogallery_datasource'];
+            }
+            if ( isset( $form_post['foogallery_datasource_value'] ) ) {
+                $args['datasource_value'] = $form_post['foogallery_datasource_value'];
+            }
+
+            return $args;
+        }
+
+        /**
+         * Allow the gallery to render using an override for the datasource
+         * @param $foogallery
+         * @param $args
+         * @return FooGallery
+         */
+        public function override_datasource_arguments( $foogallery, $args ) {
+            if ( isset( $args['datasource'] ) ) {
+                $foogallery->datasource_name = $args['datasource'];
+            }
+            if ( isset( $args['datasource_value'] ) ) {
+                $foogallery->datasource_value = $this->get_json_datasource_value( $args['datasource_value'] );
+            }
+
+            return $foogallery;
+        }
+
+		/**
+		 * Save the datasource name and value for the gallery
+		 * @param $post_id
+		 * @param $_post
+		 */
+        public function save_gallery_datasource( $post_id, $_post ) {
+            //action pre-save
+            do_action( 'foogallery_before_save_gallery_datasource', $post_id );
+
+            //set some defaults
+            $datasource = '';
+            $datasource_value = array();
+
+            if ( isset( $_POST[FOOGALLERY_META_DATASOURCE] ) ) {
+				$submitted_datasource = wp_unslash( $_POST[FOOGALLERY_META_DATASOURCE] );
+				$stored_datasource    = get_post_meta( $post_id, FOOGALLERY_META_DATASOURCE, true );
+
+				if ( $this->should_preserve_unavailable_datasource( $stored_datasource, $submitted_datasource ) ) {
+					$datasource       = $stored_datasource;
+					$datasource_value = get_post_meta( $post_id, FOOGALLERY_META_DATASOURCE_VALUE, true );
+					do_action( 'foogallery_after_save_gallery_datasource', $post_id, $datasource, $datasource_value );
+					return;
+				}
+
+				$datasource = $this->normalize_datasource_name( $submitted_datasource );
+
+				update_post_meta( $post_id, FOOGALLERY_META_DATASOURCE, $datasource );
+
+				if ( $datasource === foogallery_default_datasource() ) {
+					delete_post_meta( $post_id, FOOGALLERY_META_DATASOURCE_VALUE );
+				} elseif ( $this->should_preserve_invalid_datasource_value( $stored_datasource, $datasource ) ) {
+					$datasource_value = get_post_meta( $post_id, FOOGALLERY_META_DATASOURCE_VALUE, true );
+				} elseif ( isset( $_POST[FOOGALLERY_META_DATASOURCE_VALUE] ) ) {
+                    $datasource_value = $this->get_json_datasource_value( $_POST[FOOGALLERY_META_DATASOURCE_VALUE] );
+
+                    if ( !empty( $datasource_value ) ) {
+                        update_post_meta( $post_id, FOOGALLERY_META_DATASOURCE_VALUE, $datasource_value );
+                    } else {
+                        delete_post_meta( $post_id, FOOGALLERY_META_DATASOURCE_VALUE );
+                    }
+                }
+
+			} else {
+				$stored_datasource = get_post_meta( $post_id, FOOGALLERY_META_DATASOURCE, true );
+				if ( ! $this->datasource_is_unavailable( $stored_datasource ) ) {
+					delete_post_meta( $post_id, FOOGALLERY_META_DATASOURCE );
+				} else {
+					$datasource       = $stored_datasource;
+					$datasource_value = get_post_meta( $post_id, FOOGALLERY_META_DATASOURCE_VALUE, true );
+				}
+            }
+
+            //action for post-save
+            do_action( 'foogallery_after_save_gallery_datasource', $post_id, $datasource, $datasource_value );
+        }
+
+		/**
+		 * Check whether an unavailable datasource must survive an unrelated gallery save.
+		 *
+		 * @param mixed $stored_datasource    The stored datasource name.
+		 * @param mixed $submitted_datasource The submitted fallback datasource name.
+		 *
+		 * @return bool
+		 */
+		private function should_preserve_unavailable_datasource( $stored_datasource, $submitted_datasource ) {
+			if ( ! isset( $_POST[ self::RECOVERY_DATASOURCE_FIELD ] ) || ! is_scalar( $_POST[ self::RECOVERY_DATASOURCE_FIELD ] ) ) {
+				return false;
+			}
+
+			$recovery_datasource = trim( (string) wp_unslash( $_POST[ self::RECOVERY_DATASOURCE_FIELD ] ) );
+			$stored_datasource   = is_scalar( $stored_datasource ) ? trim( (string) $stored_datasource ) : '';
+
+			if ( '' === $stored_datasource || $stored_datasource !== $recovery_datasource || ! $this->datasource_is_unavailable( $stored_datasource ) ) {
+				return false;
+			}
+
+			return foogallery_default_datasource() === $this->normalize_datasource_name( $submitted_datasource );
+		}
+
+		/**
+		 * Check whether malformed settings should survive until the user explicitly replaces them.
+		 *
+		 * @param mixed  $stored_datasource The stored datasource name.
+		 * @param string $datasource        The normalized submitted datasource name.
+		 *
+		 * @return bool
+		 */
+		private function should_preserve_invalid_datasource_value( $stored_datasource, $datasource ) {
+			if ( empty( $_POST[ self::RECOVERY_VALUE_FIELD ] ) ) {
+				return false;
+			}
+
+			$stored_datasource = is_scalar( $stored_datasource ) ? sanitize_key( (string) $stored_datasource ) : '';
+
+			return '' !== $stored_datasource && $stored_datasource === $datasource;
+		}
+
+		/**
+		 * Check whether a stored datasource belongs to a currently unavailable add-on.
+		 *
+		 * @param mixed $datasource_name The stored datasource name.
+		 *
+		 * @return bool
+		 */
+		private function datasource_is_unavailable( $datasource_name ) {
+			if ( ! is_scalar( $datasource_name ) ) {
+				return false;
+			}
+
+			$datasource_name = trim( (string) $datasource_name );
+			if ( '' === $datasource_name || foogallery_default_datasource() !== $this->normalize_datasource_name( $datasource_name ) ) {
+				return false;
+			}
+
+			return foogallery_default_datasource() !== sanitize_key( str_replace( '-', '_', $datasource_name ) );
+		}
+
+		private function normalize_datasource_name( $datasource_name ) {
+			if ( ! is_scalar( $datasource_name ) ) {
+				return foogallery_default_datasource();
+			}
+
+			$datasource_name = sanitize_key( (string) $datasource_name );
+			$datasources     = foogallery_gallery_datasources();
+
+			if ( is_array( $datasources ) && array_key_exists( $datasource_name, $datasources ) ) {
+				return $datasource_name;
+			}
+
+			$recovered_datasource_name = str_replace( '-', '_', $datasource_name );
+			if ( is_array( $datasources ) && array_key_exists( $recovered_datasource_name, $datasources ) ) {
+				return $recovered_datasource_name;
+			}
+
+			return foogallery_default_datasource();
+		}
+
+        /**
+         * Safely returns an array from the json string
+         * @param $datasource_value_string
+         * @return mixed
+         */
+        public function get_json_datasource_value( $datasource_value_string ) {
+            $datasource_value = array();
+
+            //check if the value is JSON and convert to object if needed
+            if ( is_string($datasource_value_string) && is_array( json_decode( stripslashes( $datasource_value_string ), true ) ) ) {
+                $datasource_value = json_decode( stripslashes( $datasource_value_string ), true );
+            }
+            return $datasource_value;
+        }
+
+        /**
+         * Outputs the modal content for the specific datasource
+         */
+        public function ajax_load_datasource_content() {
+            if ( ! check_ajax_referer( 'foogallery-datasource-content', 'nonce', false ) ) {
+                wp_send_json_error(
+                    array( 'message' => __( 'Invalid security token.', 'foogallery' ) ),
+                    403
+                );
+            }
+
+            $post_data = wp_unslash( $_POST );
+            $datasource = isset( $post_data['datasource'] ) ? sanitize_key( $post_data['datasource'] ) : '';
+            $datasource_value = isset( $post_data['datasource_value'] ) ? $this->get_json_datasource_value( $post_data['datasource_value'] ) : array();
+            $foogallery_id = isset( $post_data['foogallery_id'] ) ? absint( $post_data['foogallery_id'] ) : 0;
+
+            if ( ! $foogallery_id ) {
+                wp_send_json_error(
+                    array( 'message' => __( 'Invalid gallery ID.', 'foogallery' ) ),
+                    400
+                );
+            }
+
+            $gallery = FooGallery::get_by_id( $foogallery_id );
+            if ( ! $gallery ) {
+                wp_send_json_error(
+                    array( 'message' => __( 'Gallery not found.', 'foogallery' ) ),
+                    404
+                );
+            }
+
+            if ( ! current_user_can( 'edit_post', $foogallery_id ) ) {
+                wp_send_json_error(
+                    array( 'message' => __( 'Insufficient permissions.', 'foogallery' ) ),
+                    403
+                );
+            }
+
+            $datasources = foogallery_gallery_datasources();
+            if ( empty( $datasource ) || ! is_array( $datasources ) || ! array_key_exists( $datasource, $datasources ) ) {
+                wp_send_json_error(
+                    array( 'message' => __( 'Invalid datasource.', 'foogallery' ) ),
+                    400
+                );
+            }
+
+            do_action( 'foogallery-datasource-modal-content_' . $datasource, $foogallery_id, $datasource_value );
+
+            wp_die();
+        }
+
+        /**
+         * Adds the datasource hidden inputs to the page
+         * @param FooGallery $gallery
+         */
+        public function add_datasources_hidden_inputs( $gallery ) {
+            $datasources = foogallery_gallery_datasources();
+            if ( count( $datasources ) > 1 ) {
+                $datasource_value = isset( $gallery->datasource_value ) ?
+					$gallery->datasource_value :
+					get_post_meta( $gallery->ID, FOOGALLERY_META_DATASOURCE_VALUE, true );
+                if ( is_array( $datasource_value ) ) {
+                    $datasource_value = json_encode( $datasource_value );
+                } ?>
+            <input type="hidden" data-foogallery-preview="include" name="<?php echo esc_attr( FOOGALLERY_META_DATASOURCE ); ?>" value="<?php echo esc_attr( $gallery->datasource_name ); ?>" id="<?php echo esc_attr( FOOGALLERY_META_DATASOURCE ); ?>" />
+            <input type="hidden" data-foogallery-preview="include" value="<?php echo esc_attr( $datasource_value ); ?>" name="<?php echo esc_attr( FOOGALLERY_META_DATASOURCE_VALUE ); ?>" id="<?php echo esc_attr( FOOGALLERY_META_DATASOURCE_VALUE ); ?>" />
+			<?php if ( ! empty( $gallery->_foogallery_invalid_datasource_name ) ) { ?>
+				<input type="hidden" name="<?php echo esc_attr( self::RECOVERY_DATASOURCE_FIELD ); ?>" id="<?php echo esc_attr( self::RECOVERY_DATASOURCE_FIELD ); ?>" value="<?php echo esc_attr( $gallery->_foogallery_invalid_datasource_name ); ?>" />
+			<?php } ?>
+			<?php if ( ! empty( $gallery->_foogallery_invalid_datasource_value ) ) { ?>
+				<input type="hidden" name="<?php echo esc_attr( self::RECOVERY_VALUE_FIELD ); ?>" id="<?php echo esc_attr( self::RECOVERY_VALUE_FIELD ); ?>" value="1" />
+			<?php } ?>
+            <?php }
+        }
+
+        /**
+         * Add the datasources button to the items metabox
+         */
+        public function add_datasources_button() {
+            $datasources = foogallery_gallery_datasources();
+            //we only want to show the datasources button if there are more than 1 datasources
+			if ( count( $datasources ) > 1 ) { ?>
+				<button type="button" class="button button-secondary button-hero gallery_datasources_button">
+					<span class="dashicons dashicons-format-gallery"></span>
+					<span class="foogallery-add-button-label"><?php esc_html_e( 'Add From Another Source', 'foogallery' ); ?></span>
+				</button>
+            <?php }
+        }
+
+        /**
+         * Renders the datasource modal for use on the gallery edit page
+         */
+        public function render_datasource_modal() {
+
+            global $post;
+
+            //check if the gallery edit page is being shown
+            $screen = get_current_screen();
+            if ( 'foogallery' !== $screen->id ) {
+                return;
+            }
+
+            $datasources = foogallery_gallery_datasources();
+
+            ?>
+            <?php wp_nonce_field('foogallery_load_galleries', 'foogallery_load_galleries', false); ?>
+            <div class="foogallery-modal-wrapper foogallery-datasources-modal-wrapper" data-foogalleryid="<?php echo esc_attr( $post->ID ); ?>" data-nonce="<?php echo esc_attr( wp_create_nonce( 'foogallery-datasource-content' ) ); ?>" style="display: none;">
+                <div class="media-modal wp-core-ui">
+                    <button type="button" class="media-modal-close">
+                        <span class="media-modal-icon"><span class="screen-reader-text">Close media panel</span></span>
+                    </button>
+                    <div class="media-modal-content">
+                        <div class="media-frame wp-core-ui">
+                            <div class="foogallery-modal-title foogallery-datasource-modal-title">
+                                <h1>
+                                    <?php esc_html_e('Add To Gallery From Another Source', 'foogallery'); ?>
+                                    <a class="foogallery-datasource-modal-reload button" href="#" style="display: none; margin-top: -4px;"><span style="padding-top: 3px;" class="dashicons dashicons-update"></span> <?php esc_html_e('Reload', 'foogallery'); ?></a>
+                                </h1>
+                            </div>
+                            <div class="foogallery-datasource-modal-sidebar">
+                                <div class="foogallery-datasource-modal-sidebar-menu">
+                                    <?php foreach ( $datasources as $key=>$datasource ) {
+                                    if ( $datasource['public'] ) { ?>
+                                    <a href="#" class="media-menu-item foogallery-datasource-modal-selector" data-datasource="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $datasource['menu'] ); ?></a>
+                                        <?php } } ?>
+                                </div>
+                            </div>
+                            <div class="foogallery-modal-container foogallery-datasource-modal-container">
+								<div class="foogallery-datasource-modal-container-inner">
+									<?php do_action( 'foogallery_admin_datasource_modal_content' ); ?>
+								</div>
+                                <?php foreach ( $datasources as $key=>$datasource ) {
+                                    if ( $datasource['public'] ) { ?>
+                                        <div class="foogallery-datasource-modal-container-inner <?php echo esc_attr( $key ); ?> not-loaded">
+                                            <div class="spinner"></div>
+                                        </div>
+                                    <?php } } ?>
+                            </div>
+                            <div class="foogallery-modal-toolbar foogallery-datasource-modal-toolbar">
+                                <div class="foogallery-datasource-modal-toolbar-inner">
+                                    <div class="media-toolbar-secondary">
+                                        <a href="#"
+                                           class="foogallery-datasource-modal-cancel button media-button button-large button-secondary media-button-insert"
+                                           title="<?php esc_attr_e('Cancel', 'foogallery'); ?>"><?php esc_html_e('Cancel', 'foogallery'); ?>
+										</a>
+										<p><?php esc_html_e( '* Denotes a 3rd Party Plugin by another company.', 'foogallery' ); ?></p>
+                                    </div>
+                                    <div class="media-toolbar-primary">
+                                        <a href="#"
+                                           class="foogallery-datasource-modal-insert button media-button button-large button-primary media-button-insert"
+                                           disabled="disabled"
+                                           title="<?php esc_attr_e('OK', 'foogallery'); ?>"><?php esc_html_e('OK', 'foogallery'); ?></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="media-modal-backdrop"></div>
+            </div>
+            <?php
+        }
+
+        function render_datasource_modal_default_content() {
+			?>
+	        <?php esc_html_e('Select a source on the left to get started.', 'foogallery'); ?>
+	        <div style="height: 200px;background-repeat: no-repeat;background-size: 50%;width: 200px;background-image: url(&quot;data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzMwMHB4JyB3aWR0aD0nMzAwcHgnICBmaWxsPSIjMDAwMDAwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMTAwIDEwMDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+Cgkuc3Qwe2ZpbGw6IzAwMDAwMDt9Cjwvc3R5bGU+PHBhdGggY2xhc3M9InN0MCIgZD0iTTg3LjksMjMuMUM4My4yLDM0LDc1LjYsNDMuNSw2Ni4yLDUwLjZjLTkuNSw3LjItMjEuMSwxMi41LTMzLjEsMTMuNmMtNC45LDAuNC05LjksMC0xNC40LTEuOCAgYzQuNi0wLjksOS4xLTEuOCwxMy43LTIuN2MxLTAuMiwxLjItMS42LDEuMi0yLjRjMC0wLjUtMC4yLTIuNi0xLjItMi40Yy02LjUsMS4zLTEzLjEsMi42LTE5LjYsMy45Yy0wLjEsMC0wLjMsMC4xLTAuNCwwLjIgIGMtMC4yLTAuMi0wLjQtMC40LTAuNi0wLjVjLTEuNy0xLjQtMi40LDMuMi0xLjIsNC4yYzQuOSw0LjIsOS4yLDksMTIuNiwxNC40YzAuNSwwLjgsMS4yLDAuOSwxLjcsMGMwLjUtMC45LDAuNi0yLjUsMC0zLjQgIGMtMS4yLTEuOS0yLjUtMy42LTMuOC01LjRjOS4xLDIuNSwxOS41LDAuMywyOC0zYzExLjQtNC40LDIxLjYtMTEuNywyOS41LTIxYzQuNS01LjMsOC4yLTExLjIsMTEtMTcuNWMwLjQtMSwwLjUtMi40LDAtMy40ICBDODkuMiwyMi4zLDg4LjMsMjIuMiw4Ny45LDIzLjF6Ij48L3BhdGg+PC9zdmc+&quot;);"></div>
+			<?php
+        }
+    }
+}

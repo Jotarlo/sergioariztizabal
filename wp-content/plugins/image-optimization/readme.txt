@@ -1,14 +1,14 @@
-=== Image Optimization - Compress Images and Convert to WebP or AVIF ===
+=== Image Optimizer – Compress Images and Convert to WebP or AVIF ===
 Contributors: elemntor
 Tags: image optimization, image compression, convert webp, convert avif, performance,
 Requires at least: 6.7
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.7.6
+Stable tag: 1.7.7
 License: GPL-3
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
-Automatically resize, optimize, and convert images to WebP and AVIF. Compress images in bulk or on upload to boost your WordPress site performance.
+Image Optimizer is an easy-to-use WordPress plugin that reduces image size through various compression and resizing techniques – all of which preserve the highest possible image quality. Image Optimizer supports many popular formats, including JPEG, PNG, WebP, AVIF, and GIF.
 
 == Description ==
 
@@ -17,7 +17,7 @@ https://www.youtube.com/watch?v=Fco5omeF50w
 Image Optimization (formally known as Image Optimizer) is an easy-to-use WordPress plugin that reduces image size through various compression and resizing techniques - all of which preserve the highest possible image quality. Image Optimization supports many popular formats, including  JPEG, PNG, WebP, AVIF, and GIF.
 
 = Reduced file sizes for boosted performance =
-Image Optimization ensures faster loading times, enhanced user experience, and overall boosted website performance. It reduces the size of your website's images, improving Core Web Vitals and search engine rankings. With the Image Optimization’s exceptional capabilities and unique algorithms, you can fine tune images and reduce their file sizes while retaining quality with lossless or lossy compression.
+Image Optimizer ensures faster loading times, enhanced user experience, and overall boosted website performance. It reduces the size of your website’s images, improving Core Web Vitals and search engine rankings. With Image Optimizer’s exceptional capabilities and unique algorithms, you can fine tune images and reduce their file sizes while retaining quality with lossless or lossy compression.
 
 **Features**
 
@@ -34,26 +34,26 @@ Image Optimization ensures faster loading times, enhanced user experience, and o
 * **Image thumbnails**: Resize all image sizes by default. Allow the user to choose specific image sizes based on WordPress-registered thumbnail sizes.
 
 = Bulk or single image optimization =
-Image Optimization by Elementor lets you optimize all images in your library either one at a time, or in a batch according to your preferences and settings. Easily configure the plugin to scale or compress your images on-demand, or automatically have them triggered as they are being uploaded. Or, if you have a large number of images already uploaded, the bulk optimization feature allows you to resize and/or compress your entire library of existing images in just a few clicks.
+Image Optimizer by Elementor lets you optimize all images in your library either one at a time, or in a batch according to your preferences and settings. Easily configure the plugin to scale or compress your images on-demand, or automatically have them triggered as they are being uploaded. Or, if you have a large number of images already uploaded, the bulk optimization feature allows you to resize and/or compress your entire library of existing images in just a few clicks.
 
 = Two Compression Levels =
-With Image Optimization’s advanced algorithms, you can compress images and reduce their file size at the level that makes the most sense for you. We offer 2 types of compression for processing images giving you the perfect balance of compression and quality.
+With Image Optimizer’s advanced algorithms, you can compress images and reduce their file size at the level that makes the most sense for you. We offer 2 types of compression for processing images giving you the perfect balance of compression and quality.
 
-**Lossless Compression**: Lossless compression reduces image file sizes without sacrificing or diminishing the quality of your images. This type of compression reduces file sizes by removing unused or unnecessary data so that no image details are lost along the way.  Hence, you are able to reduce the file size and still maintain the quality of your image.
+**Lossless Compression**: Lossless compression reduces image file sizes without sacrificing or diminishing the quality of your images. This type of compression reduces file sizes by removing unused or unnecessary data so that no image details are lost along the way. Hence, you are able to reduce the file size and still maintain the quality of your image.
 
 **Lossy Compression**: Lossy compression performs maximum compression resulting in lightweight images and smaller file sizes. It reduces image size by removing image data that is generally invisible to the human eye and minimizes any compromise in image quality.
 
 **Convert to WebP and AVIF**: Convert images to the slimmer WebP or AVIF formats for even better optimization with a 25-30% savings over JPEG and PNG. Most browsers support WebP, however if they don’t, you can have fallback versions of the image available in the same format as the original image.
 
-By tailoring compression to the level you need, your visitors will enjoy faster load times, improved responsiveness, and a seamless browsing experience. Our approach also enables your website to rank higher in search results. Since a search engine's ranking is heavily influenced by speed, user experience, and Core Web Vitals, Elementor's Image Optimization is an invaluable tool for any website, especially one that’s abundant with images.
+By tailoring compression to the level you need, your visitors will enjoy faster load times, improved responsiveness, and a seamless browsing experience. Our approach also enables your website to rank higher in search results. Since a search engine’s ranking is heavily influenced by speed, user experience, and Core Web Vitals, Image Optimizer is an invaluable tool for any website, especially one that’s abundant with images.
 
 = Get started today =
 
-For more information about Image Optimization, visit our [official website](https://go.elementor.com/wp-repo-description-tab-io-product-page/) or [Try It Now](https://go.elementor.com/wp-repo-description-tab-io-free-trial/).
+For more information about Image Optimizer, visit our [official website](https://go.elementor.com/wp-repo-description-tab-io-product-page/) or [Try It Now](https://go.elementor.com/wp-repo-description-tab-io-free-trial/).
 If you have any questions or need support, feel free to [contact us](https://go.elementor.com/wp-repo-description-tab-io-contact-us/) or visit our [help center](https://go.elementor.com/wp-repo-description-tab-io-help-center/).
 
-This plugin requires a connection to an active Elementor account in order to identify the user and provide the purchased service. This connection is triggered manually by the user via the plugin's settings panel.
-This plugin uses a 3rd party service operated by Elementor, which accepts a standard image in JPG, PNG, GIF or WEBP format and returns a web optimized image based on the selected settings. This flow is triggered by the user or automatically (based on the selected plugin settings) on a compatible image upload or by manually initiating optimize process.
+This plugin requires a connection to an active Elementor account in order to identify the user and provide the purchased service. This connection is triggered manually by the user via the plugin’s settings panel.
+This plugin uses a 3rd party service operated by Elementor, which accepts a standard image in JPG, PNG, GIF or WEBP format and returns a web optimized image based on the selected settings. This flow is triggered by the user or automatically (based on the selected plugin settings) on a compatible image upload or by manually initiating the optimization process.
 
 == Related Plugins ==
 [Email Deliverability](https://wordpress.org/plugins/site-mailer/): Effortlessly manage transactional emails. High deliverability, logs and statistics, and no SMTP plugins needed.
@@ -118,6 +118,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 5. Image Optimization - Image Optimization in the Media Uploader
 
 == Changelog ==
+
+= 1.7.7 2026-09-16 =
+* Tweak: Security enhancements for REST access control
 
 = 1.7.6 2026-06-30 =
 * Tweak: Renamed plugin to Image Optimization

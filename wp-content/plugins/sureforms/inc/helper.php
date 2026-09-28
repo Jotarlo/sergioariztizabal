@@ -192,6 +192,14 @@ class Helper {
 	/**
 	 * Extracts the field label from the dynamic field key ( or field slug ).
 	 *
+	 * ALWAYS escape the return value at the sink. The label is decoded from the
+	 * submitted key via {@see self::decode()}, so it is submitter-controlled and
+	 * unauthenticated — and this method is strictly more dangerous than decode()
+	 * alone, because it additionally runs html_entity_decode(), which expands
+	 * entities and therefore undoes any htmlspecialchars()-on-store defence.
+	 * When a label's integrity matters, read it from the form's stored block
+	 * definitions by block id instead of from the submitted key.
+	 *
 	 * @param string $field_key Dynamic field key.
 	 * @since 1.1.1
 	 * @return string Extracted field label.
@@ -202,10 +210,12 @@ class Helper {
 		}
 
 		$label = explode( '-lbl-', $field_key )[1];
-		// Getting the encrypted label. we are removing the block slug here.
+		// Getting the encoded label. we are removing the block slug here.
 		$label = explode( '-', $label )[0];
 
-		return $label ? html_entity_decode( self::decrypt( $label ) ) : '';
+		// The result is submitter-controlled and unauthenticated — escape it for its
+		// context at the sink (esc_html, escape_csv_formula, ...), never trust it.
+		return $label ? html_entity_decode( self::decode( $label ) ) : '';
 	}
 
 	/**
@@ -510,13 +520,32 @@ class Helper {
 	}
 
 	/**
-	 * Encrypt data using base64.
+	 * Base64-encode a string for use inside a field key.
 	 *
-	 * @param string $input The input string which needs to be encrypted.
-	 * @since 0.0.1
-	 * @return string The encrypted string.
+	 * Replaces encrypt(), which is retained as a deprecated alias. The encoding itself
+	 * is unchanged since 0.0.1 — only the name is new.
+	 *
+	 * NOT ENCRYPTION. This is plain, unkeyed base64 (padding stripped) used only to
+	 * carry a label inside a field key. There is no key, no HMAC and no integrity
+	 * protection, so a value round-tripped through decode() is fully attacker-forgeable
+	 * and must never be treated as authentic or trusted as a security boundary. When a
+	 * label's integrity matters, look it up from the form's stored block definitions by
+	 * block id instead of decoding it from the submitted key.
+	 *
+	 * Two behaviours worth knowing before relying on this pair:
+	 *
+	 * - The input is run through wp_strip_all_tags(), so this is not a lossless
+	 *   round trip: decode( encode( $x ) ) !== $x whenever $x contains markup.
+	 *   That stripping happens on this trusted side only — decode() returns raw
+	 *   submitted bytes and does NOT strip anything, so every sink must escape for
+	 *   its own context (esc_html(), escape_csv_formula(), ...).
+	 * - Falsy input (including the string '0') returns '', not base64.
+	 *
+	 * @param string $input The input string to encode.
+	 * @since 2.12.3
+	 * @return string The base64-encoded string (padding removed).
 	 */
-	public static function encrypt( $input ) {
+	public static function encode( $input ) {
 		// If the input is empty or not a string, then abandon ship.
 		if ( empty( $input ) || ! is_string( $input ) ) {
 			return '';
@@ -525,27 +554,62 @@ class Helper {
 		// Strip HTML tags to prevent them from being included in IDs and field names.
 		$input = wp_strip_all_tags( $input );
 
-		// Encrypt the input and return it.
+		// Base64-encode the input and return it.
 		$base_64 = base64_encode( $input ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
 		return rtrim( $base_64, '=' );
 	}
 
 	/**
-	 * Decrypt data using base64.
+	 * Base64-encode a string.
 	 *
-	 * @param string $input The input string which needs to be decrypted.
+	 * @deprecated 2.12.3 Use {@see self::encode()}. The name wrongly implied a security
+	 *             boundary — this is unkeyed base64, not encryption.
+	 *
+	 * @param string $input The input string to encode.
 	 * @since 0.0.1
-	 * @return string The decrypted string.
+	 * @return string The base64-encoded string.
 	 */
-	public static function decrypt( $input ) {
+	public static function encrypt( $input ) {
+		return self::encode( $input );
+	}
+
+	/**
+	 * Base64-decode a string produced by encode().
+	 *
+	 * Replaces decrypt(), which is retained as a deprecated alias. The decoding itself
+	 * is unchanged since 0.0.1 — only the name is new.
+	 *
+	 * NOT DECRYPTION. See {@see self::encode()} — the result is unauthenticated and
+	 * attacker-forgeable; do not trust it where integrity matters. The output is raw
+	 * submitted bytes: no tag stripping, no sanitising. Escape it at the sink.
+	 *
+	 * @param string $input The input string to decode.
+	 * @since 2.12.3
+	 * @return string The decoded string.
+	 */
+	public static function decode( $input ) {
 		// If the input is empty or not a string, then abandon ship.
 		if ( empty( $input ) || ! is_string( $input ) ) {
 			return '';
 		}
 
-		// Decrypt the input and return it.
+		// Base64-decode the input and return it.
 		$base_64 = $input . str_repeat( '=', strlen( $input ) % 4 );
 		return base64_decode( $base_64 ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
+	}
+
+	/**
+	 * Base64-decode a string.
+	 *
+	 * @deprecated 2.12.3 Use {@see self::decode()}. The name wrongly implied a security
+	 *             boundary — this is unkeyed base64, not decryption.
+	 *
+	 * @param string $input The input string to decode.
+	 * @since 0.0.1
+	 * @return string The decoded string.
+	 */
+	public static function decrypt( $input ) {
+		return self::decode( $input );
 	}
 
 	/**
@@ -683,6 +747,41 @@ class Helper {
 			__( 'Sorry, you are not allowed to perform this action.', 'sureforms' ),
 			[ 'status' => \rest_authorization_required_code() ]
 		);
+	}
+
+	/**
+	 * Resolve the submitting user, surviving REST's nonce-less de-authentication.
+	 *
+	 * The public form endpoints authenticate with the HMAC Submit_Token rather than
+	 * a nonce, because the form markup is page-cacheable and core answers a nonce
+	 * that fails verification with a hard 403 — a value baked into a cached page
+	 * would break submissions once it aged out.
+	 *
+	 * The trade-off is that `rest_cookie_check_errors()` treats a cookie-carrying
+	 * REST request with no nonce as anonymous and calls `wp_set_current_user( 0 )`
+	 * before dispatch. So `get_current_user_id()` returns 0 during a submission even
+	 * when the visitor is signed in, which silently drops entry attribution and
+	 * blanks every `{user_*}` smart tag.
+	 *
+	 * `wp_validate_auth_cookie()` reads the logged-in cookie directly and is
+	 * unaffected by that reset. It verifies the cookie's HMAC, so the identity is
+	 * authenticated, not merely asserted — this is the same check core itself uses
+	 * for cookie auth, and the pattern already used by the Pro login route.
+	 *
+	 * Returns 0 for genuinely anonymous submissions, so callers can keep treating
+	 * falsy as "not logged in".
+	 *
+	 * @since 2.12.6
+	 * @return int User ID, or 0 when the submitter is not signed in.
+	 */
+	public static function get_submitting_user_id() {
+		$user_id = get_current_user_id();
+
+		if ( $user_id ) {
+			return $user_id;
+		}
+
+		return absint( wp_validate_auth_cookie( '', 'logged_in' ) );
 	}
 
 	/**
@@ -2045,6 +2144,27 @@ class Helper {
 	}
 
 	/**
+	 * Whether SureForms promotional content should be hidden.
+	 *
+	 * Covers review requests, cross-sell banners and announcements. The free
+	 * plugin never hides them on its own; SureForms Pro's Distraction Free mode
+	 * turns this on through the filter.
+	 *
+	 * @since 2.12.8
+	 * @return bool
+	 */
+	public static function hide_promotions() {
+		/**
+		 * Filter whether SureForms hides its promotional content in wp-admin.
+		 *
+		 * @since 2.12.8
+		 *
+		 * @param bool $hide Default false.
+		 */
+		return (bool) apply_filters( 'srfm_hide_promotions', false );
+	}
+
+	/**
 	 * Verifies the request by checking the nonce and user capabilities.
 	 *
 	 * @param string $request_type The type of request, either 'rest' or 'ajax'.
@@ -2108,6 +2228,60 @@ class Helper {
 	 */
 	public static function get_block_name_from_field( $field_name ) {
 		return implode( '-', array_slice( explode( '-', explode( '-lbl-', $field_name )[0] ), 0, 2 ) );
+	}
+
+	/**
+	 * The active caching plugin, if there is one.
+	 *
+	 * Caching matters to SureForms because a cached page serves the same HTML to
+	 * everyone: the submission token is embedded at render time, and an
+	 * aggressively cached or JS-combining setup can serve a stale token or reorder
+	 * the scripts a form depends on. This is what surfaces that to the site owner
+	 * before it turns into "my form stopped working".
+	 *
+	 * @since 2.12.6
+	 * @return string Human-readable plugin name, or '' when none is active.
+	 */
+	public static function get_active_caching_plugin() {
+		$entry = self::get_active_caching_plugin_entry();
+
+		return null === $entry ? '' : $entry[0];
+	}
+
+	/**
+	 * Setup guide for the active caching plugin.
+	 *
+	 * Six of the recognised plugins have a guide of their own; the rest, and any
+	 * site with none detected, get the general one. Sending someone to a page that
+	 * names the plugin they actually run is the difference between advice they can
+	 * follow and advice they have to translate.
+	 *
+	 * Falls back to the general guide rather than returning nothing, so the notice
+	 * always has somewhere to send them.
+	 *
+	 * @since 2.12.7
+	 * @param string $medium Placement the link is rendered in, used as utm_medium.
+	 *                       Two surfaces show this guide -- the dashboard notice and
+	 *                       the onboarding step -- and a shared value would make the
+	 *                       two indistinguishable in reporting, which is the whole
+	 *                       point of the attribution.
+	 * @return string Absolute documentation URL.
+	 */
+	public static function get_caching_plugin_doc_url( $medium = 'form_checks_notice' ) {
+		$entry = self::get_active_caching_plugin_entry();
+		$slug  = null === $entry || '' === $entry[1] ? 'how-to-set-up-sureforms-with-caching-plugins' : $entry[1];
+
+		// Through the central builder rather than hardcoding the domain, so the
+		// link carries the same UTM attribution as every other doc link and a
+		// domain change is one edit. utm_content is the slug, so the caller can be
+		// told which guide people actually open.
+		return self::get_sureforms_website_url(
+			'docs/' . $slug . '/',
+			[
+				'utm_medium'  => self::get_string_value( $medium ),
+				'utm_content' => $slug,
+			]
+		);
 	}
 
 	/**
@@ -2639,6 +2813,79 @@ class Helper {
 	 */
 	private static function get_geo_failure_ttl() {
 		return self::get_integer_value( apply_filters( 'srfm_geo_failure_ttl', 5 * MINUTE_IN_SECONDS ) );
+	}
+
+	/**
+	 * Caching plugins SureForms recognises, and the guide for each.
+	 *
+	 * `path => [ display name, doc slug ]`. An empty slug means there is no
+	 * plugin-specific guide and the general one applies. Name and slug live in one
+	 * array on purpose: keyed separately they drift, and a doc link that silently
+	 * degrades to the generic page is the kind of regression nobody reports.
+	 *
+	 * Order is precedence: the first active plugin in this list wins. The six with
+	 * their own guide are listed first on purpose, so a site running two caching
+	 * plugins is pointed at the specific guide rather than whichever plugin the
+	 * old alphabetical order happened to reach first. That flips the winner on a
+	 * few pairs -- WP Fastest Cache over WP Super Cache, SiteGround Optimizer and
+	 * Autoptimize over their partners -- and in each case the new winner is the
+	 * one that has something to say. Reordering this array changes which guide a
+	 * two-plugin site sees.
+	 *
+	 * @since 2.12.7
+	 * @return array<string,array{0:string,1:string}>
+	 */
+	private static function get_known_caching_plugins() {
+		return [
+			'litespeed-cache/litespeed-cache.php'        => [ 'LiteSpeed Cache', 'how-to-set-up-sureforms-with-litespeed-cache' ],
+			'wp-rocket/wp-rocket.php'                    => [ 'WP Rocket', 'how-to-set-up-sureforms-with-wp-rocket' ],
+			'w3-total-cache/w3-total-cache.php'          => [ 'W3 Total Cache', 'how-to-set-up-sureforms-with-w3-total-cache' ],
+			'wp-fastest-cache/wpFastestCache.php'        => [ 'WP Fastest Cache', 'how-to-set-up-sureforms-with-wp-fastest-cache' ],
+			'sg-cachepress/sg-cachepress.php'            => [ 'SiteGround Optimizer', 'how-to-set-up-sureforms-with-siteground-optimizer' ],
+			'autoptimize/autoptimize.php'                => [ 'Autoptimize', 'how-to-set-up-sureforms-with-autoptimize' ],
+			'wp-super-cache/wp-cache.php'                => [ 'WP Super Cache', '' ],
+			'wp-optimize/wp-optimize.php'                => [ 'WP-Optimize', '' ],
+			'cache-enabler/cache-enabler.php'            => [ 'Cache Enabler', '' ],
+			'comet-cache/comet-cache.php'                => [ 'Comet Cache', '' ],
+			'hummingbird-performance/wp-hummingbird.php' => [ 'Hummingbird', '' ],
+			'breeze/breeze.php'                          => [ 'Breeze', '' ],
+			'nitropack/main.php'                         => [ 'NitroPack', '' ],
+			'swift-performance-lite/performance.php'     => [ 'Swift Performance Lite', '' ],
+			'wp-cloudflare-page-cache/wp-cloudflare-page-cache.php' => [ 'Super Page Cache', '' ],
+			'flying-press/flying-press.php'              => [ 'FlyingPress', '' ],
+			'redis-cache/redis-cache.php'                => [ 'Redis Object Cache', '' ],
+			'powered-cache/powered-cache.php'            => [ 'Powered Cache', '' ],
+			'docket-cache/docket-cache.php'              => [ 'Docket Cache', '' ],
+			'seraphinite-accelerator/plugin_root.php'    => [ 'Seraphinite Accelerator', '' ],
+		];
+	}
+
+	/**
+	 * The active caching plugin's entry, if there is one.
+	 *
+	 * Detection is by plugin path, mirroring is_any_smtp_plugin_active(), including
+	 * the multisite network-active merge. First match in
+	 * get_known_caching_plugins() wins; that array's order is the precedence.
+	 *
+	 * @since 2.12.7
+	 * @return array{0:string,1:string}|null Name and doc slug, or null when none is active.
+	 */
+	private static function get_active_caching_plugin_entry() {
+		$active_plugins = (array) get_option( 'active_plugins', [] );
+
+		// For multisite, merge sitewide active plugins.
+		if ( is_multisite() ) {
+			$network_plugins = (array) get_site_option( 'active_sitewide_plugins', [] );
+			$active_plugins  = array_merge( $active_plugins, array_keys( $network_plugins ) );
+		}
+
+		foreach ( self::get_known_caching_plugins() as $path => $entry ) {
+			if ( in_array( $path, $active_plugins, true ) ) {
+				return $entry;
+			}
+		}
+
+		return null;
 	}
 
 }

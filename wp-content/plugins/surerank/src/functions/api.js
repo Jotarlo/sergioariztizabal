@@ -189,6 +189,16 @@ export const getAuth = () => {
 };
 
 /**
+ * Fetch bulk content generation batch status
+ * @return {Promise<Object>} The batch status
+ */
+export const batchStatus = () => {
+	return apiFetch( {
+		path: `${ API_BASE_URL }/content-generation/batch-status`,
+	} );
+};
+
+/**
  * Save AI access token
  * @param {string} accessKey The access token
  * @return {Promise<Object>} The response from the API
@@ -199,6 +209,25 @@ export const saveAuthAccessToken = ( accessKey ) => {
 		method: 'POST',
 		data: { accessKey },
 	} );
+};
+
+/**
+ * Disconnect SureRank AI
+ * @return {Promise<Object>} The response from the API
+ */
+export const disconnectAuth = () => {
+	return apiFetch( {
+		path: `${ API_BASE_URL }/ai/auth`,
+		method: 'DELETE',
+	} );
+};
+
+/**
+ * Get combined SureRank AI usage
+ * @return {Promise<Object>} The usage payload { usage: { percent, features } }
+ */
+export const getAIUsage = () => {
+	return apiFetch( { path: `${ API_BASE_URL }/ai/usage` } );
 };
 
 /**

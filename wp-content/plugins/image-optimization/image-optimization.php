@@ -3,7 +3,7 @@
  * Plugin Name: Image Optimization - Optimize Images and Convert to WebP or AVIF
  * Description: Automatically resize, optimize, and convert images to WebP and AVIF. Compress images in bulk or on upload to boost your WordPress site performance.
  * Plugin URI: https://go.elementor.com/wp-repo-description-tab-io-product-page/
- * Version: 1.7.6
+ * Version: 1.7.7
  * Author: Elementor.com
  * Author URI: https://go.elementor.com/author-uri-io/
  * Text Domain: image-optimization
@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'IMAGE_OPTIMIZATION_VERSION', '1.7.6' );
+define( 'IMAGE_OPTIMIZATION_VERSION', '1.7.7' );
 define( 'IMAGE_OPTIMIZATION_FILE', __FILE__ );
 define( 'IMAGE_OPTIMIZATION_PATH', plugin_dir_path( IMAGE_OPTIMIZATION_FILE ) );
 define( 'IMAGE_OPTIMIZATION_URL', plugins_url( '/', IMAGE_OPTIMIZATION_FILE ) );

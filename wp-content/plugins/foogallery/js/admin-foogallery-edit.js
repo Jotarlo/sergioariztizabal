@@ -1,0 +1,2186 @@
+FooGallery.autoEnabled = false;
+
+(function (FOOGALLERY, $, undefined) {
+
+    FOOGALLERY.media_uploader = false;
+    FOOGALLERY.previous_post_id = 0;
+    FOOGALLERY.attachments = [];
+    FOOGALLERY.selected_attachment_id = 0;
+    FOOGALLERY.selected_gallery_template = '';
+    FOOGALLERY.dropzoneUploader = null;
+    FOOGALLERY.dropzoneInitialized = false;
+    FOOGALLERY.suppressPreviewRefresh = false;
+    FOOGALLERY.lockedSettingFieldSelector = '.foogallery_template_field[data-foogallery-locked]';
+
+    // Used for selecting files from the media modal.
+    FOOGALLERY.current_media_selector_modals = false;
+    FOOGALLERY.current_media_selector_input = false;
+
+    // A visually hidden row may still be needed by the other viewport.
+    FOOGALLERY.isSettingDependencyInactive = function($field) {
+        var active = $field.attr('data-foogallery-dependency-active');
+        return active === 'false' || (active === undefined && $field.hasClass('foogallery_template_field_template_hidden'));
+    };
+
+    FOOGALLERY.enforceLockedSettingFields = function($container) {
+        $container.find(FOOGALLERY.lockedSettingFieldSelector)
+            .find(':input, range-input')
+            .attr('disabled', true);
+    };
+
+    FOOGALLERY.enableUnlockedSettingFields = function($container) {
+        $container.find(':input').not(function() {
+            return $(this).closest(FOOGALLERY.lockedSettingFieldSelector).length > 0 ||
+                FOOGALLERY.isSettingDependencyInactive($(this).closest('.foogallery_template_field'));
+        }).prop('disabled', false);
+
+        $container.find('range-input').each(function() {
+            if ($(this).closest(FOOGALLERY.lockedSettingFieldSelector).length === 0 &&
+                !FOOGALLERY.isSettingDependencyInactive($(this).closest('.foogallery_template_field'))) {
+                this.removeAttribute('disabled');
+            }
+        });
+
+		$container.find('.foogallery-setting-control-mobile').each(function() {
+			var $control = $(this),
+				$field = $control.closest('.foogallery_template_field'),
+				locked = $field.attr('data-foogallery-locked') !== undefined,
+				hidden = FOOGALLERY.isSettingDependencyInactive($field);
+
+			$control.prop('disabled', locked || hidden);
+		});
+
+        FOOGALLERY.enforceLockedSettingFields($container);
+    };
+
+    // Viewport controller for responsive preview
+    FOOGALLERY.previewActionsController = {
+        currentViewport: 'desktop',
+        viewports: ['desktop', 'tablet', 'mobile'],
+		mobilePromoId: 0,
+        
+        init: function() {
+            this.bindEvents();
+            this.setViewport('desktop'); // Default to desktop
+        },
+        
+		bindEvents: function() {
+			var self = this;
+
+			$('#foogallery_settings').on('click', '.foogallery-setting-mobile-locked', function(e) {
+				e.preventDefault();
+				var $button = $(this),
+					$field = $button.closest('.foogallery_template_field'),
+					label = $button.attr('data-foogallery-mobile-promo-label') || $.trim($field.find('.foogallery-setting-label').first().text()),
+					promo = FOOGALLERY.il8n && FOOGALLERY.il8n.mobileSettingsPromo;
+
+				if (!promo) return;
+				self.setResponsiveSettingViewport($field, 'mobile');
+				FOOGALLERY.handleSettingsShowRules();
+				$('.foogallery-mobile-settings-promo').each(function() {
+					$(this).find('.notice-dismiss').trigger('click');
+				});
+				self.mobilePromoId++;
+				var title = (promo.title || '').replace('{field}', label),
+					promoId = 'foogallery-mobile-settings-promo-' + self.mobilePromoId,
+					titleId = promoId + '-title',
+					$trayRow = $('<tr class="foogallery-mobile-settings-promo-row"><th aria-hidden="true"></th><td></td></tr>'),
+					$tray = $('<div class="foogallery-mobile-settings-promo" role="dialog" aria-modal="false" tabindex="-1">')
+						.attr({id: promoId, 'aria-labelledby': titleId})
+						.append($('<button type="button" class="notice-dismiss" aria-label="">').attr('aria-label', promo.close || 'Close'))
+						.append($('<strong>').attr('id', titleId).text(title))
+						.append($('<p>').text(promo.body || ''))
+						.append($('<a class="button button-primary" target="_blank" rel="noopener">').attr('href', promo.trialUrl || '#').text(promo.trial || ''))
+						.append($('<a class="button" target="_blank" rel="noopener">').attr('href', promo.upgradeUrl || '#').text(promo.upgrade || ''))
+						.append($('<a class="button" target="_blank" rel="noopener">').attr('href', promo.compareUrl || '#').text(promo.compare || ''));
+				$trayRow.find('td').append($tray);
+				$field.after($trayRow);
+				$button.attr({'aria-expanded': 'true', 'aria-controls': promoId});
+				var closePromo = function() { $trayRow.remove(); $button.removeAttr('aria-controls').attr('aria-expanded', 'false').trigger('focus'); $(document).off('mousedown.foogalleryMobilePromo'); };
+				$tray.find('.notice-dismiss').on('click', closePromo);
+				$tray.on('keydown', function(event) { if ('Escape' === event.key) { $tray.find('.notice-dismiss').trigger('click'); } });
+				$(document).on('mousedown.foogalleryMobilePromo', function(event) { if (!$(event.target).closest('.foogallery-mobile-settings-promo, .foogallery-setting-mobile-locked').length) { closePromo(); } });
+				$tray.trigger('focus');
+			});
+
+			// Refresh buttons click
+			$('.foogallery-preview-actions .foogallery-preview-refresh-btn').on('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation(); // Prevent event bubbling
+                FOOGALLERY.reloadGalleryPreview();
+            });
+            
+            // Viewport button clicks
+			$('.foogallery-preview-actions .foogallery-viewport-btn').on('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation(); // Prevent event bubbling
+                var viewport = $(this).data('viewport'),
+                    scroll = viewport !== self.currentViewport ? FOOGALLERY.preservePreviewViewportScroll(this) : null;
+                self.setViewport(viewport, scroll);
+            });
+
+			$('#foogallery_settings').on('click', '.foogallery-setting-viewport-btn', function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				self.setResponsiveSettingViewport($(this).closest('.foogallery_template_field'), $(this).data('viewport'));
+				FOOGALLERY.handleSettingsShowRules();
+			});
+
+			var $currentButton = $('.foogallery-items-view-switch-container a.current'),
+				currentValue = $currentButton.data('value');
+
+			if ( currentValue === 'preview' ) {
+				//show the viewport buttons
+				$('.foogallery-preview-actions').show();
+			} else {
+				$('.foogallery-preview-actions').hide();
+			}
+        },
+        
+        setViewport: function(viewport, scroll) {
+			if ($.inArray(viewport, this.viewports) === -1) return;
+
+			var previousViewport = this.currentViewport,
+				viewportChanged = previousViewport !== viewport;
+
+            this.currentViewport = viewport;
+
+            // The core client already merges data-foogallery-mobile when this is true.
+            // Keep the selected preview viewport authoritative inside the editor.
+			if (typeof FooGallery !== 'undefined') FooGallery.isMobile = viewport === 'mobile';
+
+            // Update button states
+            $('.foogallery-viewport-btn')
+                .removeClass('active')
+                .attr('aria-pressed', 'false');
+            $('.foogallery-viewport-btn[data-viewport="' + viewport + '"]')
+                .addClass('active')
+                .attr('aria-pressed', 'true');
+            
+            // Update preview wrapper classes
+            var $wrapper = $('.foogallery-preview-wrapper');
+            
+            // If wrapper doesn't exist, create it by wrapping the preview container
+            if ($wrapper.length === 0) {
+                var $preview = $('.foogallery_preview_container');
+                if ($preview.length > 0) {
+                    $preview.wrap('<div class="foogallery-preview-wrapper viewport-desktop"></div>');
+                    $wrapper = $('.foogallery-preview-wrapper');
+                }
+            }
+            
+            if ($wrapper.length > 0) {
+                $wrapper.removeClass('viewport-desktop viewport-tablet viewport-mobile')
+                        .addClass('viewport-' + viewport);
+            }
+
+            this.updateResponsiveSettings();
+			FOOGALLERY.handleSettingsShowRules();
+
+            // Mobile options are read while the client template is constructed,
+            // so an existing preview must be reinitialized after a viewport change.
+			if (viewportChanged && typeof FooGallery !== 'undefined') {
+				var $gallery = $('.foogallery_preview_container .foogallery'),
+					instance = $gallery.data('__FooGallery__');
+
+                if (instance instanceof FooGallery.Template) {
+                    FOOGALLERY.updateGalleryPreview(true, true, scroll && scroll.finish);
+                } else if (scroll) {
+                    scroll.finish();
+                }
+            } else if (scroll) {
+                scroll.finish();
+            }
+
+            if (viewportChanged) {
+                $('body').trigger('foogallery-gallery-preview-viewport-changed', [viewport, previousViewport]);
+            }
+            if (scroll) scroll.restore();
+        },
+
+		updateResponsiveSettings: function() {
+			var self = this,
+				viewport = this.currentViewport === 'mobile' ? 'mobile' : 'desktop';
+
+			$('.foogallery_template_field[data-foogallery-mobile-friendly]').each(function() {
+				self.setResponsiveSettingViewport($(this), viewport, false);
+			});
+			$('.foogallery_template_field[data-foogallery-mobile-locked]').each(function() {
+				self.setResponsiveSettingViewport($(this), viewport, false);
+			});
+		},
+
+		setResponsiveSettingViewport: function($field, viewport, updateDependents) {
+			if (!$field.length || $.inArray(viewport, ['desktop', 'mobile']) === -1) return;
+
+			$field.attr('data-foogallery-setting-viewport', viewport);
+			FOOGALLERY.updateShortcodeArgumentHelpers($field);
+
+            // Follow a parent's device switch through shared and responsive children.
+            if (updateDependents !== false) {
+                var self = this,
+                    pending = [$field.attr('data-foogallery-setting-id')],
+                    visited = [],
+                    $dependents = $field.closest('.foogallery-settings-container')
+                        .find('[data-foogallery-show-when-field]');
+                while (pending.length) {
+                    var parentId = pending.shift();
+                    if (!parentId || visited.indexOf(parentId) !== -1) continue;
+                    visited.push(parentId);
+                    $dependents.each(function() {
+                        var $child = $(this);
+                        if ($child.attr('data-foogallery-show-when-field') === parentId) {
+                            pending.push($child.attr('data-foogallery-setting-id'));
+                            self.setResponsiveSettingViewport($child, viewport, false);
+                        }
+                    });
+                }
+            }
+
+			if ($field.is('[data-foogallery-mobile-locked]')) {
+				var isMobile = 'mobile' === viewport,
+					$lockedLabel = $field.find('.foogallery-setting-label').first(),
+					desktopFor = $lockedLabel.attr('data-desktop-for');
+
+				$field.find('.foogallery-setting-mobile-locked')
+					.toggleClass('active', isMobile)
+					.attr('aria-pressed', isMobile ? 'true' : 'false');
+				$field.find('.foogallery-setting-mobile-locked-desktop')
+					.toggleClass('active', !isMobile)
+					.attr('aria-pressed', isMobile ? 'false' : 'true');
+
+				if (desktopFor) {
+					$lockedLabel.attr('for', desktopFor);
+				}
+				return;
+			}
+
+			$field.find('.foogallery-setting-control').each(function() {
+				var $control = $(this),
+					isActive = $control.data('viewport') === viewport;
+
+				$control.prop('hidden', !isActive);
+			});
+
+			$field.find('.foogallery-setting-viewport-btn')
+				.removeClass('active')
+				.attr('aria-pressed', 'false');
+			$field.find('.foogallery-setting-viewport-btn[data-viewport="' + viewport + '"]')
+				.addClass('active')
+				.attr('aria-pressed', 'true');
+
+			var $label = $field.find('.foogallery-setting-label').first(),
+				forAttribute = $label.attr('data-' + viewport + '-for');
+
+			if (forAttribute) {
+				$label.attr('for', forAttribute);
+			} else {
+				$label.removeAttr('for');
+			}
+		}
+    };
+
+    FOOGALLERY.calculateAttachmentIds = function() {
+        var sorted = [];
+        $('.foogallery-attachments-list li:not(.add-attachment)').each(function() {
+        	if ( $(this).data('attachment-id') ) {
+                sorted.push($(this).data('attachment-id'));
+            }
+        });
+
+        $('#foogallery_attachments').val( sorted.join(',') );
+
+        // Force the datasource to be 'media_library' so that we do not get into a strange state with other datasources that were previously selected.
+        $('#foogallery_datasource').val('media_library');
+
+		$('.foogallery_preview_container').addClass('foogallery-preview-force-refresh');
+    };
+
+	FOOGALLERY.calculateHiddenAreas = function() {
+        FOOGALLERY.showHiddenAreas( FOOGALLERY.attachments.length === 0 );
+	};
+
+	FOOGALLERY.showHiddenAreas = function( show ) {
+        if ( show ) {
+            $('.foogallery-items-add').removeClass('foogallery-hidden');
+            $('.foogallery-attachments-list-container').addClass('foogallery-hidden');
+            $('.foogallery-items-empty').removeClass('foogallery-hidden');
+        } else {
+            $('.foogallery-items-add').addClass('foogallery-hidden');
+            $('.foogallery-attachments-list-container').removeClass('foogallery-hidden');
+            $('.foogallery-items-empty').addClass('foogallery-hidden');
+        }
+	};
+
+    FOOGALLERY.initAttachments = function() {
+        var attachments = $('#foogallery_attachments').val();
+		if (attachments) {
+			FOOGALLERY.attachments = $.map(attachments.split(','), function (value) {
+				return parseInt(value, 10);
+			});
+		}
+    };
+
+	FOOGALLERY.persistSettingValue = function($source, $target, settingType) {
+		if (!$source.length || !$target.length) return false;
+
+		switch (settingType) {
+			case 'radio':
+			case 'icon':
+			case 'htmlicon':
+				var selectedRadio = $source.find('input:checked').val();
+				if (selectedRadio !== undefined) {
+					var $newRadio = $target.find('input[value="' + selectedRadio + '"]'),
+						currentRadio = $target.find('input:checked').val();
+					if ($newRadio.length && currentRadio !== selectedRadio) {
+						$newRadio.prop('checked', true).trigger('change');
+						return true;
+					}
+				}
+				break;
+			case 'checkbox':
+				var isChecked = $source.find('input[type="checkbox"]').is(':checked'),
+					$newCheckbox = $target.find('input[type="checkbox"]');
+				if ($newCheckbox.length && $newCheckbox.is(':checked') !== isChecked) {
+					$newCheckbox.prop('checked', isChecked).trigger('change');
+					return true;
+				}
+				break;
+			case 'select':
+				var selectVal = $source.find('select').val(),
+					$newSelect = $target.find('select');
+				if ($newSelect.length && $newSelect.val() !== selectVal) {
+					$newSelect.val(selectVal).trigger('change');
+					return true;
+				}
+				break;
+			case 'text':
+			case 'textarea':
+			case 'number':
+			case 'slider':
+				var $input = $source.find(':input, range-input').first(),
+					value = $input.val(),
+					$newInput = $target.find(':input, range-input').first(),
+					currentValue = $newInput.val();
+
+				if ($newInput.length && currentValue !== value) {
+					$newInput.val(value).trigger('change');
+					return true;
+				}
+				break;
+			default:
+				console.log('Field type ' + settingType + ' is not supported for persisted settings.');
+				break;
+		}
+
+		return false;
+	};
+
+	FOOGALLERY.persistResponsiveSettingState = function($source, $target) {
+		if (!$source.is('[data-foogallery-mobile-friendly]') || !$target.is('[data-foogallery-mobile-friendly]')) {
+			return false;
+		}
+
+		var locked = $target.attr('data-foogallery-locked') !== undefined,
+			hidden = FOOGALLERY.isSettingDependencyInactive($target),
+			fallbackMode = $target.attr('data-foogallery-mobile-fallback-mode') || 'inherit',
+			settingType = $target.data('foogallery-setting-type'),
+			$desktopControl = $target.find('.foogallery-setting-control-desktop'),
+			$mobileControl = $target.find('.foogallery-setting-control-mobile'),
+			fallbackValue,
+			mobileValue;
+
+		$mobileControl.prop('disabled', locked || hidden);
+		if (locked || hidden) return true;
+
+		if (fallbackMode === 'inherit') {
+			fallbackValue = FOOGALLERY.getSettingControlValue($desktopControl, settingType);
+			$target.attr('data-foogallery-mobile-fallback-value', JSON.stringify(fallbackValue));
+		} else {
+			try {
+				fallbackValue = JSON.parse($target.attr('data-foogallery-mobile-fallback-value'));
+			} catch (error) {
+				return false;
+			}
+		}
+
+		mobileValue = FOOGALLERY.getSettingControlValue($mobileControl, settingType);
+		$target.attr(
+			'data-foogallery-mobile-mode',
+			FOOGALLERY.mobileSettingValuesMatch(mobileValue, fallbackValue) ? fallbackMode : 'custom'
+		);
+
+		return true;
+	};
+
+	FOOGALLERY.setSettingControlValue = function($target, settingType, value) {
+		if (!$target.length) return;
+
+		switch (settingType) {
+			case 'radio':
+			case 'icon':
+			case 'htmlicon':
+				$target.find('input[type="radio"]').prop('checked', false).filter(function() {
+					return $(this).val() === String(value);
+				}).prop('checked', true);
+				break;
+			case 'checkbox':
+				$target.find('input[type="checkbox"]').prop('checked', value === 'on');
+				break;
+			case 'select':
+				$target.find('select').val(value);
+				break;
+			case 'text':
+			case 'textarea':
+			case 'number':
+			case 'slider':
+				$target.find(':input, range-input').first().val(value);
+				break;
+			default:
+				if ($.isPlainObject(value)) {
+					$.each(value, function(key, childValue) {
+						$target.find('[name$="[' + key + ']"]').val(childValue);
+					});
+				}
+				break;
+		}
+	};
+
+	FOOGALLERY.getSettingControlValue = function($source, settingType) {
+		if (!$source.length) return undefined;
+
+		switch (settingType) {
+			case 'radio':
+			case 'icon':
+			case 'htmlicon':
+				return $source.find('input:checked').val();
+			case 'checkbox':
+				return $source.find('input[type="checkbox"]').is(':checked') ? 'on' : '';
+			case 'select':
+				return $source.find('select').val();
+			case 'text':
+			case 'textarea':
+			case 'number':
+			case 'slider':
+				return $source.find(':input, range-input').first().val();
+			default:
+				var value = {};
+				$.each($source.find(':input').serializeArray(), function(index, entry) {
+					var key = entry.name.match(/\[([^\]]+)\]$/);
+					if (key) value[key[1]] = entry.value;
+				});
+				return value;
+		}
+	};
+
+	FOOGALLERY.syncInheritedMobileSetting = function($field, changedElement) {
+		if (!$field.length ||
+			$field.attr('data-foogallery-mobile-fallback-mode') !== 'inherit' ||
+			FOOGALLERY.isSettingDependencyInactive($field) ||
+			$field.attr('data-foogallery-locked') !== undefined) return false;
+
+		var $desktopControl = $(changedElement).closest('.foogallery-setting-control-desktop'),
+			$mobileControl = $field.find('.foogallery-setting-control-mobile'),
+			settingType = $field.data('foogallery-setting-type'),
+			value;
+
+		if (!$desktopControl.length || !$mobileControl.length) return false;
+
+		value = FOOGALLERY.getSettingControlValue($desktopControl, settingType);
+		if (value === undefined) return false;
+
+		$field.attr('data-foogallery-mobile-fallback-value', JSON.stringify(value));
+		if ($field.attr('data-foogallery-mobile-mode') === 'inherit') {
+			FOOGALLERY.setSettingControlValue($mobileControl, settingType, value);
+		}
+
+		return true;
+	};
+
+	FOOGALLERY.mobileSettingValuesMatch = function(left, right) {
+		if ($.isPlainObject(left) || $.isPlainObject(right) || Array.isArray(left) || Array.isArray(right)) {
+			return JSON.stringify(left) === JSON.stringify(right);
+		}
+
+		return String(left == null ? '' : left) === String(right == null ? '' : right);
+	};
+
+	FOOGALLERY.syncMobileSettingMode = function($field, changedElement) {
+		var $mobileControl = $(changedElement).closest('.foogallery-setting-control-mobile'),
+			fallbackValue,
+			value;
+
+		if (!$field.length || !$mobileControl.length) return false;
+
+		try {
+			fallbackValue = JSON.parse($field.attr('data-foogallery-mobile-fallback-value'));
+		} catch (error) {
+			return false;
+		}
+
+		value = FOOGALLERY.getSettingControlValue($mobileControl, $field.data('foogallery-setting-type'));
+		$field.attr(
+			'data-foogallery-mobile-mode',
+			FOOGALLERY.mobileSettingValuesMatch(value, fallbackValue)
+				? ($field.attr('data-foogallery-mobile-fallback-mode') || 'inherit')
+				: 'custom'
+		);
+
+		return true;
+	};
+
+	/**
+	 * Keep initialized inactive layouts out of the document. Retaining the original
+	 * elements preserves unsaved values, widget instances and direct event handlers.
+	 * Inactive fields are already disabled and excluded from gallery saves.
+	 */
+	FOOGALLERY.initTemplateSettingsStorage = function () {
+		if ( FOOGALLERY.templateSettings ) {
+			return;
+		}
+
+		FOOGALLERY.templateSettings = $(
+			'#foogallery_settings .foogallery-settings-container'
+		);
+		FOOGALLERY.templateSettings.each( function () {
+			const placeholder = document.createComment(
+				'FooGallery layout settings'
+			);
+			this.parentNode.insertBefore( placeholder, this );
+			$( this ).data( 'foogallery-settings-placeholder', placeholder );
+		} );
+
+		FOOGALLERY.templateSettings
+			.not( '.foogallery-settings-container-active' )
+			.detach();
+	};
+
+	/**
+	 * Mount a stored layout before persistence, visibility rules and extension hooks run.
+	 *
+	 * @param {string} template The selected gallery layout slug.
+	 */
+	FOOGALLERY.mountTemplateSettings = function ( template ) {
+		if ( ! FOOGALLERY.templateSettings ) {
+			return;
+		}
+
+		FOOGALLERY.templateSettings
+			.filter( '.foogallery-settings-container-' + template )
+			.each( function () {
+				const placeholder = $( this ).data(
+					'foogallery-settings-placeholder'
+				);
+				if (
+					! this.parentNode &&
+					placeholder &&
+					placeholder.parentNode
+				) {
+					placeholder.parentNode.insertBefore(
+						this,
+						placeholder.nextSibling
+					);
+				}
+			} );
+	};
+
+	FOOGALLERY.galleryTemplateChanged = function(reloadPreview) {
+		const selectedTemplate = FOOGALLERY.getSelectedTemplate();
+
+		FOOGALLERY.mountTemplateSettings( selectedTemplate );
+
+		var $settingsToShow = $('.foogallery-settings-container-' + selectedTemplate),
+			$settingsToHide = $('.foogallery-settings-container').not($settingsToShow),
+			$currentTab = $settingsToHide.find('.foogallery-vertical-tab.foogallery-tab-active'),
+			currentTab = $currentTab.data('name'),
+			currentChildTab = $currentTab.find('.foogallery-vertical-child-tab.foogallery-tab-active').data('name'),
+			previousSelectedTemplate = FOOGALLERY.selected_gallery_template;
+
+		FOOGALLERY.selected_gallery_template = selectedTemplate;
+
+		var previousSuppressState = FOOGALLERY.suppressPreviewRefresh;
+		FOOGALLERY.suppressPreviewRefresh = true;
+
+		var persistedCount = 0;
+
+		//check for persist settings
+		$('.foogallery-settings-container-' + previousSelectedTemplate + ' [data-foogallery-persist]').each(function() {
+			var $this = $(this),
+				settingId = $this.data('foogallery-setting-id'),
+				settingType = $this.data('foogallery-setting-type'),
+				$newSetting = $settingsToShow.find('[data-foogallery-setting-id="' + settingId + '"]');
+			
+			if ( FOOGALLERY.isSettingDependencyInactive($this) ) {
+				return;
+			}
+			
+			if ( $newSetting.length ) {
+				var $sources = $this.is('[data-foogallery-mobile-friendly]') ? $this.find('.foogallery-setting-control') : $this;
+
+				$sources.each(function() {
+					var $source = $(this),
+						viewport = $source.data('viewport'),
+						$target = viewport ? $newSetting.find('.foogallery-setting-control[data-viewport="' + viewport + '"]') : $newSetting;
+
+					if (FOOGALLERY.persistSettingValue($source, $target, settingType)) {
+						persistedCount++;
+					}
+				});
+
+				FOOGALLERY.persistResponsiveSettingState($this, $newSetting);
+			}
+		});
+
+		console.log('Persisted ' + persistedCount + ' settings.');
+
+		FOOGALLERY.suppressPreviewRefresh = previousSuppressState;
+
+		//hide all template fields
+		$settingsToHide.hide()
+			.removeClass('foogallery-settings-container-active')
+			.find(':input, range-input').attr('disabled', true);
+
+		if ( FOOGALLERY.templateSettings ) {
+			$settingsToHide.detach();
+		}
+
+		//show all fields for the selected template only
+		$settingsToShow.show()
+			.addClass('foogallery-settings-container-active');
+
+		FOOGALLERY.enableUnlockedSettingFields($settingsToShow);
+		FOOGALLERY.previewActionsController.updateResponsiveSettings();
+
+		if (currentTab) {
+			currentTab = currentTab.replace( previousSelectedTemplate, selectedTemplate );
+
+			//ensure the previously active tab is clicked
+			$settingsToShow.find('.foogallery-vertical-tab[data-name="' + currentTab + '"]').trigger('click');
+
+			if (currentChildTab) {
+				currentChildTab = currentChildTab.replace( previousSelectedTemplate, selectedTemplate );
+
+				//ensure the previously active child tab is clicked
+				$settingsToShow.find('.foogallery-vertical-child-tab[data-name="' + currentChildTab + '"]').trigger('click');
+			}
+		}
+
+		// always ensure a tab is clicked
+		if ( $settingsToShow.find('.foogallery-vertical-tab.foogallery-tab-active').length === 0 ) {
+			$settingsToShow.find('.foogallery-vertical-tab:first').trigger('click');
+		}
+
+		//trigger a change so custom template js can do something
+		FOOGALLERY.triggerTemplateChangedEvent();
+
+		if (reloadPreview) {
+			FOOGALLERY.reloadGalleryPreview();
+		}
+	};
+
+	FOOGALLERY.handleSettingFieldChange = function(reloadPreview, setContainerHeight) {
+
+		//make sure the fields that should be hidden or shown are doing what they need to do
+        FOOGALLERY.handleSettingsShowRules();
+
+		//update the gallery preview
+		FOOGALLERY.updateGalleryPreview(reloadPreview, setContainerHeight);
+	};
+
+	FOOGALLERY.handleSettingControlChange = function($fieldContainer, changedElement) {
+		FOOGALLERY.syncInheritedMobileSetting($fieldContainer, changedElement);
+		FOOGALLERY.syncMobileSettingMode($fieldContainer, changedElement);
+
+		if ($fieldContainer.data('foogallery-preview') && $fieldContainer.data('foogallery-preview').indexOf('shortcode') !== -1) {
+			FOOGALLERY.reloadGalleryPreview();
+		} else {
+			FOOGALLERY.handleSettingFieldChange(
+				$fieldContainer.data('foogallery-preview') && $fieldContainer.data('foogallery-preview').indexOf('class') !== -1,
+				true
+			);
+		}
+	};
+
+	/**
+	 * Keep the clicked preview button in place through reinitialization and the
+	 * wrapper's 300ms width transition. Yield immediately to further user input.
+	 */
+	FOOGALLERY.preservePreviewViewportScroll = function ( button ) {
+		if ( FOOGALLERY.previewViewportScroll )
+			FOOGALLERY.previewViewportScroll.stop();
+		const before = button.getBoundingClientRect();
+		if (
+			! before.height ||
+			before.bottom <= 0 ||
+			before.top >= window.innerHeight
+		)
+			return null;
+
+		let frame,
+			stopped = false,
+			settleUntil = Infinity;
+		const deadline = Date.now() + 10000;
+		const inputs = [ 'wheel', 'touchmove', 'pointerdown', 'keydown' ];
+		const scroll = {
+			restore: function () {
+				if ( stopped ) return;
+				if ( ! button.isConnected || ! button.getClientRects().length ) {
+					scroll.stop();
+					return;
+				}
+				const displacement =
+					button.getBoundingClientRect().top - before.top;
+				if ( Math.abs( displacement ) > 1 ) {
+					window.scrollBy( {
+						top: displacement,
+						left: 0,
+						behavior: 'instant',
+					} );
+				}
+			},
+			finish: function () {
+				// Keep watching until the width animation has had time to finish.
+				settleUntil = Date.now() + 350;
+			},
+			stop: function () {
+				stopped = true;
+				window.cancelAnimationFrame( frame );
+				inputs.forEach( function ( type ) {
+					document.removeEventListener( type, onInput, true );
+				} );
+				if ( FOOGALLERY.previewViewportScroll === scroll )
+					FOOGALLERY.previewViewportScroll = null;
+			},
+		};
+		function onInput( event ) {
+			const activatesButton =
+				event.type === 'pointerdown' ||
+				( event.type === 'keydown' &&
+					( event.key === 'Enter' || event.key === ' ' ) );
+			if (
+				activatesButton &&
+				$( event.target ).closest(
+					'.foogallery-preview-actions .foogallery-viewport-btn'
+				).length
+			)
+				return;
+			scroll.stop();
+		}
+		function tick() {
+			if ( Date.now() >= Math.min( deadline, settleUntil ) ) {
+				scroll.stop();
+				return;
+			}
+			scroll.restore();
+			if ( ! stopped ) frame = window.requestAnimationFrame( tick );
+		}
+		FOOGALLERY.previewViewportScroll = scroll;
+		inputs.forEach( function ( type ) {
+			document.addEventListener( type, onInput, {
+				capture: true,
+				passive: true,
+			} );
+		} );
+		frame = window.requestAnimationFrame( tick );
+		return scroll;
+	};
+
+	/**
+	 * Release the preview's temporary height without moving visible settings.
+	 * Measure at completion so scrolling while an AJAX preview loads is respected.
+	 */
+	FOOGALLERY.releaseGalleryPreviewHeight = function ( $previewContainer ) {
+		if ( FOOGALLERY.previewViewportScroll ) {
+			$previewContainer.css( 'height', '' );
+			FOOGALLERY.previewViewportScroll.restore();
+			return;
+		}
+		const settings = document.getElementById( 'foogallery_settings' ),
+			preview = $previewContainer[ 0 ],
+			before = settings && settings.getBoundingClientRect(),
+			preservePosition =
+				before &&
+				preview &&
+				$previewContainer.is( ':visible' ) &&
+				before.height > 0 &&
+				before.bottom > 0 &&
+				before.top < window.innerHeight &&
+				preview.getBoundingClientRect().bottom <= before.top;
+
+		$previewContainer.css( 'height', '' );
+
+		if ( preservePosition ) {
+			// Use the remaining viewport displacement: native scroll anchoring may
+			// already have compensated for some or all of the height change.
+			const displacement = settings.getBoundingClientRect().top - before.top;
+			if ( Math.abs( displacement ) > 1 ) {
+				window.scrollBy( {
+					top: displacement,
+					left: 0,
+					behavior: 'instant',
+				} );
+			}
+		}
+	};
+
+	FOOGALLERY.updateGalleryPreview = function( initGallery, setContainerHeight, onUpdated ) {
+		var $preview = $('.foogallery_preview_container .foogallery'),
+			$preview_container = $('.foogallery_preview_container');
+		var releaseHeight = function() {
+			FOOGALLERY.releaseGalleryPreviewHeight($preview_container);
+			if (typeof onUpdated === 'function') onUpdated();
+		};
+
+		if ( setContainerHeight ) {
+			$preview_container.css('height', $preview_container.height());
+		}
+
+		//this allows any extensions to hook into the template change event
+		$('body').trigger('foogallery-gallery-preview-updated' + FOOGALLERY.getSelectedTemplate() );
+
+		//this handles all built-in templates that use the FooGallery core client side JS
+		if ( $preview.data('fg-common-fields') ) {
+			if ( initGallery ) {
+				$preview.foogallery( {}, function() {
+					releaseHeight();
+					if ( !$preview_container.find('.foogallery').data('foogallery-lightbox') ) {
+						$preview_container.find(".fg-thumb").off("click.foogallery").on("click", function (e) {
+							e.preventDefault();
+						});
+					}
+				} );
+			} else {
+				$preview.foogallery( 'layout' );
+				releaseHeight();
+			}
+		} else {
+			//reset the height to what it should be
+			releaseHeight();
+		}
+	};
+
+	FOOGALLERY.getGalleryPreviewSettingsData = function($shortcodeFields) {
+		var data = [];
+
+		if (!$shortcodeFields.length) return data;
+
+		data = $shortcodeFields.find(':input').serializeArray();
+		$shortcodeFields.find('range-input').each(function() {
+			if (!this.hasAttribute('disabled') && !$(this).closest('fieldset:disabled').length) {
+				data.push({name: this.name, value: this.value});
+			}
+		});
+
+		return data;
+	};
+
+	FOOGALLERY.reloadGalleryPreview = function() {
+		if ( FOOGALLERY.suppressPreviewRefresh ) {
+			return;
+		}
+
+		//make sure the fields that should be hidden or shown are doing what they need to do
+		FOOGALLERY.handleSettingsShowRules();
+
+		var $preview_container = $('.foogallery_preview_container'),
+			$preview = $preview_container.find('.foogallery');
+
+		//set the preview height so there is no jump
+		$preview_container.css('height', $preview_container.height());
+
+		//build up all the data to generate a preview
+		var $shortcodeFields = $('.foogallery-settings-container-active .foogallery-metabox-settings .foogallery_template_field[data-foogallery-preview*="shortcode"]'),
+			data = FOOGALLERY.getGalleryPreviewSettingsData($shortcodeFields),
+			foogallery_id = $('#post_ID').val();
+
+        //clear any items just in case
+		window['foogallery-gallery-' + foogallery_id + '_items'] = null;
+
+        //add additional data for the preview
+		data.push({name: 'foogallery_id', value: foogallery_id});
+		data.push({name: 'foogallery_template', value: FOOGALLERY.getSelectedTemplate()});
+
+		//include other preview fields
+        var previewData = $('[data-foogallery-preview="include"]').serializeArray();
+        data = data.concat(previewData);
+
+		//data.push({name: 'foogallery_attachments', value: $('#foogallery_attachments').val()});
+        data.push({name: 'foogallery_datasource', value: $('#foogallery_datasource').val()});
+        data.push({name: 'foogallery_datasource_value', value: $('#_foogallery_datasource_value').val()});
+
+		//add data needed for the ajax call
+		data.push({name: 'action', value: 'foogallery_preview'});
+		data.push({name: 'foogallery_preview_nonce', value: $('#foogallery_preview').val()});
+		data.push({name: '_wp_http_referer', value: encodeURIComponent($('input[name="_wp_http_referer"]').val())});
+
+        $('#foogallery_preview_spinner').addClass('is-active');
+		$preview_container.addClass('loading');
+
+		if ($preview.length > 0){
+			var fg = $preview.data("__FooGallery__");
+			if (fg instanceof FooGallery.Template){
+				fg.destroy(false);
+			}
+		}
+
+        $.ajax({
+            type: "POST",
+            url: ajaxurl,
+            data: data,
+			cache: false,
+            success: function(data) {
+				$('.foogallery_preview_container .foogallery').foogallery("destroy");
+
+                //updated the preview
+				$preview_container.html(data);
+                $('#foogallery_preview_spinner').removeClass('is-active');
+				$preview_container.removeClass('loading foogallery-preview-force-refresh');
+
+				FOOGALLERY.updateGalleryPreview(true, true);
+            }
+        });
+	};
+
+	FOOGALLERY.handleSettingsShowRules = function() {
+        var $rows = $('.foogallery-settings-container-active .foogallery_template_field'),
+            rowsById = Object.create(null),
+            states = { desktop: new Map(), mobile: new Map() },
+            editorViewports = new Map();
+
+        $rows.each(function() {
+            rowsById[$(this).attr('data-foogallery-setting-id')] = $(this);
+        });
+
+        function editorViewport($row) {
+            var row = $row[0];
+            if (editorViewports.has(row)) return editorViewports.get(row);
+            editorViewports.set(row, 'desktop');
+            var $parent = rowsById[$row.attr('data-foogallery-show-when-field')],
+                viewport = $row.is('[data-foogallery-mobile-friendly]')
+                    ? $row.attr('data-foogallery-setting-viewport')
+                    : ($parent ? editorViewport($parent) : 'desktop');
+            editorViewports.set(row, viewport || 'desktop');
+            return viewport || 'desktop';
+        }
+
+        // Evaluate ancestors before descendants, independently of DOM order and visibility.
+        function isActive($row, viewport) {
+            var row = $row[0], cache = states[viewport];
+            if (cache.has(row)) return cache.get(row);
+            cache.set(row, false); // A cyclic dependency cannot activate itself.
+            var parentId = $row.attr('data-foogallery-show-when-field'),
+                $parent = rowsById[parentId],
+                active = !$row.is('[data-foogallery-hidden]');
+
+            if (parentId) {
+                if (!$parent) {
+                    active = true; // Some layouts replace a parent with a separate panel.
+                } else if (isActive($parent, viewport)) {
+                    var $scope = $parent.is('[data-foogallery-mobile-friendly]')
+                            ? $parent.find('.foogallery-setting-control[data-viewport="' + viewport + '"]') : $parent,
+                        selector = $parent.data('foogallery-value-selector'),
+                        attribute = $parent.data('foogallery-value-attribute'),
+                        expected = $row.data('foogallery-show-when-field-value'),
+                        operator = $row.data('foogallery-show-when-field-operator');
+                    active = false;
+                    $scope.find(selector).each(function() {
+                        var actual = attribute ? $(this).attr(attribute) : $(this).val();
+                        if (operator === '!==') active = active || actual !== expected;
+                        else if (operator === 'regex') active = active || new RegExp(expected).test(actual);
+                        else if (operator === 'indexOf') active = active || (actual != null && actual.indexOf(expected) !== -1);
+                        else active = active || actual === expected;
+                    });
+                } else {
+                    active = false;
+                }
+            }
+            cache.set(row, active);
+            return active;
+        }
+
+        $rows.filter('[data-foogallery-hidden], [data-foogallery-show-when-field]').each(function() {
+            var $row = $(this),
+                visible = isActive($row, editorViewport($row)),
+                required = isActive($row, 'desktop') || isActive($row, 'mobile');
+
+            $row.attr('data-foogallery-dependency-active', String(required))
+                .toggle(visible).toggleClass('foogallery_template_field_template_hidden', !visible);
+
+            // Submit both variants when either branch needs this row. The desktop
+            // value is also the fallback used when normalizing inherited mobile values.
+            $row.find(':input, range-input').attr('disabled', true);
+            if (required) {
+                FOOGALLERY.enableUnlockedSettingFields($row);
+                FOOGALLERY.persistResponsiveSettingState($row, $row);
+                $row.find('.colorpicker').not(function() {
+                    return $(this).closest(FOOGALLERY.lockedSettingFieldSelector).length > 0;
+                }).spectrum("enable");
+            }
+        });
+
+        FOOGALLERY.handleSettingsTabs();
+	};
+
+	FOOGALLERY.handleSettingsTabs = function() {
+			var $activeSettings = $('.foogallery-settings-container-active'),
+				$tabs = $activeSettings.find('.foogallery-vertical-tab');
+
+			$tabs.each(function() {
+			var $tab = $(this),
+				tabName = $tab.data('name'),
+				$content = $activeSettings.find('.foogallery-tab-content[data-name="' + tabName + '"]'),
+				hasVisibleFields = $content.find('tr:not(.foogallery_template_field_template_hidden)').length > 0;
+
+			$tab.find('.foogallery-vertical-child-tab').each(function() {
+				var $childTab = $(this),
+					childName = $childTab.data('name'),
+					$childContent = $activeSettings.find('.foogallery-tab-content[data-name="' + childName + '"]'),
+					childHasVisibleFields = $childContent.find('tr:not(.foogallery_template_field_template_hidden)').length > 0;
+
+				if (childHasVisibleFields) {
+					$childTab.show();
+					hasVisibleFields = true;
+				} else {
+					$childTab.hide().removeClass('foogallery-tab-active');
+					$childContent.removeClass('foogallery-tab-active');
+				}
+			});
+
+			if (hasVisibleFields) {
+				$tab.show();
+			} else {
+				$tab.hide().removeClass('foogallery-tab-active');
+				$content.removeClass('foogallery-tab-active');
+			}
+		});
+
+		var $activeTab = $activeSettings.find('.foogallery-vertical-tab.foogallery-tab-active:visible'),
+			$visibleTabs = $activeSettings.find('.foogallery-vertical-tab:visible');
+
+		if ($activeTab.length === 0 && $visibleTabs.length) {
+			$visibleTabs.first().trigger('click');
+		} else if ($activeTab.length) {
+			var $visibleChildren = $activeTab.find('.foogallery-vertical-child-tab:visible');
+
+			if ($visibleChildren.length && $visibleChildren.filter('.foogallery-tab-active').length === 0) {
+				$visibleChildren.first().trigger('click');
+			}
+		}
+	};
+
+	FOOGALLERY.initSettings = function() {
+		//move the template selector into the metabox heading
+		var $metabox_heading = $('#foogallery_settings .hndle span');
+		//This check is done to accommodate a markup change in WP 5.5
+		if ( $metabox_heading.length === 0 ) {
+			$metabox_heading = $('#foogallery_settings .hndle');
+			$metabox_heading.addClass( 'foogallery-custom-metabox-header' );
+		}
+
+        $('.foogallery-template-selector').appendTo( $metabox_heading ).removeClass('foogallery-hidden');
+
+		//remove the loading spinner
+		$('.foogallery-gallery-items-metabox-title').remove();
+
+		var $items_metabox_heading = $('#foogallery_items .hndle span');
+		//This check is done to accommodate a markup change in WP 5.5
+		if ( $items_metabox_heading.length === 0 ) {
+			$items_metabox_heading = $('#foogallery_items .hndle');
+			$items_metabox_heading.addClass( 'foogallery-custom-metabox-header' );
+		}
+
+		$('.foogallery-items-view-switch-container').appendTo( $items_metabox_heading ).removeClass('foogallery-hidden');
+
+		//Bind to the Manage / Preview buttons
+		$('.foogallery-items-view-switch-container a').on('click', function(e) {
+			e.stopPropagation();
+
+			var $currentButton = $('.foogallery-items-view-switch-container a.current'),
+				currentSelector = $currentButton.data('container'),
+				$nextButton = $(this),
+				nextSelector = $nextButton.data('container'),
+				value = $nextButton.data('value');
+
+			//if the preview button is already selected, and we are clicking it again, then force a preview refresh
+			if ( currentSelector === nextSelector && value === 'preview' ) {
+				$('.foogallery_preview_container').addClass('foogallery-preview-force-refresh');
+			}
+
+			if ( value === 'preview' ) {
+				//show the viewport buttons
+				$('.foogallery-preview-actions').show();
+			} else {
+				$('.foogallery-preview-actions').hide();
+			}
+
+			//toggle the views
+			$(currentSelector).hide();
+			$(nextSelector).show();
+
+			//toggle the switch button
+			$currentButton.removeClass('current');
+			$nextButton.addClass('current');
+
+			//set the input so that it is saved
+			$('#foogallery_items_view_input').val(value);
+
+			if ( $('.foogallery_preview_container').is(':visible') ) {
+				FOOGALLERY.updateGalleryPreview(false, false);
+
+				//check if there is no preview
+				if ( !$.trim( $('.foogallery_preview_container').html() ) ||
+					$( '.foogallery_preview_container.foogallery-preview-force-refresh').length > 0 ) {
+					FOOGALLERY.reloadGalleryPreview();
+				}
+			}
+		});
+
+		FOOGALLERY.previewActionsController.init();
+
+		$(function() {
+
+			// Prevent inputs in settings meta box headings opening/closing contents.
+			$( '#foogallery_settings' ).find( '.hndle' ).off( 'click.postboxes' );
+
+			$( '#foogallery_settings' ).on( 'click', '.hndle', function( event ) {
+
+				// If the user clicks on some form input inside the h3 the box should not be toggled.
+				if ( $( event.target ).filter( 'input, option, label, select' ).length ) {
+					return;
+				}
+
+				$( '#foogallery_settings' ).toggleClass( 'closed' );
+			});
+
+			// Prevent inputs in items meta box headings opening/closing contents.
+			$( '#foogallery_items' ).find( '.hndle' ).off( 'click.postboxes' );
+
+			$( '#foogallery_items' ).on( 'click', '.hndle', function( event ) {
+
+				// If the user clicks on some form input inside the h3 the box should not be toggled.
+				if ( $( event.target ).filter( 'input, option, label, select' ).length ) {
+					return;
+				}
+
+				$( '#foogallery_items' ).toggleClass( 'closed' );
+			});
+		});
+
+		//hook into settings fields changes
+		$('.foogallery-metabox-settings .foogallery_template_field[data-foogallery-change-selector]').each(function(index, item) {
+			var $fieldContainer = $(item),
+				selector = $fieldContainer.data('foogallery-change-selector');
+
+			$fieldContainer.find(selector).on('change', function() {
+				FOOGALLERY.handleSettingControlChange($fieldContainer, this);
+			});
+        });
+
+		$(document).on('change', 'input[name="foogallery_sort"]', function() {
+			$('.foogallery_preview_container').addClass('foogallery-preview-force-refresh');
+
+			if ( $('.foogallery_preview_container').is(':visible') ) {
+				FOOGALLERY.reloadGalleryPreview();
+			}
+		});
+
+		//trigger this onload too!
+		FOOGALLERY.galleryTemplateChanged(false);
+
+		//force hidden field state to be correct on load
+		FOOGALLERY.handleSettingFieldChange(true, false);
+	};
+
+	FOOGALLERY.getSelectedTemplate = function() {
+		return $('#FooGallerySettings_GalleryTemplate').val();
+	};
+
+	FOOGALLERY.triggerTemplateChangedEvent = function() {
+		$('body').trigger('foogallery-gallery-template-changed-' + FOOGALLERY.getSelectedTemplate() );
+	};
+
+	FOOGALLERY.triggerAttachmentsChangedEvent = function(action, attachmentId) {
+		var attachments = $.isArray(FOOGALLERY.attachments) ? FOOGALLERY.attachments.slice(0) : [];
+
+		$('body').trigger('foogallery-attachments-changed', [attachments, action || '', parseInt(attachmentId, 10) || 0]);
+	};
+
+    FOOGALLERY.addAttachmentToGalleryList = function(attachment) {
+
+        if ($.inArray(attachment.id, FOOGALLERY.attachments) !== -1) return;
+
+        var $template = $($('#foogallery-attachment-template').val());
+
+        $template.attr('data-attachment-id', attachment.id);
+
+        $template.find('img').attr('src', attachment.src);
+
+        if (attachment.subtype) {
+			$template.find('.attachment-preview.type-image').addClass('subtype-' + attachment.subtype);
+		}
+
+        if ( $('.foogallery-attachments-list').hasClass('foogallery-add-media-button-start') ) {
+			$('.foogallery-attachments-list .datasource-medialibrary').after($template);
+		} else {
+			$('.foogallery-attachments-list .datasource-medialibrary').before($template);
+		}
+
+        FOOGALLERY.attachments.push( attachment.id );
+
+        FOOGALLERY.calculateAttachmentIds();
+
+        FOOGALLERY.calculateHiddenAreas();
+
+		$('.foogallery_preview_container').addClass('foogallery-preview-force-refresh');
+
+		FOOGALLERY.triggerAttachmentsChangedEvent('add', attachment.id);
+    };
+
+    FOOGALLERY.removeAttachmentFromGalleryList = function(id) {
+        var index = $.inArray(id, FOOGALLERY.attachments);
+        if (index !== -1) {
+            FOOGALLERY.attachments.splice(index, 1);
+        }
+		$('.foogallery-attachments-list [data-attachment-id="' + id + '"]').remove();
+
+        FOOGALLERY.calculateAttachmentIds();
+
+		FOOGALLERY.calculateHiddenAreas();
+
+		FOOGALLERY.triggerAttachmentsChangedEvent('remove', id);
+    };
+
+	FOOGALLERY.showAttachmentInfoModal = function(id) {
+		FOOGALLERY.openMediaModal( id );
+	};
+
+	FOOGALLERY.openMediaModal = function(selected_attachment_id) {
+		if (!selected_attachment_id) { selected_attachment_id = 0; }
+
+		var modal_style = $('#foogallery-image-edit-modal').data('modal_style');
+
+		if ( selected_attachment_id > 0 && modal_style === 'on') {
+			FOOGALLERY.openAttachmentModal( selected_attachment_id );
+		} else {
+			FOOGALLERY.selected_attachment_id = selected_attachment_id;
+
+			if (FOOGALLERY.media_uploader !== false){
+				FOOGALLERY.media_uploader.open();
+				return;
+			}
+
+			var createModal = $.isFunction(wp.foogallery) ? wp.foogallery : wp.media;
+
+			// Create our FooGallery media frame (use the child Select when available so extensions can override it).
+			FOOGALLERY.media_uploader = createModal({
+				frame: ( wp.foogallery && wp.foogallery.media && wp.foogallery.media.Select ) ? "select-child" : "select",
+				multiple: 'add',
+				title: FOOGALLERY.mediaModalTitle,
+				button: {
+					text: FOOGALLERY.mediaModalButtonText
+				},
+				library: {
+					type: "image"
+				}
+			}).on("select", function(){
+				var attachments = FOOGALLERY.media_uploader.state().get('selection').toJSON();
+
+				$.each(attachments, function(i, item) {
+					if ( item && item.id ) {
+						var attachment = {
+							id: item.id,
+							src: null,
+							subtype: null
+						};
+						if ( item.sizes && item.sizes.thumbnail) {
+							attachment.src = item.sizes.thumbnail.url;
+						} else {
+							//thumbnail could not be found for whatever reason. Default to the full image URL
+							attachment.src = item.url;
+						}
+						if ( item.subtype ) {
+							attachment.subtype = item.subtype;
+						}
+
+						FOOGALLERY.addAttachmentToGalleryList(attachment);
+					} else {
+						//there was a problem adding the item! Move on to the next
+						alert( 'There was a problem adding the item to the gallery!' );
+					}
+				});
+			})
+			.on( 'open', function() {
+				var selection = FOOGALLERY.media_uploader.state().get('selection');
+				if (selection && !$.isFunction(wp.foogallery)) {
+					//clear any previous selections
+					selection.reset();
+				}
+
+				if (FOOGALLERY.selected_attachment_id > 0) {
+					var attachment = wp.media.attachment(FOOGALLERY.selected_attachment_id);
+					attachment.fetch();
+					selection.add( attachment ? [ attachment ] : [] );
+				} else {
+					//would be nice to have all previously added media selected
+				}
+			});
+
+			// Finally, open the modal
+			FOOGALLERY.media_uploader.open();
+		}
+	};
+
+	FOOGALLERY.initUsageMetabox = function() {
+		$('#foogallery_create_page').on('click', function(e) {
+			e.preventDefault();
+
+			$('#foogallery_create_page_spinner').addClass('is-active');
+			var data = 'action=foogallery_create_gallery_page' +
+				'&foogallery_id=' + $('#post_ID').val() +
+				'&foogallery_create_gallery_page_nonce=' + $('#foogallery_create_gallery_page_nonce').val() +
+				'&_wp_http_referer=' + encodeURIComponent($('input[name="_wp_http_referer"]').val());
+
+			$.ajax({
+				type: "POST",
+				url: ajaxurl,
+				data: data,
+				success: function(data) {
+					if (data && data.success) {
+						//refresh page
+						location.reload();
+						return;
+					}
+
+					var message = data && data.data && data.data.message ? data.data.message : 'Unable to create page.';
+					alert(message);
+					$('#foogallery_create_page_spinner').removeClass('is-active');
+				},
+				error: function(xhr) {
+					var message = xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message ? xhr.responseJSON.data.message : 'Unable to create page.';
+					alert(message);
+					$('#foogallery_create_page_spinner').removeClass('is-active');
+				}
+			});
+		});
+	};
+
+	FOOGALLERY.initThumbCacheMetabox = function() {
+		$('#foogallery_clear_thumb_cache').on('click', function(e) {
+			e.preventDefault();
+
+			$('#foogallery_clear_thumb_cache_spinner').addClass('is-active');
+			var data = 'action=foogallery_clear_gallery_thumb_cache' +
+				'&foogallery_id=' + $('#post_ID').val() +
+				'&foogallery_clear_gallery_thumb_cache_nonce=' + $('#foogallery_clear_gallery_thumb_cache_nonce').val() +
+				'&_wp_http_referer=' + encodeURIComponent($('input[name="_wp_http_referer"]').val());
+
+			$.ajax({
+				type: "POST",
+				url: ajaxurl,
+				data: data,
+				success: function(data) {
+					var message = data && data.data && data.data.message ? data.data.message : data;
+					alert(message);
+					$('#foogallery_clear_thumb_cache_spinner').removeClass('is-active');
+				},
+				error: function(xhr) {
+					var message = xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message ? xhr.responseJSON.data.message : 'There was a problem clearing the thumbnail cache.';
+					alert(message);
+					$('#foogallery_clear_thumb_cache_spinner').removeClass('is-active');
+				}
+			});
+		});
+	};
+
+	FOOGALLERY.updateShortcodeArgumentHelpers = function($container) {
+		$container.find('label[data-setting]').each(function() {
+			var $label = $(this),
+				$helper = $label.find('.foogallery-shortcode-argument-helper'),
+				isMobile = $label.closest('.foogallery_template_field').attr('data-foogallery-setting-viewport') === 'mobile',
+				settingId = (isMobile && $label.attr('data-mobile-setting')) || $label.attr('data-setting');
+
+			if ( $helper.find('code').text() !== settingId ) {
+				window.clearTimeout($helper.data('foogalleryCopiedTimeout'));
+				$helper.removeClass('foogallery-shortcode-helper-copied').removeData('foogalleryCopiedTimeout');
+				$helper.find('code').text(settingId);
+			}
+		});
+	};
+
+	FOOGALLERY.initShortcodeHelpers = function() {
+		var $toggle = $('#foogallery_toggle_shortcode_helpers');
+
+		if ( !$toggle.length ) {
+			return;
+		}
+
+		var helperSelector = '.foogallery-shortcode-argument-helper, .foogallery-shortcode-choice-helper, .foogallery-shortcode-select-helper',
+			copyHelperText = function(text, onCopied) {
+				if (navigator.clipboard && navigator.clipboard.writeText) {
+					navigator.clipboard.writeText(text).then(onCopied, fallbackCopy);
+				} else {
+					fallbackCopy();
+				}
+
+				function fallbackCopy() {
+					var $temp = $('<textarea class="foogallery-shortcode-hidden"></textarea>');
+					$temp.val(text)
+						.attr('readonly', 'readonly')
+						.css({ position: 'absolute', left: '-9999px', top: '0' });
+					$('body').append($temp);
+					$temp[0].select();
+
+					try {
+						if ( document.execCommand('copy') ) {
+							onCopied();
+						}
+					} catch (err) {
+						console.log('Oops, unable to copy!');
+					}
+
+					$temp.remove();
+				}
+			};
+
+		$(document)
+			.off('mousedown.foogalleryShortcodeHelper', helperSelector)
+			.on('mousedown.foogalleryShortcodeHelper', helperSelector, function(e) {
+				e.stopPropagation();
+			})
+			.off('click.foogalleryShortcodeHelper', helperSelector)
+			.on('click.foogalleryShortcodeHelper', helperSelector, function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+
+				// Preserve text selected by dragging or double-clicking for manual copying.
+				var selection = window.getSelection();
+				if ( selection && !selection.isCollapsed && selection.containsNode(this, true) ) {
+					return;
+				}
+
+				var $helper = $(this);
+				copyHelperText($helper.find('code').text(), function() {
+					window.clearTimeout($helper.data('foogalleryCopiedTimeout'));
+					$helper.addClass('foogallery-shortcode-helper-copied');
+					$helper.data('foogalleryCopiedTimeout', window.setTimeout(function() {
+						$helper.removeClass('foogallery-shortcode-helper-copied');
+						$helper.removeData('foogalleryCopiedTimeout');
+					}, 1500));
+				});
+			});
+
+		$('.foogallery-metabox-settings label[data-setting]').each(function() {
+			var $label = $(this),
+				settingId = $label.data('setting');
+
+			if ( !settingId || $label.find('.foogallery-shortcode-argument-helper').length ) {
+				return;
+			}
+
+			$label.append(
+				$('<span class="foogallery-shortcode-argument-helper" aria-hidden="true"></span>').append(
+					$('<code></code>').text(settingId)
+				)
+			);
+		});
+
+		FOOGALLERY.updateShortcodeArgumentHelpers($('.foogallery-metabox-settings'));
+
+		$('.foogallery_metabox_field-radio > label').each(function() {
+			var $label = $(this),
+				$input = $label.find('input[type="radio"]').first(),
+				choiceValue = $input.val(),
+				choiceHelperText = choiceValue === '' ? '<empty>' : choiceValue;
+
+			if ( !$input.length || typeof choiceValue === 'undefined' || $label.find('.foogallery-shortcode-choice-helper').length ) {
+				return;
+			}
+
+			$label.append(
+				$('<span class="foogallery-shortcode-choice-helper foogallery-shortcode-choice-helper-radio" aria-hidden="true"></span>').append(
+					$('<code></code>').text(choiceHelperText)
+				)
+			);
+		});
+
+		$('.foogallery_metabox_field-htmlicon > label[for]').each(function() {
+			var $label = $(this),
+				inputId = $label.attr('for'),
+				$input = $('#' + inputId),
+				choiceValue = $input.val(),
+				choiceHelperText = choiceValue === '' ? '<empty>' : choiceValue;
+
+			if ( !$input.length || typeof choiceValue === 'undefined' || $label.next('.foogallery-shortcode-choice-helper-htmlicon').length ) {
+				return;
+			}
+
+			var $helper = $('<span class="foogallery-shortcode-choice-helper foogallery-shortcode-choice-helper-htmlicon" aria-hidden="true"></span>').append(
+				$('<code></code>').text(choiceHelperText)
+			);
+
+			$label.after($helper);
+
+			if ( !$input.parent().hasClass('foogallery-shortcode-choice-group-htmlicon') ) {
+				$input.add($label).add($helper).wrapAll('<span class="foogallery-shortcode-choice-group-htmlicon"></span>');
+			}
+		});
+
+		$('.foogallery_metabox_field-select select').each(function() {
+			var $select = $(this),
+				$helper = $select.siblings('.foogallery-shortcode-select-helper'),
+				updateHelper = function() {
+					var selectedValue = $select.val(),
+						helperText = selectedValue === '' ? '<empty>' : selectedValue;
+
+					if ( typeof selectedValue === 'undefined' ) {
+						return;
+					}
+
+					$helper.find('code').text(helperText);
+				};
+
+			if ( !$helper.length ) {
+				$helper = $('<span class="foogallery-shortcode-select-helper" aria-hidden="true"></span>').append(
+					$('<code></code>')
+				);
+				$select.after($helper);
+			}
+
+			updateHelper();
+			$select.off('change.foogalleryShortcodeHelper').on('change.foogalleryShortcodeHelper', updateHelper);
+		});
+
+		var showLabel = $toggle.data('show-label') || 'Show Argument Helpers',
+			hideLabel = $toggle.data('hide-label') || 'Hide Argument Helpers',
+			stateClass = 'foogallery-show-argument-helpers',
+			updateState = function(show) {
+				$('body').toggleClass(stateClass, show);
+				$toggle.attr('aria-expanded', show ? 'true' : 'false').text(show ? hideLabel : showLabel);
+			};
+
+		updateState(false);
+
+		$toggle.on('click', function(e) {
+			e.preventDefault();
+			updateState( !$('body').hasClass(stateClass) );
+		});
+	};
+
+    FOOGALLERY.adminReady = function () {
+        $('.upload_image_button').on('click', function(e) {
+            e.preventDefault();
+			FOOGALLERY.mediaModalTitle = $(this).data( 'uploader-title' );
+			FOOGALLERY.mediaModalButtonText = $(this).data( 'uploader-button-text' );
+			FOOGALLERY.openMediaModal(0);
+        });
+
+		$('.remove_all_media').on('click', function(e) {
+			$('.foogallery-attachments-list a.remove').trigger('click');
+		});
+
+		$(document).on('foogallery-datasource-changed', function(e, activeDatasource) {
+			FOOGALLERY.showHiddenAreas( activeDatasource === 'media_library' );
+		});
+
+        FOOGALLERY.initAttachments();
+
+		FOOGALLERY.initSettings();
+
+		FOOGALLERY.initUsageMetabox();
+
+		FOOGALLERY.initThumbCacheMetabox();
+
+		FOOGALLERY.initShortcodeHelpers();
+
+		FOOGALLERY.initAttachmentModal();
+
+		FOOGALLERY.initMediaSelector();
+
+        $('.foogallery-attachments-list')
+            .on('click' ,'a.remove', function(e) {
+				e.preventDefault();
+                var $selected = $(this).parents('li:first'),
+					attachment_id = $selected.data('attachment-id');
+                FOOGALLERY.removeAttachmentFromGalleryList(attachment_id);
+            })
+			.on('click' ,'a.info', function() {
+				var $selected = $(this).parents('li:first'),
+					attachment_id = $selected.data('attachment-id');
+				FOOGALLERY.showAttachmentInfoModal(attachment_id);
+			})
+            .sortable({
+                items: 'li:not(.add-attachment)',
+                distance: 10,
+                placeholder: 'attachment placeholder',
+                stop : function() {
+                    FOOGALLERY.calculateAttachmentIds();
+                }
+            });
+
+		//init any colorpickers
+		$('.colorpicker').spectrum({
+			preferredFormat: "rgb",
+			showInput: true,
+			clickoutFiresChange: true
+		});
+
+		if (typeof IntersectionObserver === "undefined") {
+			$(".foogallery-attachments-list .attachment .thumbnail img").each(function(i, img){
+				var $img = $(img);
+				$img.attr("src", $img.data("src"));
+			});
+		} else {
+			//lazy loading of images on the gallery edit page
+			var io = new IntersectionObserver(function (entries) {
+				entries.forEach(function (entry) {
+					if (entry.isIntersecting) {
+						var $target = $(entry.target);
+						$target.attr("src", $target.data("src"));
+						io.unobserve(entry.target);
+					}
+				});
+			}, {
+				root: $(".foogallery-attachments-list").get(0)
+			});
+
+			$(".foogallery-attachments-list .attachment .thumbnail img").each(function(i, img){
+				io.observe(img);
+			});
+		}
+
+	    $('.foogallery-admin-promo-dismiss').on('click', function(e) {
+		    e.preventDefault();
+		    alert( 'If you want to turn off these promotional messages forever, goto FooGallery Settings -> Advanced, and set the "Disable PRO Promotions" setting. Thank you for using FooGallery :)')
+	    } );
+
+		$('.foogallery-attachment-modal-toggle').on('click', function(e) {
+			e.preventDefault();
+			$(this).attr('disabled', 'disabled');
+
+			$.ajax({
+				type: "POST",
+				url: ajaxurl,
+				data: {
+					action: 'foogallery_attachment_modal_toggle',
+					'nonce' : $(this).data('nonce')
+				},
+				success: function(data) {
+					alert(data);
+					//refresh page
+					location.reload();
+				}
+			});
+		} );
+
+		FOOGALLERY.initDropzone();
+
+		// Let ready handlers initialize all layouts before storing their elements.
+		$( function () {
+			setTimeout( FOOGALLERY.initTemplateSettingsStorage, 0 );
+		} );
+    };
+
+	FOOGALLERY.initMediaSelector = function() {
+		$(document).on('click', '.foogallery-media-selector-choose', function(e){
+			e.preventDefault();
+
+			var $el = $( this );
+
+			if ( $el.data( 'input' ) ) {
+				// The input has been set by data-input="#my-input"
+				FOOGALLERY.current_media_selector_input = $( $el.data('input') );
+			} else {
+				// Try and be smart and find the input.
+				FOOGALLERY.current_media_selector_input = $el.parent().find( 'input[type="text"]')
+			}
+
+			// If we do not have an input then get out!
+			if ( FOOGALLERY.current_media_selector_input.length === 0 ) {
+				return;
+			}
+
+			var
+			modalTitle = $el.data('modal-title') ? $el.data( 'modal-title' ) : 'Choose Image',
+			modalButton = $el.data('modal-button') ? $el.data( 'modal-button' ) : 'Select Image',
+			modalMultiple = $el.data('modal-multiple' ) ? $el.data( 'modal-multiple' ) === 'yes' : true;
+			states = [
+				// Main states.
+				new wp.media.controller.Library( {
+					library: wp.media.query(),
+					multiple: modalMultiple,
+					title: modalTitle,
+					priority: 20,
+					filterable: 'uploaded',
+				} ),
+			];
+
+			// keep an array of modals, based off the modal title
+
+			//first check if modals have been initialized
+			FOOGALLERY.current_media_selector_modals = FOOGALLERY.current_media_selector_modals || {};
+
+			// Check if we have a modal for this title
+			if ( FOOGALLERY.current_media_selector_modals[modalTitle] ) {
+				FOOGALLERY.current_media_selector_modals[modalTitle].open();
+				return;
+			}
+
+			// Create the media frame.
+			FOOGALLERY.current_media_selector_modals[modalTitle] = wp.media.frames.downloadable_file = wp.media(
+				{
+					// Set the title of the modal.
+					title: modalTitle,
+					library: {
+						type: '',
+					},
+					button: {
+						text: modalButton,
+					},
+					multiple: modalMultiple,
+					states: states,
+				}
+			);
+
+			// When an image is selected, run a callback.
+			FOOGALLERY.current_media_selector_modals[modalTitle].on( 'select', function () {
+				var file_path = '',
+					selection = FOOGALLERY.current_media_selector_modals[modalTitle].state().get( 'selection' );
+
+				selection.map( function ( attachment ) {
+					attachment = attachment.toJSON();
+					if ( attachment.url ) {
+						file_path = attachment.url;
+					}
+				} );
+
+				FOOGALLERY.current_media_selector_input.val( file_path ).trigger( 'change' );
+			} );
+
+			// Finally, open the modal.
+			FOOGALLERY.current_media_selector_modals[modalTitle].open();
+		});
+
+		$(document).on('click', '.foogallery-media-selector-clear', function(e){
+			e.preventDefault();
+
+			var $el = $( this );
+
+			if ( $el.data( 'input' ) ) {
+				// The input has been set by data-input="#my-input"
+				FOOGALLERY.current_media_selector_input = $( $el.data('input') );
+			} else {
+				// Try and be smart and find the input.
+				FOOGALLERY.current_media_selector_input = $el.parent().find( 'input[type="text"]')
+			}
+
+			// If we do not have an input then get out!
+			if ( FOOGALLERY.current_media_selector_input.length === 0 ) {
+				return;
+			}
+
+			// Clear the input.
+			FOOGALLERY.current_media_selector_input.val( '' ).trigger( 'change' );
+		});
+	};
+
+	FOOGALLERY.initAttachmentModal = function() {
+		//close attachments modal
+		jQuery('#foogallery-image-edit-modal .media-modal-close').on('click', function() {
+			var $content = jQuery('#foogallery-image-edit-modal'),
+				$wrapper = jQuery('#foogallery-image-edit-modal .media-frame-content .attachment-details'),
+				$loader = jQuery('#foogallery-image-edit-modal .media-frame-content .spinner');
+
+			$content.hide();
+			$wrapper.addClass('not-loaded');
+			$loader.addClass('is-active');
+		});
+
+		// Attachment taxonomy button toggles
+		$(document).on('click', '#foogallery-panel-taxonomies ul a', function(e){
+			var term_id = parseInt( $(this).data('term-id') ),
+				$ul = $(this).parents('ul').first();
+			if ( !isNaN(term_id) && term_id > 0 ) {
+				$(this).toggleClass('button-primary');
+				var terms = [];
+				$ul.find('a.button-primary').each(function () {
+					term_id = $(this).data('term-id');
+					terms.push(term_id);
+				});
+				var terms_str = terms.toString();
+				$('#foogallery_attachment_taxonomy_' + $ul.data('taxonomy') + '_selected').val(terms_str);
+			} else {
+				var action = $(this).data('action');
+				if ( action === 'add' ) {
+					$ul.find('.foogallery_attachment_taxonomy_add').toggle();
+					$ul.find('.taxonomy_add input').focus();
+				} else if ( action === 'save' || action === 'cancel' ){
+					var term_to_add = $ul.find('input.foogallery_attachment_taxonomy_add').val();
+					if ( term_to_add && term_to_add.length > 0 && action === 'save' ) {
+						var nonce = $('#foogallery-panel-taxonomies').data('nonce');
+						$.ajax({
+							type: "POST",
+							url: ajaxurl,
+							data: {
+								'img_id': $('.foogallery-image-edit-main').data('img_id'),
+								'nonce': nonce,
+								'action': 'foogallery_attachment_modal_taxonomy_add',
+								'taxonomy' : $ul.data('taxonomy'),
+								'term': term_to_add
+							},
+							cache: false,
+							success: function(res) {
+								var html = '<li><a href="javascript:void(0);" class="button button-small recently-added" data-term-id="' + res.data.id + '">' + res.data.name + '</a></li>';
+								$ul.find('.taxonomy_add').before(html);
+								$ul.find('a.recently-added').removeClass('recently-added').trigger('click');
+								$ul.find('input.foogallery_attachment_taxonomy_add').val('');
+								$ul.find('.foogallery_attachment_taxonomy_add').toggle();
+							}
+						});						
+					} else {
+						$ul.find('input.foogallery_attachment_taxonomy_add').val('');
+						$ul.find('.foogallery_attachment_taxonomy_add').toggle();
+					}
+				} else if ( action === 'remove' ) {
+					// Deselect all taxonomies
+					$ul.find('a.button.button-small').removeClass('button-primary');
+					$('#foogallery_attachment_taxonomy_' + $ul.data('taxonomy') + '_selected').val('');
+				}
+			}
+		});
+
+		$(document).on('click', '#attachments-data-save-btn', function(e){
+			e.preventDefault();
+			FOOGALLERY.saveAttachmentModal();
+		});
+
+		$(document).on('click', '.copy-attachment-file-url', function(e) {
+			$('#attachments-foogallery-file-url').select();
+			document.execCommand('copy');
+		});
+
+		$(document).on('click', '#foogallery-image-edit-modal .foogallery-img-modal-tab-wrapper', function(e) {
+			var panel = '#' + $(this).data('tab_id');
+			$('#foogallery-image-edit-modal .tab-panel').removeClass('active');
+			$(panel).addClass('active');
+			$('#foogallery-image-edit-modal').data( 'current_tab', $(this).data('tab_id') );
+		});
+
+		$(document).on('click', '#foogallery_clear_img_thumb_cache', function(e) {
+			e.preventDefault();
+
+			$('#foogallery_clear_img_thumb_cache_spinner').addClass('is-active');
+			var data = 'action=foogallery_clear_attachment_thumb_cache' +
+				'&attachment_id=' + $('.foogallery-image-edit-main').data('img_id') +
+				'&foogallery_clear_attachment_thumb_cache_nonce=' + $('#foogallery_clear_attachment_thumb_cache_nonce').val() +
+				'&_wp_http_referer=' + encodeURIComponent($('input[name="_wp_http_referer"]').val());
+
+			$.ajax({
+				type: "POST",
+				url: ajaxurl,
+				data: data,
+				success: function(data) {
+					var message = data && data.data && data.data.message ? data.data.message : data;
+					alert(message);
+					$('#foogallery_clear_img_thumb_cache_spinner').removeClass('is-active');
+				},
+				error: function(xhr) {
+					var message = xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message ? xhr.responseJSON.data.message : 'There was a problem clearing the thumbnail cache.';
+					alert(message);
+					$('#foogallery_clear_img_thumb_cache_spinner').removeClass('is-active');
+				}
+			});
+		});
+
+		$(document).on('click', '#foogallery-image-edit-modal .edit-media-header button:not(.media-modal-close)', function(e) {
+			e.preventDefault();
+
+			$(this).attr( 'disabled', 'disabled' );
+			var selected_attachment_id = parseInt( $(this).data('attachment') ),
+				autosave = jQuery('#attachment-modal-autosave').is(':checked');
+			if ( selected_attachment_id > 0 ) {
+
+				// Check if we must save the data first!
+				if ( autosave ) {
+					FOOGALLERY.saveAttachmentModal(function () {
+						$(this).prop( 'disabled', false );
+						FOOGALLERY.openAttachmentModal(selected_attachment_id);
+					});
+				} else {
+					$(this).prop( 'disabled', false );
+					FOOGALLERY.openAttachmentModal(selected_attachment_id);
+				}
+			}
+		});
+	};
+
+	FOOGALLERY.saveAttachmentModal = function(callback) {
+		var data = $('#foogallery_attachment_modal_save_form').serialize(),
+			$spinner = $('.foogallery-image-edit-footer .spinner');
+		$spinner.addClass('is-active');
+		$.ajax({
+			type: "POST",
+			url: ajaxurl,
+			data: data,
+			cache: false,
+			success: function(res) {
+				$spinner.removeClass('is-active');
+				if ( $.isFunction(callback) ) {
+					callback();
+				}
+			}
+		});
+	};
+
+	FOOGALLERY.openAttachmentModal = function(img_id) {
+		var $content = jQuery('#foogallery-image-edit-modal'),
+			$wrapper = jQuery('#foogallery-image-edit-modal .media-frame-content .attachment-details'),
+			$loader = jQuery('#foogallery-image-edit-modal .media-frame-content .spinner'),
+			nonce = $content.data('nonce'),
+			gallery_id = $content.data('gallery_id'),
+			current_tab = $content.data('current_tab');
+
+		$content.show();
+		$wrapper.addClass('not-loaded').html('<div class="spinner is-active"></div>');
+		$wrapper.css({'grid-template-columns': '1fr'});
+		$loader.addClass('is-active');
+
+		jQuery.ajax({
+			type: "POST",
+			url: ajaxurl,
+			data: {
+				'img_id': img_id,
+				'gallery_id': gallery_id,
+				'override_attachments': $('#foogallery_attachments').val(),
+				'current_tab': current_tab,
+				'nonce': nonce,
+				'action': 'foogallery_attachment_modal_open'
+			},
+			success: function(json) {
+				jQuery('#foogallery-image-edit-modal .edit-media-header button.left')
+					.attr('disabled', !json.prev_slide)
+					.data('attachment', json.prev_img_id);
+				jQuery('#foogallery-image-edit-modal .edit-media-header button.right')
+					.attr('disabled', !json.next_slide)
+					.data('attachment', json.next_img_id);
+
+				if ( json.override_thumbnail ) {
+					jQuery('#foogallery-image-edit-modal .tab-panels .settings span.setting.override-thumbnail').addClass('is-override-thumbnail');
+					jQuery('#foogallery-image-edit-modal .tab-panels .settings span.setting.override-thumbnail-preview').addClass('is-override-thumbnail');
+				}
+
+				jQuery('#foogallery-image-edit-modal .media-modal-content .edit-attachment-frame .media-frame-content .attachment-details').html(json.html);
+
+				if ( json.current_tab ) {
+					jQuery('.foogallery-img-modal-tab-wrapper[data-tab_id="' + json.current_tab + '"] input').trigger('click');
+				}
+
+				$wrapper.removeClass('not-loaded');
+				$wrapper.css({'grid-template-columns': '1fr 2fr'});
+				$loader.removeClass('is-active');
+			},
+		});
+	};
+
+	FOOGALLERY.initDropzone = function() {
+		const $metaBox = $('#foogallery_items .inside');
+
+		if (!$metaBox.length || typeof wp === 'undefined' || !wp.Uploader) {
+			return;
+		}
+
+		if (FOOGALLERY.dropzoneInitialized) {
+			return;
+		}
+
+		let $dropZone = $metaBox.find('.foogallery-dropzone');
+		if (!$dropZone.length) {
+			const dropzoneMessage = (FOOGALLERY.il8n && FOOGALLERY.il8n.dropzone_message) || 'Drop images here to upload';
+
+			$dropZone = $(
+				'<div class="foogallery-dropzone">' +
+					'<p class="message"></p>' +
+					'<div class="upload-progress"></div>' +
+				'</div>'
+			);
+			$metaBox.prepend($dropZone);
+			$dropZone.find('.message').text(dropzoneMessage);
+		}
+
+		FOOGALLERY.dropzoneInitialized = true;
+
+		const $progress = $dropZone.find('.upload-progress').css('width', '0').hide();
+		const $uploadButton = $metaBox.find('.foogallery-upload-direct');
+
+		let dragDepth = 0;
+		let uploadActive = false;
+
+		const isFileDrag = function(event) {
+			const dt = event && event.originalEvent && event.originalEvent.dataTransfer;
+
+			if (!dt || !dt.types) {
+				return false;
+			}
+
+			if (typeof dt.types.indexOf === 'function') {
+				return dt.types.indexOf('Files') !== -1;
+			}
+
+			if (typeof dt.types.contains === 'function') {
+				return dt.types.contains('Files');
+			}
+
+			return dt.types === 'Files';
+		};
+
+		$(document)
+			.on('dragenter.foogalleryDropzone', function(event) {
+				if (!isFileDrag(event)) {
+					return;
+				}
+
+				dragDepth++;
+				$dropZone.addClass('visible');
+			})
+			.on('dragleave.foogalleryDropzone', function(event) {
+				if (!isFileDrag(event)) {
+					return;
+				}
+
+				dragDepth = Math.max(dragDepth - 1, 0);
+				if (dragDepth === 0) {
+					if (uploadActive) {
+						$dropZone.removeClass('drag-over');
+					} else {
+						$dropZone.removeClass('visible drag-over');
+					}
+				}
+			})
+			.on('dragover.foogalleryDropzone', function(event) {
+				if (!isFileDrag(event)) {
+					return;
+				}
+
+				event.preventDefault();
+			})
+			.on('drop.foogalleryDropzone', function(event) {
+				if (!isFileDrag(event)) {
+					return;
+				}
+
+				event.preventDefault();
+
+				const isInsideDropZone = $dropZone.is(event.target) || $.contains($dropZone[0], event.target);
+
+				dragDepth = 0;
+				$dropZone.removeClass('drag-over');
+
+				if (!isInsideDropZone) {
+					uploadActive = false;
+					$dropZone.removeClass('visible');
+				} else {
+					uploadActive = true;
+				}
+			});
+
+		$dropZone
+			.on('dropzone:enter.foogalleryDropzone', function() {
+				$dropZone.addClass('visible drag-over');
+			})
+			.on('dropzone:leave.foogalleryDropzone', function() {
+				if (dragDepth === 0) {
+					$dropZone.removeClass('visible drag-over');
+				}
+			});
+
+		const finalizeUI = function() {
+			setTimeout(function() {
+				$dropZone.removeClass('drag-over visible');
+				dragDepth = 0;
+				uploadActive = false;
+
+				$progress.fadeOut(200, function() {
+					$(this).css('width', '0');
+				});
+			}, 400);
+		};
+
+		try {
+			const uploaderSettings = {
+				container: $dropZone,
+				dropzone: $dropZone,
+				params: {
+					post_id: $('#post_ID').val()
+				},
+				added: function() {
+					uploadActive = true;
+					$dropZone.addClass('visible');
+					$progress.show().css('width', '0');
+				},
+				progress: function(attachment) {
+					let percent = 0;
+
+					if (this.uploader && this.uploader.total && typeof this.uploader.total.percent === 'number') {
+						percent = this.uploader.total.percent;
+					} else if (attachment && attachment.get) {
+						percent = attachment.get('percent') || 0;
+					}
+
+					$progress.css('width', percent + '%');
+				},
+				success: function(attachment) {
+					const data = attachment && attachment.toJSON ? attachment.toJSON() : attachment;
+
+					if (!data || !data.id) {
+						return;
+					}
+
+					const subtype = data.subtype || (data.mime ? data.mime.split('/')[1] : null);
+
+					FOOGALLERY.addAttachmentToGalleryList({
+						id: data.id,
+						src: (data.sizes && data.sizes.thumbnail && data.sizes.thumbnail.url) ||
+							data.icon ||
+							data.url ||
+							'',
+						subtype: subtype
+					});
+
+					if (!wp.Uploader.queue || !wp.Uploader.queue.length) {
+						finalizeUI();
+					}
+				},
+				error: function(message, responseData, file) {
+					console.error('FooGallery uploader error:', message || responseData, file);
+
+					if (!wp.Uploader.queue || !wp.Uploader.queue.length) {
+						finalizeUI();
+					}
+				}
+			};
+
+			if ($uploadButton.length) {
+				uploaderSettings.browser = $uploadButton;
+			}
+
+			const uploader = new wp.Uploader(uploaderSettings);
+
+			FOOGALLERY.dropzoneUploader = uploader;
+		} catch (error) {
+			console.error('FooGallery failed to initialize dropzone uploader', error);
+		}
+	};
+
+	// $(document).ready(function () {
+
+    //     FOOGALLERY.initAttachments();
+
+    //     FOOGALLERY.galleryTemplateChanged(false);
+    // });
+
+}(window.FOOGALLERY = window.FOOGALLERY || {}, jQuery));
+
+FooGallery.utils.ready(function ($) {
+	if ( $('#foogallery_attachments').length > 0 ) {
+		FOOGALLERY.adminReady();
+	}
+});

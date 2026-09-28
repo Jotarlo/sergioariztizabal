@@ -7,7 +7,9 @@
 
 namespace SRFM\Admin;
 
+use SRFM\Inc\Database\Register;
 use SRFM\Inc\Database\Tables\Entries;
+use SRFM\Inc\Form_Views;
 use SRFM\Inc\Helper;
 use SRFM\Inc\Learn;
 use SRFM\Inc\Traits\Get_Instance;
@@ -129,13 +131,17 @@ class Analytics {
 	 * @return array
 	 */
 	public function add_srfm_analytics_data( $stats_data ) {
-		$stats_data['plugin_data']['sureforms']                   = [
+		$stats_data['plugin_data']['sureforms'] = [
 			'free_version'          => SRFM_VER,
 			'site_language'         => get_locale(),
 			'most_used_anti_spam'   => $this->most_used_anti_spam(),
 			'user_status'           => $this->user_status(),
 			'pointer_popup_clicked' => $this->pointer_popup_clicked(),
 		];
+		// Every query against the entries table errors when the table is missing, so
+		// resolve that once here rather than letting each caller below trip over it.
+		$entries_table_missing = Register::is_entries_table_missing();
+
 		$stats_data['plugin_data']['sureforms']['numeric_values'] = [
 			'total_forms'                => wp_count_posts( SRFM_FORMS_POST_TYPE )->publish ?? 0,
 			'instant_forms_enabled'      => $this->instant_forms_enabled(),
@@ -143,12 +149,19 @@ class Analytics {
 			'ai_generated_forms'         => $this->ai_generated_forms(),
 			'ai_generated_payment_forms' => $this->ai_generated_forms( 'payments' ),
 			'payment_forms'              => $this->get_payment_forms_count(),
-			'total_entries'              => Entries::get_total_entries_by_status(),
+			'total_entries'              => $entries_table_missing ? 0 : Entries::get_total_entries_by_status(),
 			'restricted_forms'           => $this->get_restricted_forms(),
 			'embed_styling_gb_default'   => self::embed_styling_gutenberg_count( 'default' ),
 			'embed_styling_el_default'   => self::embed_styling_elementor_count( 'default' ),
 			'embed_styling_br_default'   => self::embed_styling_bricks_count( 'default' ),
+			'total_form_views'           => $this->total_form_views(),
+			'forms_with_views'           => $this->forms_with_views(),
 		];
+
+		// Whether the entries table is currently missing. An event fires once when a
+		// site first sees the notice; this is what shows the state persisting, and
+		// catches a recurrence that the event's one-time dedup would swallow.
+		$stats_data['plugin_data']['sureforms']['boolean_values']['db_entries_table_missing'] = $entries_table_missing;
 
 		$stats_data['plugin_data']['sureforms'] = array_merge_recursive( $stats_data['plugin_data']['sureforms'], $this->global_settings_data() );
 		// Add KPI tracking data.
@@ -488,7 +501,83 @@ class Analytics {
 		// Payment analytics - check if any payment method is enabled.
 		$global_data['boolean_values']['stripe_enabled'] = $this->is_stripe_enabled();
 
+		// Delegated rather than read from $general_settings directly, so the telemetry
+		// can never disagree with what the Forms list actually shows. That matters
+		// because the default has already changed once: reimplementing the check here
+		// means a future change has two places to be made and one to be forgotten.
+		$global_data['boolean_values']['form_views_columns_enabled'] = Form_Views::get_instance()->is_tracking_enabled();
+
 		return $global_data;
+	}
+
+	/**
+	 * Total page views counted across all published forms.
+	 *
+	 * Read alongside `forms_with_views`, which is what makes this figure legible: a
+	 * site with views but no forms recording any reads very differently from one
+	 * with neither.
+	 *
+	 * Not a denominator for `total_entries`, and the two must not be divided. This
+	 * total starts at the moment tracking opened and leaves out anyone who can edit
+	 * the site, while `total_entries` is an unfiltered all-time count of every
+	 * entry ever received. A rate built from the pair answers neither question and
+	 * will not match the Conversion Rate column, which measures both halves over
+	 * the same window with the same exclusion.
+	 *
+	 * Counts only published forms, so views left behind by a trashed or draft form
+	 * do not inflate the total against a denominator that no longer includes them.
+	 *
+	 * @since 2.12.6
+	 * @return int
+	 */
+	public function total_form_views() {
+		global $wpdb;
+
+		// Deliberately uncached: the only caller is the analytics payload builder,
+		// which runs once per cron pass. A cache would never see a second read inside
+		// a request, and any TTL would always have expired between passes — while
+		// still going stale if a second caller ever appeared.
+		// PHPCS: Ignore direct database query warning, as there is no built-in alternative.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$total = $wpdb->get_var(
+			$wpdb->prepare(
+				"
+			SELECT SUM( pm.meta_value )
+			FROM {$wpdb->postmeta} pm
+			INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+			WHERE pm.meta_key = %s
+			AND p.post_type = %s
+			AND p.post_status = 'publish'
+		",
+				Form_Views::META_KEY,
+				SRFM_FORMS_POST_TYPE
+			)
+		);
+
+		return Helper::get_integer_value( $total );
+	}
+
+	/**
+	 * Number of published forms that have been viewed at least once.
+	 *
+	 * Distinguishes "the feature is on but nothing is embedded anywhere" from "the
+	 * beacon is firing" — a total alone cannot, because one busy form looks the
+	 * same as many quiet ones.
+	 *
+	 * @since 2.12.6
+	 * @return int
+	 */
+	public function forms_with_views() {
+		return $this->custom_wp_query_total_posts(
+			[
+				[
+					'key'     => Form_Views::META_KEY,
+					'value'   => 0,
+					'compare' => '>',
+					'type'    => 'NUMERIC',
+				],
+			]
+		);
 	}
 
 	/**
@@ -720,6 +809,22 @@ class Analytics {
 	}
 
 	/**
+	 * Track the plugin_activated event with the correct install referer.
+	 *
+	 * Dedup in self::events()->track() ensures this fires only once. Runs on
+	 * 'shutdown' (see detect_state_events()) so it reads bsf_product_referers
+	 * after any late-writing referer call has had a chance to run.
+	 *
+	 * @since 2.12.6
+	 * @return void
+	 */
+	public function track_plugin_activated_event() {
+		$bsf_referrers = get_option( 'bsf_product_referers', [] );
+		$source        = ! empty( $bsf_referrers['sureforms'] ) ? $bsf_referrers['sureforms'] : 'self';
+		self::events()->track( 'plugin_activated', SRFM_VER, [ 'source' => $source ] );
+	}
+
+	/**
 	 * Extract non-inherit formTheme values from Bricks element data.
 	 *
 	 * Recursively walks the unserialized Bricks elements array looking for
@@ -824,6 +929,14 @@ class Analytics {
 	 * @return int Daily submissions count.
 	 */
 	private function get_daily_submissions_count( $date ) {
+		// Guarded here rather than at the call site: this is the function that runs
+		// the query, so a future caller is covered too. Every read against a missing
+		// entries table raises a DB error, and the daily send would raise one per
+		// day counted on exactly the sites whose breakage we most need reported.
+		if ( Register::is_entries_table_missing() ) {
+			return 0;
+		}
+
 		$start_date = $date . ' 00:00:00';
 		$end_date   = $date . ' 23:59:59';
 
@@ -853,10 +966,17 @@ class Analytics {
 	 * @return void
 	 */
 	private function detect_state_events() {
-		// plugin_activated: dedup in self::events()->track() ensures this fires only once.
-		$bsf_referrers = get_option( 'bsf_product_referers', [] );
-		$source        = ! empty( $bsf_referrers['sureforms'] ) ? $bsf_referrers['sureforms'] : 'self';
-		self::events()->track( 'plugin_activated', SRFM_VER, [ 'source' => $source ] );
+		// plugin_activated: deferred to 'shutdown' so that a referring plugin/theme's
+		// own BSF_UTM_Analytics::update_referer() call — which some products (incorrectly)
+		// make only after their activate_plugin() call returns, in the same request — has
+		// already run by the time we read bsf_product_referers. Reading this synchronously
+		// here would race that write, since this constructor can execute mid-request while
+		// SureForms itself is being activated by that other plugin.
+		if ( did_action( 'shutdown' ) ) {
+			$this->track_plugin_activated_event();
+		} else {
+			add_action( 'shutdown', [ $this, 'track_plugin_activated_event' ], PHP_INT_MAX );
+		}
 
 		// One-time: re-send onboarding_completed with full properties (v2).
 		if ( ! Helper::get_srfm_option( 'onboarding_event_v2_flushed', false )
@@ -869,6 +989,14 @@ class Analytics {
 		if ( \SRFM\Inc\Onboarding::get_instance()->get_onboarding_status() ) {
 			$onboarding_props     = [];
 			$onboarding_analytics = Helper::get_srfm_option( 'onboarding_analytics', [] );
+
+			// Which wizard produced the blob. Outside the non-empty guard and not
+			// isset()-gated like the flags below, because absence IS the answer: a
+			// blob from the old wizard, or no blob at all, must still report 'no'.
+			// Without this the two wizards share one event name and can only be
+			// told apart by which properties happen to be present -- and a v2 run
+			// on Pro with no caching plugin emits none of the new ones.
+			$onboarding_props['onboarding_v2'] = ! empty( $onboarding_analytics['onboardingV2'] ) ? 'yes' : 'no';
 
 			if ( ! empty( $onboarding_analytics ) && is_array( $onboarding_analytics ) ) {
 				if ( ! empty( $onboarding_analytics['skippedSteps'] ) && is_array( $onboarding_analytics['skippedSteps'] ) ) {
@@ -891,15 +1019,38 @@ class Analytics {
 					$onboarding_props['exited_early'] = (bool) $onboarding_analytics['exitedEarly'] ? 'yes' : 'no';
 				}
 
-				if ( ! empty( $onboarding_analytics['premiumFeatures']['selectedFeatures'] ) && is_array( $onboarding_analytics['premiumFeatures']['selectedFeatures'] ) ) {
-					$premium                                       = array_filter(
-						$onboarding_analytics['premiumFeatures']['selectedFeatures'],
-						static function( $f ) {
-							return 'ai-form-generation' !== $f && 'entries' !== $f;
-						}
+				// Add-ons step: the wizard shows one feature tab at a time
+				// instead of a checkbox list, so we report which tabs were opened and
+				// whether Upgrade was clicked. Blobs written by older wizards carry
+				// neither key and emit neither property.
+				if ( ! empty( $onboarding_analytics['premiumFeatures']['viewedTabs'] ) && is_array( $onboarding_analytics['premiumFeatures']['viewedTabs'] ) ) {
+					// The blob is whatever the wizard POSTed. The tabs are a closed
+					// set of four, so intersect against it rather than filtering on
+					// type: that drops anything unrecognised and caps both the
+					// content and the length of the property in one step.
+					$viewed_tabs                             = array_values(
+						array_intersect(
+							array_map( 'strval', array_filter( (array) $onboarding_analytics['premiumFeatures']['viewedTabs'], 'is_scalar' ) ),
+							[ 'multistep', 'conditional', 'calculation', 'conversational' ]
+						)
 					);
-					$onboarding_props['selected_premium_features'] = implode( ',', $premium );
-					$onboarding_props['premium_features_count']    = (string) count( $premium );
+					$onboarding_props['viewed_premium_tabs'] = implode( ',', $viewed_tabs );
+				}
+
+				if ( isset( $onboarding_analytics['premiumFeatures']['upgradeClicked'] ) ) {
+					$onboarding_props['premium_upgrade_clicked'] = (bool) $onboarding_analytics['premiumFeatures']['upgradeClicked'] ? 'yes' : 'no';
+				}
+
+				// Cache-conflict step: shown only when a recognised caching plugin
+				// is active; "yes" means the user pressed "I've fixed this".
+				//
+				// Read this as an abandonment signal, not as intent. Acknowledging
+				// is the only way past the step, so everyone who completes the
+				// wizard reports "yes" and "no" only ever appears next to
+				// exited_early. It cannot answer "did people act on the warning" --
+				// only "did they stop here".
+				if ( isset( $onboarding_analytics['cacheConflictAcknowledged'] ) ) {
+					$onboarding_props['cache_conflict_acknowledged'] = (bool) $onboarding_analytics['cacheConflictAcknowledged'] ? 'yes' : 'no';
 				}
 			}
 

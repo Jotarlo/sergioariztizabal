@@ -25,6 +25,12 @@ class Get_Optimization_Details extends Route_Base {
 	}
 
 	public function GET( WP_REST_Request $request ) {
+		$error = $this->verify_capability();
+
+		if ( $error ) {
+			return $error;
+		}
+
 		try {
 			$image_id = $request->get_param( 'image_id' );
 

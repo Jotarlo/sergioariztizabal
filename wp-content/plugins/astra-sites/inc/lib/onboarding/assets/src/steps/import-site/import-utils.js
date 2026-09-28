@@ -61,6 +61,7 @@ export const extractPluginError = ( err, fallback ) => {
 
 export const getDemo = async ( id, storedState ) => {
 	const [ , dispatch ] = storedState; // Destructuring assignment only for dispatch method.
+	let templateData = null;
 
 	const generateData = new FormData();
 	generateData.append( 'action', 'astra-sites-api-request' );
@@ -90,6 +91,7 @@ export const getDemo = async ( id, storedState ) => {
 					importError: false,
 					isEcommerce,
 				} );
+				templateData = response.data;
 			} else {
 				let errorMessages = {};
 
@@ -188,6 +190,8 @@ export const getDemo = async ( id, storedState ) => {
 				},
 			} );
 		} );
+
+	return templateData;
 };
 
 export const getAiDemo = async (
@@ -467,6 +471,13 @@ export function getFeaturePluginList(
 					name: 'SureCookie',
 					slug: 'surecookie',
 					init: 'surecookie/surecookie.php',
+				} );
+				break;
+			case 'sigmize':
+				requiredPlugins.push( {
+					name: 'Sigmize',
+					slug: 'sigmize',
+					init: 'sigmize/sigmize.php',
 				} );
 				break;
 			default:

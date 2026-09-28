@@ -229,6 +229,11 @@ class Ai_Builder_ZipWP_Api {
 							'required'          => true,
 							'sanitize_callback' => 'sanitize_text_field',
 						],
+						'funnel_session_id' => [
+							'type'              => 'string',
+							'required'          => false,
+							'sanitize_callback' => 'sanitize_text_field',
+						],
 					],
 				],
 			]
@@ -786,9 +791,8 @@ class Ai_Builder_ZipWP_Api {
 		$api_endpoint = $this->get_api_domain( false ) . '/plan/current-plan';
 
 		$request_args = array(
-			'headers'   => $this->get_api_headers(),
-			'timeout'   => 100,
-			'sslverify' => false,
+			'headers' => $this->get_api_headers(),
+			'timeout' => 100,
 		);
 		$response     = wp_safe_remote_get( $api_endpoint, $request_args );
 
@@ -1102,6 +1106,17 @@ class Ai_Builder_ZipWP_Api {
 		}
 		$response_code = wp_remote_retrieve_response_code( $response );
 		$response_body = wp_remote_retrieve_body( $response );
+
+		/*
+		 * Transient upstream states while the async site-build job is still
+		 * writing its export data. A fetch that lands before that job commits
+		 * returns one of these; the frontend retries them instead of failing
+		 * the import. 202 = build accepted/pending, 404 = export data not
+		 * persisted yet.
+		 */
+		$retryable_codes = array( 202, 404 );
+		$is_retryable    = in_array( (int) $response_code, $retryable_codes, true );
+
 		if ( 201 === $response_code || 200 === $response_code ) {
 			$response_data = json_decode( $response_body, true );
 			if ( is_array( $response_data ) ) {
@@ -1131,18 +1146,20 @@ class Ai_Builder_ZipWP_Api {
 			} else {
 				wp_send_json_error(
 					array(
-						'data'   => 'Failed ' . $response_body,
-						'status' => false,
-
+						'data'      => 'Failed - ' . $response_body,
+						'status'    => false,
+						'code'      => $response_code,
+						'retryable' => $is_retryable,
 					)
 				);
 			}
 		} else {
 			wp_send_json_error(
 				array(
-					'data'   => 'Failed - ' . $response_body,
-					'status' => false,
-
+					'data'      => 'Failed - ' . $response_body,
+					'status'    => false,
+					'code'      => $response_code,
+					'retryable' => $is_retryable,
 				)
 			);
 		}
@@ -1182,8 +1199,6 @@ class Ai_Builder_ZipWP_Api {
 			'business_category_name' => isset( $request['business_category'] ) ? sanitize_text_field( $request['business_category'] ) : '',
 			'image_keyword'          => isset( $request['keywords'] ) ? $request['keywords'] : [],
 			'images'                 => isset( $request['images'] ) ? $request['images'] : [],
-			'keywords'               => isset( $request['user_keywords'] ) ? $request['user_keywords'] : [],
-			'tone'                   => isset( $request['site_tone'] ) ? $request['site_tone'] : '',
 			'social_profiles'        => isset( $request['social_profiles'] ) ? $request['social_profiles'] : [],
 			'language'               => isset( $request['site_language'] ) ? sanitize_text_field( $request['site_language'] ) : 'en',
 			'templates'              => get_option( 'zipwp_selection_templates', array() ),
@@ -1269,8 +1284,6 @@ class Ai_Builder_ZipWP_Api {
 			'business_desc'     => isset( $request['business_description'] ) ? sanitize_text_field( $request['business_description'] ) : '',
 			'business_category' => isset( $request['category'] ) ? sanitize_text_field( $request['category'] ) : '',
 			'language'          => isset( $request['language'] ) ? sanitize_text_field( $request['language'] ) : 'en',
-			'site_goals'        => isset( $request['site_goals'] ) ? $request['site_goals'] : [],
-			'site_goals_other'  => isset( $request['site_goals_other'] ) ? $request['site_goals_other'] : '',
 		);
 
 		$body = wp_json_encode( $post_data );
@@ -2042,8 +2055,18 @@ class Ai_Builder_ZipWP_Api {
 			);
 		}
 
-		$site         = get_option( 'zipwp_import_site_details', array() );
-		$uuid         = is_array( $site ) ? $site['uuid'] : '';
+		$site = get_option( 'zipwp_import_site_details', array() );
+		$uuid = is_array( $site ) && ! empty( $site['uuid'] ) ? $site['uuid'] : '';
+
+		if ( empty( $uuid ) ) {
+			wp_send_json_error(
+				array(
+					'data'   => __( 'Site not found.', 'astra-sites' ),
+					'status' => false,
+				)
+			);
+		}
+
 		$api_endpoint = $this->get_api_domain( false ) . '/sites/import-status/' . $uuid . '/';
 		$request_args = array(
 			'headers' => $this->get_api_headers(),
@@ -2307,6 +2330,13 @@ class Ai_Builder_ZipWP_Api {
 			'email'             => $this->get_zip_user_email(),
 			'source'            => self::get_site_source(),
 		];
+
+		// UUID generated once per wizard session so ZipWP can count each build as its own attempt.
+		// The ZipWP endpoint validates it as nullable|uuid, so only forward a well-formed UUID.
+		$funnel_session_id = isset( $request['funnel_session_id'] ) ? strtolower( sanitize_text_field( $request['funnel_session_id'] ) ) : '';
+		if ( wp_is_uuid( $funnel_session_id ) ) {
+			$post_data['funnel_session_id'] = $funnel_session_id;
+		}
 
 		$body = wp_json_encode( $post_data );
 

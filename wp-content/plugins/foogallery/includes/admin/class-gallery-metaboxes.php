@@ -1,0 +1,766 @@
+<?php
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/*
+ * FooGallery Admin Gallery MetaBoxes class
+ */
+
+if ( ! class_exists( 'FooGallery_Admin_Gallery_MetaBoxes' ) ) {
+
+	class FooGallery_Admin_Gallery_MetaBoxes {
+
+		private $_gallery;
+
+		public function __construct() {
+			global $foogallery_admin_metaboxes_instantiated;
+
+			if ( $foogallery_admin_metaboxes_instantiated ) {
+				return;
+			}
+
+			$foogallery_admin_metaboxes_instantiated = true;
+
+			//add our foogallery metaboxes
+			add_action( 'add_meta_boxes_' . FOOGALLERY_CPT_GALLERY, array( $this, 'add_meta_boxes_to_gallery' ) );
+
+			//save extra post data for a gallery
+			add_action( 'save_post', array( $this, 'save_gallery' ) );
+
+			//save custom field on a page or post
+			add_action( 'save_post', array( $this, 'attach_gallery_to_post' ), 10, 2 );
+
+			//add scripts used by metaboxes
+			add_action( 'admin_enqueue_scripts', array( $this, 'include_required_scripts' ) );
+
+			// Ajax calls for creating a page for the gallery
+			add_action( 'wp_ajax_foogallery_create_gallery_page', array( $this, 'ajax_create_gallery_page' ) );
+
+			// Ajax call for clearing thumb cache for the gallery
+			add_action( 'wp_ajax_foogallery_clear_gallery_thumb_cache', array( $this, 'ajax_clear_gallery_thumb_cache' ) );
+			add_action( 'wp_ajax_foogallery_clear_attachment_thumb_cache', array( $this, 'ajax_clear_attachment_thumb_cache' ) );
+
+			add_filter( 'hidden_meta_boxes', array( $this, 'get_hidden_meta_boxes' ), 10, 3 );
+
+			add_filter( 'postbox_classes_foogallery_foogallery_items' , array( $this, 'ensure_metabox_not_closed' ) );
+			add_filter( 'postbox_classes_foogallery_foogallery_settings' , array( $this, 'ensure_metabox_not_closed' ) );
+
+			add_action( 'admin_notices', array( $this, 'show_warning_for_force_use_original_thumbs' ) );
+
+			add_filter( 'foogallery_available_extensions', array( $this, 'register_extension' ) );
+		}
+
+		/**
+		 * Sanitize the gallery settings
+		 *
+		 * @param $settings
+		 * @param $gallery_template
+		 *
+		 * @return array
+		 */
+		function sanitize_gallery_settings( $settings, $gallery_template ) {
+			$fields = foogallery_get_fields_for_template( $gallery_template );
+
+			foreach ( $fields as $field ) {
+				$field_variants = array( $field );
+				$mobile_field   = foogallery_get_mobile_field_for_template_field( $field, null, $gallery_template );
+				if ( false !== $mobile_field ) {
+					$field_variants[] = $mobile_field;
+				}
+
+				foreach ( $field_variants as $field_variant ) {
+					$field_id   = isset( $field_variant['id'] ) ? $field_variant['id'] : false;
+					$field_type = isset( $field_variant['type'] ) ? $field_variant['type'] : false;
+					// Developer JSON is authorized and validated by the advanced-settings save filter.
+					if ( 'custom_settings' === $field_id ) {
+						continue;
+					}
+					if ( $field_id && ( 'text' === $field_type || 'textarea' === $field_type ) ) {
+						$setting_id = $gallery_template . '_' . $field_id;
+						if ( isset( $settings[ $setting_id ] ) ) {
+							$settings[ $setting_id ] = foogallery_sanitize_full( $settings[ $setting_id ] );
+						}
+					}
+				}
+			}
+
+			return $settings;
+		}
+
+		/**
+		 * Clear the cached thumbnails for a gallery.
+		 *
+		 * @param FooGallery|int $foogallery The gallery object or ID.
+		 *
+		 * @return bool Whether a local thumbnail cache was cleared.
+		 */
+		public static function clear_gallery_thumbnail_cache( $foogallery ) {
+			if ( ! ( $foogallery instanceof FooGallery ) ) {
+				$foogallery = FooGallery::get_by_id( absint( $foogallery ) );
+			}
+
+			if ( ! $foogallery ) {
+				return false;
+			}
+
+			$engine = foogallery_thumb_active_engine();
+			if ( ! $engine->has_local_cache() ) {
+				return false;
+			}
+
+			ob_start();
+
+			foreach ( $foogallery->attachments() as $attachment ) {
+				if ( ! empty( $attachment->url ) ) {
+					$engine->clear_local_cache_for_file( $attachment->url );
+				}
+			}
+
+			ob_end_clean();
+
+			return true;
+		}
+
+		function register_extension( $extensions_list ) {
+            $extensions_list[] = array(
+				'slug' => 'foogallery-custom-css',
+				'class' => 'FooGallery_Admin_Gallery_MetaBoxes',
+				'categories' => array('free'),
+				'title' => foogallery__('Custom CSS', 'foogallery'),
+				'description' => foogallery__('Allows you to add custom CSS to your galleries. A Custom CSS metabox will show under your gallery settings, when editing a gallery.', 'foogallery'),
+				'external_link_text' => foogallery__( 'Read documentation', 'foogallery' ),
+                'external_link_url' => 'https://fooplugins.com/documentation/foogallery/developers/customize-gallery-custom-css/',
+				'dashicon'          => 'dashicons-editor-code',
+				'tags' => array('free'),
+				'source' => 'bundled',
+				'activated_by_default' => true,
+				'feature' => true
+			);
+
+            return $extensions_list;
+        }
+
+
+		function show_warning_for_force_use_original_thumbs() {
+			global $post;
+
+			if ( !isset( $post ) ) {
+				return;
+			}
+
+			$screen_id = foo_current_screen_id();
+
+			//only include scripts if we on the foogallery add/edit page
+			if ( FOOGALLERY_CPT_GALLERY === $screen_id ) {
+
+				$gallery = $this->get_gallery( $post );
+
+				if ( $gallery->force_use_original_thumbs ) {
+					?>
+					<div class="notice notice-warning">
+						<p>
+							<strong><?php esc_html_e('WARNING : The gallery is using original thumbnails!', 'foogallery'); ?></strong><br/>
+							<?php esc_html_e('You have enabled the "Force Original Thumbs" setting, which means your gallery will try to use the built-in thumbnails generated by WordPress. Most of the time, the original full-size image will be used as the thumbnail. This causes gallery layout issues and also slows down the loading of your gallery for your visitors. We do NOT recommend you enable this setting!', 'foogallery'); ?><br/>
+						</p>
+					</div>
+					<?php
+				}
+			}
+		}
+
+		public function add_meta_boxes_to_gallery( $post ) {
+
+			add_meta_box(
+				'foogallery_help',
+				__( 'Gallery Shortcode', 'foogallery' ),
+				array( $this, 'render_gallery_shortcode_metabox' ),
+				FOOGALLERY_CPT_GALLERY,
+				'side',
+				'default'
+			);
+
+			if ( 'publish' == $post->post_status ) {
+				add_meta_box( 'foogallery_pages',
+					__( 'Gallery Usage', 'foogallery' ),
+					array( $this, 'render_gallery_usage_metabox' ),
+					FOOGALLERY_CPT_GALLERY,
+					'side',
+					'high'
+				);
+			}
+
+			if ( foogallery_feature_enabled( 'foogallery-custom-css' ) ){
+				add_meta_box(
+					'foogallery_customcss',
+					__( 'Custom CSS', 'foogallery' ),
+					array( $this, 'render_customcss_metabox' ),
+					FOOGALLERY_CPT_GALLERY,
+					'normal',
+					'low'
+				);
+			}
+			
+
+			add_meta_box(
+				'foogallery_retina',
+				__( 'Retina Support', 'foogallery' ),
+				array( $this, 'render_retina_metabox' ),
+				FOOGALLERY_CPT_GALLERY,
+				'side',
+				'default'
+			);
+
+			add_meta_box(
+				'foogallery_sorting',
+				__( 'Gallery Sorting', 'foogallery' ),
+				array( $this, 'render_sorting_metabox' ),
+				FOOGALLERY_CPT_GALLERY,
+				'side',
+				'default'
+			);
+
+			add_meta_box(
+				'foogallery_thumb_settings',
+				__( 'Thumbnails', 'foogallery' ),
+				array( $this, 'render_thumb_settings_metabox' ),
+				FOOGALLERY_CPT_GALLERY,
+				'side',
+				'default'
+			);
+		}
+
+		public function get_gallery( $post ) {
+			if ( ! isset($this->_gallery) ) {
+				$this->_gallery = foogallery_admin_get_current_gallery( $post );
+
+				//attempt to load default gallery settings from another gallery, as per FooGallery settings page
+				$this->_gallery->load_default_settings_if_new();
+			}
+
+			return $this->_gallery;
+		}
+
+		public function save_gallery( $post_id ) {
+			// check autosave
+			if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+				return $post_id;
+			}
+
+			// verify nonce
+			if ( array_key_exists( FOOGALLERY_CPT_GALLERY . '_nonce', $_POST ) &&
+				wp_verify_nonce( $_POST[FOOGALLERY_CPT_GALLERY . '_nonce'], plugin_basename( FOOGALLERY_FILE ) )
+			) {
+				//if we get here, we are dealing with the Gallery custom post type
+				do_action( 'foogallery_before_save_gallery', $post_id, $_POST );
+
+				if ( isset( $_POST[FOOGALLERY_META_TEMPLATE] ) ) {
+					$gallery_template = $_POST[FOOGALLERY_META_TEMPLATE];
+					update_post_meta( $post_id, FOOGALLERY_META_TEMPLATE, $gallery_template );
+				} else {
+					$gallery_template = foogallery_default_gallery_template();
+				}
+
+				if ( isset( $_POST[FOOGALLERY_META_SETTINGS] ) ) {
+					$settings = isset( $_POST[FOOGALLERY_META_SETTINGS] ) ?
+						$_POST[FOOGALLERY_META_SETTINGS] : array();
+				} else {
+					$settings = array();
+				}
+
+				$settings = apply_filters( 'foogallery_save_gallery_settings', $settings, $post_id, $_POST );
+				$settings = apply_filters( 'foogallery_save_gallery_settings-'. $gallery_template, $settings, $post_id, $_POST );
+				$settings = foogallery_normalize_mobile_settings_for_save( $settings, $gallery_template );
+				$settings = foogallery_preserve_paid_mobile_settings( $settings, $gallery_template, $post_id );
+
+				$settings = $this->sanitize_gallery_settings( $settings, $gallery_template );
+
+				update_post_meta( $post_id, FOOGALLERY_META_SETTINGS, $settings );
+
+				if ( isset( $_POST[FOOGALLERY_META_SORT] ) ) {
+					update_post_meta( $post_id, FOOGALLERY_META_SORT, $_POST[FOOGALLERY_META_SORT] );
+				}
+
+				$custom_css = foogallery_sanitize_full( isset( $_POST[FOOGALLERY_META_CUSTOM_CSS] ) ?
+					$_POST[FOOGALLERY_META_CUSTOM_CSS] : '' );
+
+				if ( empty( $custom_css ) ) {
+					delete_post_meta( $post_id, FOOGALLERY_META_CUSTOM_CSS );
+				} else {
+					update_post_meta( $post_id, FOOGALLERY_META_CUSTOM_CSS, $custom_css );
+				}
+
+				if ( isset( $_POST[FOOGALLERY_META_RETINA] ) ) {
+					update_post_meta( $post_id, FOOGALLERY_META_RETINA, $_POST[FOOGALLERY_META_RETINA] );
+				} else {
+					delete_post_meta( $post_id, FOOGALLERY_META_RETINA );
+				}
+
+				if ( isset( $_POST[FOOGALLERY_META_FORCE_ORIGINAL_THUMBS] ) ) {
+					update_post_meta( $post_id, FOOGALLERY_META_FORCE_ORIGINAL_THUMBS, $_POST[FOOGALLERY_META_FORCE_ORIGINAL_THUMBS] );
+				} else {
+					delete_post_meta( $post_id, FOOGALLERY_META_FORCE_ORIGINAL_THUMBS );
+				}
+
+				do_action( 'foogallery_after_save_gallery', $post_id, $_POST );
+			}
+		}
+
+		public function attach_gallery_to_post( $post_id, $post ) {
+
+			// check autosave.
+			if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+				return;
+			}
+
+			if ( ! is_object( $post ) ) {
+				return;
+			}
+
+			if ( FOOGALLERY_CPT_GALLERY === $post->post_type || FOOGALLERY_CPT_ALBUM === $post->post_type ) {
+				return;
+			}
+
+			$allowed_post_types = foogallery_allowed_post_types_for_usage();
+
+			// only do this check for a page or post.
+			if ( in_array( $post->post_type, $allowed_post_types, true ) ) {
+
+				// clear any foogallery usages that the post might have.
+				delete_post_meta( $post_id, FOOGALLERY_META_POST_USAGE );
+
+				// clear any foogallery css usage that the post might have.
+				delete_post_meta( $post_id, FOOGALLERY_META_POST_USAGE_CSS );
+
+				$galleries = $this->find_galleries_in_post( $post );
+
+				if ( is_array( $galleries ) ) {
+					foreach ( $galleries as $gallery_id ) {
+						if ( intval( $gallery_id ) > 0 ) {
+							// if the content contains the foogallery shortcode then add usage post meta.
+							add_post_meta( $post_id, FOOGALLERY_META_POST_USAGE, $gallery_id, false );
+
+							do_action( 'foogallery_attach_gallery_to_post', $post_id, $gallery_id );
+						}
+					}
+				}
+			}
+		}
+
+		/**
+		 * Find all galleries in a post.
+		 *
+		 * @param WP_Post $post The post to check.
+		 *
+		 * @return array array of all galleries found in the post.
+		 */
+		private function find_galleries_in_post( $post ) {
+			$galleries = array();
+
+			if ( ! is_object( $post ) ) {
+				return $galleries;
+			}
+
+			// get all foogallery shortcodes that are on the page/post.
+			$gallery_shortcodes = foogallery_extract_gallery_shortcodes( $post->post_content );
+
+			if ( is_array( $gallery_shortcodes ) && count( $gallery_shortcodes ) > 0 ) {
+
+				foreach ( $gallery_shortcodes as $id => $shortcode ) {
+					$galleries[] = $id;
+				}
+			}
+
+			return apply_filters( 'foogallery_find_galleries_in_post', $galleries, $post );
+		}
+
+		public function render_gallery_shortcode_metabox( $post ) {
+			$gallery                = $this->get_gallery( $post );
+			$shortcode              = $gallery->shortcode();
+			$show_helpers_label     = __( 'Show Shortcode Helpers', 'foogallery' );
+			$hide_helpers_label     = __( 'Hide Shortcode Helpers', 'foogallery' );
+			?><script>
+				jQuery(function($) {
+					var shortcodeInput = document.querySelector('#foogallery_copy_shortcode');
+					shortcodeInput.addEventListener('click', function () {
+						try {
+							// select the contents
+							shortcodeInput.select();
+							//copy the selection
+							document.execCommand('copy');
+							//show the copied message
+							$('.foogallery-shortcode-message').remove();
+							$(shortcodeInput).after('<p class="foogallery-shortcode-message"><?php esc_html_e( 'Shortcode copied to clipboard :)','foogallery' ); ?></p>');
+						} catch(err) {
+							console.log('Oops, unable to copy!');
+						}
+					}, false);
+				});
+			</script>
+			<p class="foogallery-shortcode">
+				<input type="text" id="foogallery_copy_shortcode" size="<?php echo absint( strlen( $shortcode ) ) + 2; ?>" value="<?php echo esc_attr( $shortcode ); ?>" readonly="readonly" />
+			</p>
+			<p>
+				<?php esc_html_e( 'Paste the above shortcode into a post or page to show the gallery.', 'foogallery' ); ?>
+			</p>
+			<p class="foogallery-shortcode-helper-action">
+				<button
+					type="button"
+					class="button button-secondary"
+					id="foogallery_toggle_shortcode_helpers"
+					data-show-label="<?php echo esc_attr( $show_helpers_label ); ?>"
+					data-hide-label="<?php echo esc_attr( $hide_helpers_label ); ?>"
+					aria-expanded="false"
+				>
+					<?php echo esc_html( $show_helpers_label ); ?>
+				</button>
+			</p>
+			<p class="foogallery-help">
+				<?php esc_html_e( 'Shortcode helpers show the argument names and option values next to each setting so they can be copied for use in your shortcodes.', 'foogallery' ); ?>
+			</p>
+			<?php
+		}
+
+		public function render_gallery_usage_metabox( $post ) {
+			$gallery = $this->get_gallery( $post );
+			$posts = $gallery->find_usages();
+			if ( $posts && count( $posts ) > 0 ) { ?>
+				<p>
+					<?php esc_html_e( 'This gallery is used on the following posts or pages:', 'foogallery' ); ?>
+				</p>
+				<ul class="ul-disc">
+				<?php foreach ( $posts as $post ) {
+					$url = get_permalink( $post->ID );
+					echo '<li>' . esc_html( $post->post_title ) . '&nbsp;';
+					edit_post_link( esc_html__( 'Edit', 'foogallery' ), '<span class="edit">', ' | </span>', $post->ID );
+					echo '<span class="view"><a href="' . esc_url( $url ) . '" target="_blank">' . esc_html__( 'View', 'foogallery' ) . '</a></li>';
+				} ?>
+				</ul>
+			<?php } else { ?>
+				<p>
+					<?php esc_html_e( 'This gallery is not used on any pages or pages yet. Quickly create a page:', 'foogallery' ); ?>
+				</p>
+				<div class="foogallery_metabox_actions">
+					<button class="button button-primary button-large" id="foogallery_create_page"><?php esc_html_e( 'Create Gallery Page', 'foogallery' ); ?></button>
+					<span id="foogallery_create_page_spinner" class="spinner"></span>
+					<?php wp_nonce_field( 'foogallery_create_gallery_page', 'foogallery_create_gallery_page_nonce', false ); ?>
+				</div>
+				<p>
+					<?php esc_html_e( 'A draft page will be created which includes the gallery shortcode in the content. The title of the page will be the same title as the gallery.', 'foogallery' ); ?>
+				</p>
+			<?php }
+		}
+
+		public function render_sorting_metabox( $post ) {
+			$gallery = $this->get_gallery( $post );
+			$sorting_options = foogallery_sorting_options();
+			if ( empty( $gallery->sorting ) ) {
+				$gallery->sorting = '';
+			}
+			?>
+			<p>
+				<?php esc_html_e('Change the way images are sorted within your gallery. By default, they are sorted in the order you see them.', 'foogallery'); ?>
+			</p>
+			<?php
+			foreach ( $sorting_options as $sorting_key => $sorting_label ) { ?>
+				<p>
+				<input type="radio" value="<?php echo esc_attr( $sorting_key ); ?>" <?php checked( $sorting_key === $gallery->sorting ); ?> id="FooGallerySettings_GallerySort_<?php echo esc_attr( $sorting_key ); ?>" name="<?php echo esc_attr( FOOGALLERY_META_SORT ); ?>" data-foogallery-preview="include" />
+				<label for="FooGallerySettings_GallerySort_<?php echo esc_attr( $sorting_key ); ?>"><?php echo esc_html( $sorting_label ); ?></label>
+				</p><?php
+			} ?>
+			<p class="foogallery-help">
+				<?php esc_html_e('PLEASE NOTE : sorting randomly will force HTML Caching for the gallery to be disabled.', 'foogallery'); ?>
+			</p>
+			<?php
+		}
+
+		public function render_retina_metabox( $post ) {
+			$gallery = $this->get_gallery( $post );
+			$retina_options = foogallery_retina_options();
+			if ( empty( $gallery->retina ) ) {
+				$gallery->retina = foogallery_get_setting( 'default_retina_support', array() );
+			}
+			?>
+			<p>
+				<?php esc_html_e('Add retina support to this gallery by choosing the different pixel densities you want to enable.', 'foogallery'); ?>
+			</p>
+			<?php
+			foreach ( $retina_options as $retina_key => $retina_label ) {
+				$checked = array_key_exists( $retina_key, $gallery->retina ) ? ('true' === $gallery->retina[$retina_key]) : false;
+				?>
+				<p>
+				<input type="checkbox" value="true" <?php checked( $checked ); ?> id="FooGallerySettings_Retina_<?php echo esc_attr( $retina_key ); ?>" name="<?php echo esc_attr( FOOGALLERY_META_RETINA ); ?>[<?php echo esc_attr( $retina_key ); ?>]" />
+				<label for="FooGallerySettings_Retina_<?php echo esc_attr( $retina_key ); ?>"><?php echo esc_html( $retina_label ); ?></label>
+				</p><?php
+			} ?>
+			<p class="foogallery-help">
+				<?php esc_html_e('PLEASE NOTE : thumbnails will be generated for each of the pixel densities chosen, which will increase your website\'s storage space!', 'foogallery'); ?>
+			</p>
+			<?php
+		}
+
+		public function render_thumb_settings_metabox( $post ) {
+			$force_use_original_thumbs = 'true' === get_post_meta( $post->ID, FOOGALLERY_META_FORCE_ORIGINAL_THUMBS, true );
+			$checked = $force_use_original_thumbs;
+
+			$engine = foogallery_thumb_active_engine();
+
+			if ( $engine->has_local_cache() ) { ?>
+			<p>
+				<?php esc_html_e( 'Clear all the previously cached thumbnails that have been generated for this gallery.', 'foogallery' ); ?>
+			</p>
+			<div class="foogallery_metabox_actions">
+				<button class="button button-primary button-large" id="foogallery_clear_thumb_cache"><?php esc_html_e( 'Clear Thumbnail Cache', 'foogallery' ); ?></button>
+				<span id="foogallery_clear_thumb_cache_spinner" class="spinner"></span>
+				<?php wp_nonce_field( 'foogallery_clear_gallery_thumb_cache', 'foogallery_clear_gallery_thumb_cache_nonce', false ); ?>
+			</div>
+			<?php } ?>
+			<p>
+				<input type="checkbox" value="true" <?php checked( $checked ); ?> id="FooGallerySettings_ForceOriginalThumbs" name="<?php echo esc_attr( FOOGALLERY_META_FORCE_ORIGINAL_THUMBS ); ?>" />
+				<label for="FooGallerySettings_ForceOriginalThumbs"><?php esc_html_e('Force Original Thumbs', 'foogallery'); ?></label>
+			</p>
+			<?php
+		}
+
+		public function include_required_scripts() {
+			$screen_id = foo_current_screen_id();
+
+			//only include scripts if we on the foogallery add/edit page
+			if ( FOOGALLERY_CPT_GALLERY === $screen_id ||
+			     'edit-' . FOOGALLERY_CPT_GALLERY === $screen_id ) {
+
+				//include any admin js required for the templates
+				foreach ( foogallery_gallery_templates() as $template ) {
+					$admin_js = foo_safe_get( $template, 'admin_js' );
+					if ( is_array( $admin_js ) ) {
+						//dealing with an array of js files to include
+						foreach( $admin_js as $admin_js_key => $admin_js_src ) {
+							wp_enqueue_script( 'foogallery-gallery-admin-' . $template['slug'] . '-' . $admin_js_key, $admin_js_src, array('jquery', 'media-upload', 'jquery-ui-sortable'), FOOGALLERY_VERSION );
+						}
+					} else if ( !empty( $admin_js ) ) {
+						//dealing with a single js file to include
+						wp_enqueue_script( 'foogallery-gallery-admin-' . $template['slug'], $admin_js, array('jquery', 'media-upload', 'jquery-ui-sortable'), FOOGALLERY_VERSION );
+					}
+
+					$admin_css = foo_safe_get( $template, 'admin_css' );
+					if ( !empty( $admin_css ) ) {
+						wp_enqueue_style( 'foogallery-gallery-admin-' . $template['slug'], $admin_css, array(), FOOGALLERY_VERSION );
+					}
+				}
+			}
+		}
+
+		public function render_customcss_metabox( $post ) {
+			$gallery = $this->get_gallery( $post );
+			$custom_css = $gallery->custom_css;
+			$example = '<code>#foogallery-gallery-' . $post->ID . ' { }</code>';
+			?>
+			<p>
+				<?php /* translators: %s: Value inserted at runtime. */ ?>
+				<?php printf( esc_html__( 'Add any custom CSS to target this specific gallery. For example %s', 'foogallery' ), $example ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $example contains intentional HTML code tag ?>
+			</p>
+			<table id="table_styling" class="form-table">
+				<tbody>
+				<tr>
+					<td>
+						<textarea class="foogallery_metabox_custom_css" name="<?php echo esc_attr( FOOGALLERY_META_CUSTOM_CSS ); ?>" type="text"><?php echo esc_textarea( $custom_css ); ?></textarea>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+			<?php
+		}
+
+		public function ajax_create_gallery_page() {
+			if ( ! check_ajax_referer( 'foogallery_create_gallery_page', 'foogallery_create_gallery_page_nonce', false ) ) {
+				wp_send_json_error(
+					array( 'message' => __( 'Invalid security token.', 'foogallery' ) ),
+					403
+				);
+			}
+
+			$foogallery_id = isset( $_POST['foogallery_id'] ) ? absint( $_POST['foogallery_id'] ) : 0;
+			if ( ! $foogallery_id ) {
+				wp_send_json_error(
+					array( 'message' => __( 'Invalid gallery ID.', 'foogallery' ) ),
+					400
+				);
+			}
+
+			// Check if the user can edit the current foogallery.
+			if ( ! current_user_can( 'edit_post', $foogallery_id ) ) {
+				wp_send_json_error(
+					array( 'message' => __( 'Insufficient permissions.', 'foogallery' ) ),
+					403
+				);
+			}
+
+			// Check if the user can create draft pages.
+			if ( ! current_user_can( 'edit_pages' ) ) {
+				wp_send_json_error(
+					array( 'message' => __( 'Insufficient permissions.', 'foogallery' ) ),
+					403
+				);
+			}
+
+			$foogallery = FooGallery::get_by_id( $foogallery_id );
+			if ( ! $foogallery ) {
+				wp_send_json_error(
+					array( 'message' => __( 'Gallery not found.', 'foogallery' ) ),
+					404
+				);
+			}
+
+			$content = apply_filters( 'foogallery_create_gallery_page_content', $foogallery->shortcode(), $foogallery );
+
+			$post = apply_filters( 'foogallery_create_gallery_page_arguments', array(
+				'post_content' => $content,
+				'post_title'   => $foogallery->name,
+				'post_status'  => 'draft',
+				'post_type'    => 'page',
+			) );
+
+			$page_id = wp_insert_post( $post, true );
+			if ( is_wp_error( $page_id ) ) {
+				wp_send_json_error(
+					array( 'message' => $page_id->get_error_message() ),
+					500
+				);
+			}
+
+			wp_send_json_success(
+				array( 'page_id' => $page_id )
+			);
+		}
+
+		public function ajax_clear_gallery_thumb_cache() {
+			if ( ! check_ajax_referer( 'foogallery_clear_gallery_thumb_cache', 'foogallery_clear_gallery_thumb_cache_nonce', false ) ) {
+				wp_send_json_error(
+					array( 'message' => __( 'Invalid security token.', 'foogallery' ) ),
+					403
+				);
+			}
+
+			$foogallery_id = isset( $_POST['foogallery_id'] ) ? absint( $_POST['foogallery_id'] ) : 0;
+			if ( ! $foogallery_id ) {
+				wp_send_json_error(
+					array( 'message' => __( 'Invalid gallery ID.', 'foogallery' ) ),
+					400
+				);
+			}
+
+			if ( ! current_user_can( 'edit_post', $foogallery_id ) ) {
+				wp_send_json_error(
+					array( 'message' => __( 'Insufficient permissions.', 'foogallery' ) ),
+					403
+				);
+			}
+
+			$foogallery = FooGallery::get_by_id( $foogallery_id );
+			if ( ! $foogallery ) {
+				wp_send_json_error(
+					array( 'message' => __( 'Gallery not found.', 'foogallery' ) ),
+					404
+				);
+			}
+
+			if ( self::clear_gallery_thumbnail_cache( $foogallery ) ) {
+				wp_send_json_success(
+					array( 'message' => __( 'The thumbnail cache has been cleared!', 'foogallery' ) )
+				);
+			}
+
+			wp_send_json_success(
+				array( 'message' => __( 'There was no thumbnail cache to clear.', 'foogallery' ) )
+			);
+		}
+
+		public function ajax_clear_attachment_thumb_cache() {
+			if ( ! check_ajax_referer( 'foogallery_clear_attachment_thumb_cache', 'foogallery_clear_attachment_thumb_cache_nonce', false ) ) {
+				wp_send_json_error(
+					array( 'message' => __( 'Invalid security token.', 'foogallery' ) ),
+					403
+				);
+			}
+
+			$attachment_id = isset( $_POST['attachment_id'] ) ? absint( $_POST['attachment_id'] ) : 0;
+			if ( ! $attachment_id ) {
+				wp_send_json_error(
+					array( 'message' => __( 'Invalid attachment ID.', 'foogallery' ) ),
+					400
+				);
+			}
+
+			if ( ! current_user_can( 'edit_post', $attachment_id ) ) {
+				wp_send_json_error(
+					array( 'message' => __( 'Insufficient permissions.', 'foogallery' ) ),
+					403
+				);
+			}
+
+			$attachment = get_post( $attachment_id );
+			if ( ! $attachment || 'attachment' !== $attachment->post_type ) {
+				wp_send_json_error(
+					array( 'message' => __( 'Attachment not found.', 'foogallery' ) ),
+					404
+				);
+			}
+
+			$engine = foogallery_thumb_active_engine();
+
+			if ( $engine->has_local_cache() ) {
+				$url = wp_get_attachment_image_url( $attachment_id, 'full' );
+
+				ob_start();
+
+				$engine->clear_local_cache_for_file( $url );
+
+				ob_end_clean();
+
+				wp_send_json_success(
+					array( 'message' => __( 'The thumbnail cache has been cleared!', 'foogallery' ) )
+				);
+			}
+
+			wp_send_json_success(
+				array( 'message' => __( 'There was no thumbnail cache to clear.', 'foogallery' ) )
+			);
+		}
+
+		/**
+		 * Returns a list of all hidden metaboxes
+		 *
+		 * @param string[]  $hidden       An array of IDs of hidden meta boxes.
+		 * @param WP_Screen $screen       WP_Screen object of the current screen.
+		 * @param bool      $use_defaults Whether to show the default meta boxes.
+		 *
+		 * @return mixed
+		 */
+		function get_hidden_meta_boxes( $hidden, $screen, $use_defaults ) {
+			if ( isset( $screen ) && $screen->post_type === FOOGALLERY_CPT_GALLERY ) {
+
+				$ensure_not_hidden = array(
+					'foogallery_items',
+					'foogallery_settings'
+				);
+
+				foreach ( $ensure_not_hidden as $item ) {
+					$key = array_search( $item, $hidden );
+					if ( $key !== false ) {
+						unset( $hidden[$key] );
+					}
+				}
+			}
+
+			return $hidden;
+		}
+
+		function ensure_metabox_not_closed( $classes ) {
+		    if ( is_array( $classes ) && in_array( 'closed', $classes ) ) {
+			    $classes = array_diff( $classes, array( 'closed' ) );
+		    }
+		    return $classes;
+		}
+	}
+}

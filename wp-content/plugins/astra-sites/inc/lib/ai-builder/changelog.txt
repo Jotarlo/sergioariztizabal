@@ -1,3 +1,25 @@
+v1.2.91 - 7th September 2026
+- Improvement: Build-with-AI step tracking now sends a per-session funnel id and records the provisioning and site-building stages, so each website build is counted as its own attempt in ZipWP analytics.
+- Fix: AI website builder reported a generic import failure and logged a PHP warning when the site details were not yet stored.
+
+v1.2.90 - 19th August 2026
+- Improvement: Added AVIF image support, so templates using AVIF images bring them across along with the other formats.
+- Improvement: Removed the goals selection screen and the tone and keywords options from the AI website builder onboarding.
+- Fix: The import stream now closes after an import error instead of silently reconnecting against the finished import.
+- Fix: Security - Enforced TLS certificate verification on the ZipWP plan API request.
+
+v1.2.89 - 11th August 2026
+- Improvement: Ecommerce AI site builds now show live status updates during the final step instead of appearing stalled.
+- Fix: AI site import now retries when export data isn't ready yet, instead of erroring under high-volume site creation.
+
+v1.2.88 - 29th July 2026
+- Improvement: The import screen now shows a waiting state when a previous import request is still running, instead of stalling without feedback.
+- Fix: Content import no longer reconnects endlessly when the server-side import dies mid-way — the import screen now reports a clear error after repeated connection failures instead of looping silently.
+
+v1.2.87 - 28th July 2026
+- Improvement: PHP fatal errors during import are now captured in the import log and reported on the import screen instead of failing silently.
+- Fix: Step tracking now sends the backend-whitelisted step slugs instead of display labels, so build-with-AI onboarding steps are recorded correctly.
+
 v1.2.86 - 21st July 2026
 - Fix: Template search now correctly handles multiple keywords and keywords containing spaces or special characters.
 
