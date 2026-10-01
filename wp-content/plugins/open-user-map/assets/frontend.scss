@@ -1,0 +1,4943 @@
+// Variables
+$colors: (
+  primary: #e82c71,
+  highlight: red
+);
+
+$search_input_width: 300px;
+
+// Mixins
+@mixin oum-carousel {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  // Allow hover on the whole image so slider arrows fade in (not only on the arrow hitboxes)
+  pointer-events: auto;
+
+  &:hover {
+    .oum-carousel-prev,
+    .oum-carousel-next {
+      opacity: 1;
+    }
+  }
+
+  .oum-carousel-inner {
+    display: flex;
+    width: 100%;
+    height: 100%;
+
+    .oum-carousel-item {
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: none;
+      background-color: #eee;
+
+      &.active {
+        display: block;
+        animation: carouselFadeIn 0.3s ease-in-out;
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        max-width: 100%;
+      }
+    }
+  }
+
+  // Different aspect ratios for cover modes
+  &.popup-image-size-cover-4-3 {
+    aspect-ratio: 4/3;
+
+    .oum-carousel-inner {
+      .oum-carousel-item {
+        img {
+          object-fit: cover;
+          object-position: top center;
+        }
+      }
+    }
+  }
+
+  &.popup-image-size-cover-16-9 {
+    aspect-ratio: 16/9;
+
+    .oum-carousel-inner {
+      .oum-carousel-item {
+        img {
+          object-fit: cover;
+          object-position: top center;
+        }
+      }
+    }
+  }
+
+  &.popup-image-size-cover-1-1 {
+    aspect-ratio: 1/1;
+
+    .oum-carousel-inner {
+      .oum-carousel-item {
+        img {
+          object-fit: cover;
+          object-position: top center;
+        }
+      }
+    }
+  }
+
+  // Original size mode
+  &.popup-image-size-original {
+    aspect-ratio: auto;
+    
+    .oum-carousel-inner {
+      .oum-carousel-item {
+        img {
+          width: 100%;
+          height: auto;
+        }
+      }
+    }
+  }
+
+  .oum-carousel-prev,
+  .oum-carousel-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    margin: 0;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    box-shadow: none;
+    border-radius: 50%;
+    color: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    opacity: 0;
+    z-index: 1;
+    font-size: 0;
+    text-indent: -9999px;
+    pointer-events: auto;
+
+    // Always show controls on mobile
+    @media (max-width: 768px) {
+      opacity: 1;
+    }
+
+    &::before {
+      content: '';
+      display: block;
+      width: 10px;
+      height: 10px;
+      border-style: solid;
+      border-width: 2px 2px 0 0;
+      border-color: #fff;
+    }
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.8);
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .oum-carousel-prev {
+    left: 10px;
+
+    &::before {
+      transform: rotate(-135deg);
+      margin-left: 4px;
+    }
+  }
+
+  .oum-carousel-next {
+    right: 10px;
+
+    &::before {
+      transform: rotate(45deg);
+      margin-right: 4px;
+    }
+  }
+
+  .oum-carousel-counter {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    z-index: 1;
+  }
+}
+
+// Fix Elementor Widget Flexbox issue (no width set by default)
+.elementor-widget-open_user_map_widget,
+.elementor-widget-shortcode:has(.open-user-map),
+.elementor-widget-shortcode:has(.open-user-map-image-gallery) {
+  width: 100%;
+}
+
+.open-user-map {
+  position: relative;
+  z-index: 1;
+
+  /* resets */
+  img {
+    display: inherit;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    max-width: inherit;
+  }
+
+  input[type="radio"], 
+  input[type="checkbox"] {
+    margin: inherit;
+    padding: inherit;
+  }
+
+  input[type=text] {
+    background-color: #fff;
+    color: #333;
+    border-radius: 0;
+    font-size: 16px;
+  }
+
+  h1, h2, h3, h4 {
+    margin: 0;
+    padding: 0;
+    display: inherit;
+  }
+
+  button {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* end resets */
+
+  $marker_size: 22px;
+  $info_width: 320px;
+
+  $search_input_width: 320px;
+
+  input.oum-switch[type="checkbox"] {
+    position: relative;
+    left: 0;
+    top: 0;
+    z-index: 0;
+    appearance: none;
+    visibility: hidden;
+
+    + label {
+      position: relative;
+      display: block;
+      cursor: pointer;
+      font-family: sans-serif;
+      font-size: 16px;
+      line-height: 22px;
+      padding-left: 50px;
+      position: relative;
+      margin-left: 4px !important;
+      margin-top: -16px;
+
+      &::before {
+        box-sizing: border-box;
+        width: 40px;
+        height: 20px;
+        border-radius: 30px;
+        border: 2px solid #ddd;
+        background-color: #eee;
+        content: "";
+        margin-right: 15px;
+        transition: background-color 0.5s linear;
+        z-index: 5;
+        position: absolute;
+        left: 0px;
+        top: 1px;
+      }
+
+      &::after {
+        box-sizing: border-box;
+        width: 16px;
+        height: 16px;
+        border-radius: 30px;
+        background-color: #fff;
+        content: "";
+        transition: margin 0.1s linear;
+        box-shadow: 0px 0px 5px #aaa;
+        position: absolute;
+        left: 2px;
+        top: 3px;
+        z-index: 10;
+      }
+    }
+
+    &:checked + label::before {
+      background-color: #e82c71;
+    }
+
+    &:checked + label::after {
+      margin: 0 0 0 20px;
+    }
+  }
+  
+  .box-wrap {
+    .tab-wrap {
+      .oum-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+    
+        .nav-item {
+          font-size: 19px;
+          padding: 3px 15px;
+          border-bottom: 3px solid transparent;
+          color: inherit;
+          cursor: pointer;
+    
+          &.active {
+            font-weight: bold;
+            border-color: black;
+            color: black;
+          }
+    
+          &:hover {
+            border-color: black;
+          }
+        }
+      }
+    }
+
+    .map-wrap {
+      position: relative;
+      aspect-ratio: 1.77;
+
+      .oum-map-filter-wrapper {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        width: auto;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 15px;
+
+
+      }
+
+      .oum-filter-controls {
+        position: relative;
+        z-index: auto;
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: flex-end;
+        gap: 8px;
+
+        &.active {
+          max-width: 250px;
+        }
+
+        .oum-filter-toggle {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: rgba(255, 255, 255, 0.9);
+          background-image: url('images/ico_marker_categories.png');
+          background-position: center center;
+          background-repeat: no-repeat;
+          background-size: 60%;
+          width: 44px;
+          height: 44px;
+          border: 2px solid rgba(0, 0, 0, 0.2);
+          border-radius: 5px;
+          cursor: pointer;
+          z-index: 1;
+        }
+
+        .oum-filter-list {
+          display: flex;
+          background: rgba(255, 255, 255, 0.95);
+          color: #333;
+          padding: 6px;
+          border: 1px solid rgba(0, 0, 0, 0.2);
+          border-radius: 5px;
+          position: relative;
+          z-index: 2;
+          flex-direction: column;
+          gap: 5px;
+          padding-right: 30px;
+
+          .oum-toggle-all-wrapper {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding-bottom: 8px;
+            margin-bottom: 5px;
+
+            .oum-toggle-all-text {
+              opacity: 0.8;
+              font-weight: bold;
+            }
+          }
+
+          label {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            margin: 0;
+            padding: 0;
+            font-weight: normal;
+            cursor: pointer;
+            color: #333;
+
+            input[type='checkbox'] {
+              margin: 0;
+              position: relative;
+              top: 2px;
+              appearance: auto;
+              accent-color: map-get($colors, 'primary');
+              width: 16px;
+              height: 16px;
+              flex-shrink: 0;
+
+              &::before,
+              &::after {
+                display: none;
+              }
+            }
+
+            img {
+              height: 26px;
+              width: 26px;
+              object-fit: contain;
+              object-position: top;
+              transform: translateY(-10%);
+              flex-shrink: 0;
+            }
+
+            .oum-filter-category-shape-icon {
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              height: 26px;
+              width: 26px;
+              margin: 0;
+              flex-shrink: 0;
+
+              svg {
+                display: block;
+                height: 26px;
+                width: 26px;
+              }
+            }
+
+            span {
+              font-size: 12px;
+              line-height: 1.2;
+              margin-top: 2px;
+              margin-bottom: 5px;
+            }
+          }
+
+          .close-filter-list {
+            position: absolute;
+            top: 4px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 13px;
+
+            &:hover {
+              color: map-get($colors, 'primary');
+            }
+          }
+        }
+
+        // Default state: show list, hide toggle (when not collapsed and not active)
+        &:not(.use-collapse):not(.active) {
+          .oum-filter-toggle {
+            display: none;
+          }
+          .oum-filter-list {
+            display: flex;
+          }
+        }
+
+        // When use-collapse is present, show toggle button (unless active)
+        &.use-collapse:not(.active) {
+          .oum-filter-list {
+            display: none;
+          }
+          .oum-filter-toggle {
+            display: flex !important;
+          }
+        }
+
+        // When active class is present (expanded), show list and hide toggle (regardless of use-collapse)
+        &.active {
+          .oum-filter-list {
+            display: flex;
+          }
+          .oum-filter-toggle {
+            display: none;
+          }
+        }
+      }
+
+      // Loading overlay styles
+      .oum-loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.9);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.3s ease-out;
+
+        &.hidden {
+          opacity: 0;
+          pointer-events: none;
+        }
+
+        .oum-loading-spinner {
+          width: 50px;
+          height: 50px;
+          border: 3px solid #f3f3f3;
+          border-top: 3px solid #e82c71;
+          border-radius: 50%;
+          animation: oum-spin 1s linear infinite;
+        }
+      }
+
+      @keyframes oum-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      // Initially hide controls until map is loaded
+      .oum-filter-controls,
+      .open-add-location-overlay,
+      .oum-advanced-filter-button,
+      .oum-advanced-filter-panel {
+        opacity: 0;
+        transition: opacity 0.3s ease-out;
+
+        &.visible {
+          opacity: 1;
+        }
+      }
+
+      .leaflet-map {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: 100%;
+  
+        a {
+          text-decoration: none !important;
+          padding: 0;
+          margin: 0;
+        }
+
+        .leaflet-tile-pane img.leaflet-tile {
+          box-shadow: none;
+          padding: 0;
+          margin: 0;
+          border: none;
+          border-radius: unset;
+        }
+
+        .leaflet-marker-icon:not(.marker-cluster):not(.leaflet-div-icon):not(.leaflet-editing-icon) {
+          height: 40px !important;
+          width: 40px !important;
+          margin-top: -40px !important;
+          margin-left: -20px !important;
+          object-fit: contain;
+          object-position: center bottom;
+          outline: none !important;
+
+          &:hover {
+            width: 44px !important;
+            height: 44px !important;
+            margin-top: -44px !important;
+            margin-left: -22px !important;
+          }
+        }
+        .leaflet-popup {
+          box-shadow: 0 3px 14px rgba(0,0,0,0.2);
+          border-radius: 10px;
+        }
+  
+        .leaflet-popup-content-wrapper {
+          position: relative;
+          z-index: 1;
+          box-shadow: none;
+          border-radius: 10px;
+          overflow: hidden;
+          padding: 0;
+
+          &::after {
+            content: '';
+            display: block;
+            background: linear-gradient(0deg, white, transparent);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 25px;
+            pointer-events: none;
+          }
+  
+          .leaflet-popup-content {
+            margin: 0;
+            width: 250px;
+            max-height: 400px;
+            overflow: auto;
+
+            .oum_location_video {
+              background-color: #eee;
+              aspect-ratio: 16/9;
+
+              > * {
+                margin: 0;
+                width: 100%;
+                height: 100%;
+
+                > p {
+                  width: 100%;
+                  height: 100%;
+                  margin: 0 auto;
+                }
+              }
+
+              iframe {
+                width: 100%;
+                height: 100%;
+                margin: 0 auto;
+              }
+            }
+  
+            .oum_location_text {
+              padding: 15px;
+              overflow: auto;
+  
+              * {
+                color: #000;
+              }
+
+              .oum_location_title {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 4px;
+
+                .oum_location_name {
+                  font-size: 20px;
+                  line-height: 1.4;
+                  font-weight: bold;
+                  margin-top: 0;
+                  margin-bottom: 0;
+                }
+
+                .oum_location_measurement {
+                  display: inline-flex;
+                  align-items: center;
+                  height: 20px;
+                  padding: 0 9px;
+                  border-radius: 10px;
+                  background: rgba(0, 0, 0, 0.08);
+                  font-size: 13px;
+                  line-height: 20px;
+                  font-weight: bold;
+                }
+                
+                .oum_location_category_icons {
+                  display: flex;
+                  flex-wrap: wrap;
+                  gap: 4px;
+              
+                  .oum_category_icon {
+                    width: 20px;
+                    height: 20px;
+                    object-fit: contain;
+                    object-position: center;
+                    flex-shrink: 0;
+                  }
+
+                  .oum_category_shape_icon {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    svg {
+                      display: block;
+                      width: 20px;
+                      height: 20px;
+                    }
+                  }
+                }
+              }
+  
+              a {
+                color: map-get($colors, "primary");
+              }
+  
+              .oum_location_date {
+                opacity: 0.8;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                font-size: 11px;
+                margin-bottom: 5px;
+              }
+  
+              .oum_location_address {
+                opacity: 0.8;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                font-size: 11px;
+                margin-bottom: 10px;
+              }
+  
+  
+              .oum_location_custom_fields {
+                font-size: 14px;
+                opacity: 0.8;
+                margin-top: 10px;
+
+                .oum_custom_field {
+                  margin-bottom: 10px;
+                }
+  
+                a {
+                  display: inline-block;
+                  hyphens: auto;
+                }
+  
+                a[href*=facebook] {
+                  display: inline-block;
+                  margin: 6px 1px;
+                  top: -2px;
+                  position: relative;
+                  width: 20px;
+                  height: 20px;
+                  background: url(images/ico_facebook_50x50.png) no-repeat center center transparent;
+                  background-size: contain;
+                  text-indent: -9999px;
+                  margin: 6px 0;
+                }
+  
+                a[href*=instagram] {
+                  display: inline-block;
+                  margin: 6px 1px;
+                  top: -2px;
+                  position: relative;
+                  width: 20px;
+                  height: 20px;
+                  background: url(images/ico_instagram_50x50.png) no-repeat center center transparent;
+                  background-size: contain;
+                  text-indent: -9999px;
+                  margin: 6px 0;
+                }
+  
+                a[href*=linkedin] {
+                  display: inline-block;
+                  margin: 6px 1px;
+                  top: -2px;
+                  position: relative;
+                  width: 20px;
+                  height: 20px;
+                  background: url(images/ico_linkedin_50x50.png) no-repeat center center transparent;
+                  background-size: contain;
+                  text-indent: -9999px;
+                  margin: 6px 0;
+                }
+  
+                a[href*=twitter] {
+                  display: inline-block;
+                  margin: 6px 1px;
+                  top: -2px;
+                  position: relative;
+                  width: 20px;
+                  height: 20px;
+                  background: url(images/ico_twitter_50x50.png) no-repeat center center transparent;
+                  background-size: contain;
+                  text-indent: -9999px;
+                  margin: 6px 0;
+                }
+  
+                a[href*=youtube] {
+                  display: inline-block;
+                  margin: 6px 1px;
+                  top: -2px;
+                  position: relative;
+                  width: 20px;
+                  height: 20px;
+                  background: url(images/ico_youtube_50x50.png) no-repeat center center transparent;
+                  background-size: contain;
+                  text-indent: -9999px;
+                  margin: 6px 0;
+                }
+  
+                a[href*=soundcloud] {
+                  display: inline-block;
+                  margin: 6px 1px;
+                  top: -2px;
+                  position: relative;
+                  width: 20px;
+                  height: 20px;
+                  background: url(images/ico_soundcloud_50x50.png) no-repeat center center transparent;
+                  background-size: contain;
+                  text-indent: -9999px;
+                  margin: 6px 0;
+                }
+
+                // Opening hours field styling
+                .oum-opening-hours-header {
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                  margin-bottom: 8px;
+                  cursor: pointer;
+                  user-select: none;
+                  outline: none;
+                  
+                  &:hover {
+                    opacity: 0.8;
+                  }
+                  
+                  .oum-opening-hours-label {
+                    margin-right: 0;
+                  }
+                  
+                  .oum-opening-hours-status-indicator {
+                    display: inline-block;
+                    font-weight: bolder;
+                    
+                    &.oum-opening-hours-status-open {
+                      color: #28a745; // Green for open
+                    }
+                    
+                    &.oum-opening-hours-status-closed {
+                      color: #dc3545; // Red for closed
+                    }
+                  }
+                  
+                  .oum-opening-hours-toggle-icon {
+                    width: 16px;
+                    height: 16px;
+                    margin-left: auto;
+                    transition: transform 0.2s ease;
+                    opacity: 0.7;
+                  }
+                  
+                  // Rotate icon when expanded
+                  &.oum-opening-hours-expanded .oum-opening-hours-toggle-icon {
+                    transform: rotate(180deg);
+                  }
+                }
+                
+                .oum-opening-hours-wrapper {
+                  margin-top: 8px;
+                  
+                  &.oum-opening-hours-expanded {
+                    display: block !important;
+                  }
+                }
+                
+                .oum-opening-hours-wrapper {
+                  .oum-opening-hours-row {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: start;
+                    margin-bottom: 5px;
+                    font-size: 13px;
+
+                    &:has(.closed) {
+                      opacity: 0.5;
+                    }
+
+                    .oum-opening-hours-day-name {
+                      margin-right: 10px;
+                    }
+                    
+                    .oum-opening-hours-times,
+                    .oum-opening-hours-status {
+                      text-align: right;
+                      flex: 1;
+                    }
+                  }
+                }
+
+                .oum_custom_field:has(span):not(.oum_custom_field_type_opening_hours) {
+                  display: flex;
+                  flex-wrap: wrap;
+                  align-items: center;
+                  gap: 5px;
+
+                  span {
+                    background:rgba(0, 0, 0, 0.1);
+                    display: inline-block;
+                    padding: 3px 5px;
+                    border-radius: 5px;
+                    font-size: 13px;
+                  }
+                }
+              }
+  
+              .oum_location_description {
+                font-size: 14px;
+                opacity: 0.8;
+                margin-top: 10px;
+
+                &:empty {
+                  display: none;
+                }
+              }
+  
+              audio {
+                margin-top: 15px;
+              }
+
+              .oum_location_text_bottom {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 10px;
+                margin-top: 14px;
+
+                &:empty {
+                  display: none;
+                }
+              }
+  
+              .oum_read_more a {
+                font-size: 14px;
+              }
+
+              .oum_vote_button_wrap {
+                .oum_vote_button {
+                  min-width: auto;
+                  width: auto;
+                  line-height: 1;
+                  background: #f8f9fa;
+                  border: 1px solid #dee2e6;
+                  border-radius: 20px;
+                  height: 27px;
+                  padding: 4px 11px;
+                  cursor: pointer;
+                  transition: all 0.2s ease;
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 6px;
+                  font-size: 14px;
+                  color: #6c757d;
+            
+                  &:hover {
+                    background: #e9ecef;
+                    border-color: #adb5bd;
+                  }
+            
+                  &.voted {
+                    background: #dc3545;
+                    border-color: #dc3545;
+                    
+                    * {
+                      color: white;
+                    }
+                  }
+            
+                  .oum_vote_count {
+                    background: rgba(0, 0, 0, 0.3);
+                    color: #fff;
+                    border-radius: 10px;
+                    padding: 2px 6px;
+                    font-size: 12px;
+                    font-weight: bold;
+                    min-width: 20px;
+                    text-align: center;
+                    margin-left: 4px;
+                  }
+                }
+              }
+
+              // Star Rating Styles
+              .oum_star_rating_wrap {
+                .oum_star_rating {
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 8px;
+                  font-size: 14px;
+
+                  .oum_stars {
+                    display: inline-flex;
+                    gap: 2px;
+                    cursor: pointer;
+
+                    .oum_star {
+                      color: #ddd;
+                      font-size: 18px;
+                      line-height: 1;
+                      transition: color 0.2s ease;
+                      user-select: none;
+
+                      &.active {
+                        color: #ffc107;
+                      }
+
+                      &.hover {
+                        color: #ff9800;
+                      }
+
+                      &.half {
+                        background: linear-gradient(90deg, #ffc107 50%, #ddd 50%);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        background-clip: text;
+                      }
+                    }
+                  }
+
+                  .oum_star_rating_count {
+                    color: #6c757d;
+                    font-size: 12px;
+                  }
+                }
+              }
+            }
+
+            .oum-carousel {
+              @include oum-carousel;
+            }
+          }
+        }
+  
+        &.map-style_Custom1 {
+          // map tiles
+          .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+            filter: saturate(3);
+          }
+          // label tiles
+        }
+  
+        &.map-style_Custom2 {
+          // map tiles
+          .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+            filter: sepia(1) invert(0) saturate(28) hue-rotate(-53deg);
+          }
+  
+          // label tiles
+          .leaflet-tile-pane .leaflet-layer:nth-child(2) .leaflet-tile {
+            filter: sepia(0) contrast(1) invert(1) brightness(2);
+          }
+        }
+  
+        &.map-style_Custom3 {
+          // map tiles
+          .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+            filter: sepia(1) invert(1) saturate(100) brightness(1) hue-rotate(-300deg);
+          }
+  
+          // label tiles
+          .leaflet-tile-pane .leaflet-layer:nth-child(2) .leaflet-tile {
+            filter: sepia(0) contrast(1) invert(1) brightness(2);
+          }
+        }
+
+        .edit-location-button {
+          background: url(images/ico_pen.png) no-repeat 62% 29% #fff;
+          background-size: 66%;
+          border-radius: 99px;
+          height: 24px;
+          width: 24px;
+          text-align: center;
+          top: 5px;
+          right: 34px;
+          z-index: 2;
+          position: absolute;
+          cursor: pointer;
+          opacity: 0.8;
+          transition: opacity 0.12s ease-in;
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+  
+        .leaflet-popup-close-button {
+          background: #fff;
+          border-radius: 99px;
+          font-size: 20px;
+          width: 24px;
+          height: 24px;
+          line-height: 1;
+          text-align: center;
+          top: 5px;
+          right: 5px;
+          z-index: 2;
+          opacity: 0.8;
+          transition: opacity 0.12s ease-in;
+
+          span {
+            display: block;
+            height: 100%;
+            width: 100%;
+          }
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+
+        .leaflet-control-zoom {
+          a {
+            background-color: #fff;
+
+            &:hover {
+              background-color: #f4f4f4;
+            }
+          }
+        }
+  
+        .leaflet-control-layers-overlays {
+          label {
+            img {
+              height: 30px;
+              margin-right: 6px;
+              margin-left: 3px;
+              vertical-align: middle;
+            }
+          }
+        }
+  
+        .leaflet-control-search {
+          height: 34px;
+          box-sizing: border-box;
+          
+          &.search-exp {
+            width: $search_input_width;
+            max-width: 70vw;
+          }
+  
+          .search-input {
+            box-sizing: border-box;
+            width: calc(100% - 34px);
+            min-width: unset;
+            min-height: unset;
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            font-size: 14px;
+  
+            @media screen and (max-width: 768px) {
+              font-size: 16px;
+            }
+          }
+  
+          .search-button {
+            background: url(images/ico_search_marker.png) 0 0 no-repeat #fff;
+            background-size: contain;
+          }
+  
+          .search-tooltip {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+  
+            .search-tip {
+              font-size: 12px;
+              line-height: 24px;
+              border-radius: 0;
+              padding-left: 8px;
+              padding-right: 8px;
+              display: flex;
+  
+              img {
+                width: 20px;
+                height: 20px;
+                margin-right: 5px;
+                object-fit: contain;
+              }
+            }
+          }
+        }
+  
+        .leaflet-control-geosearch {
+          &.leaflet-geosearch-button {
+            display: flex;
+            flex-wrap: nowrap;
+  
+            &.active {
+              width: $search_input_width;
+              max-width: 70vw;
+            }
+    
+            form {
+              position: relative;
+              left: 0;
+              box-shadow: none;
+              border-radius: 0;
+              padding: 0;
+              width: calc(100% - 30px);
+              max-width: 100%;
+    
+              input[type=text] {
+                width: calc(100% - 20px);
+                margin: 0 20px 0 0 !important;
+                min-width: unset;
+                min-height: unset;
+                border: none !important;
+                box-shadow: none !important;
+                outline: none !important;
+                font-size: 14px;
+  
+                @media screen and (max-width: 768px) {
+                  font-size: 16px;
+                }
+              }
+
+              button.reset {
+                background-color: #ddd;
+                color: black;
+                margin: 0;
+                padding: 0;
+                border: none;
+                box-shadow: none;
+                margin: 0;
+                outline: none;
+                font-size: 18px;
+                line-height: 1;
+                width: 20px;
+                height: 20px;
+                text-align: center;
+                border-radius: 99px;
+                font-family: monospace;
+                top: 5px;
+                opacity: 0.5;
+                text-align: center;
+
+                &:hover {
+                  opacity: 1;
+                }
+              }
+
+              .results {
+                color: #333;
+
+                > * {
+                  font-size: 12px;
+                }
+              }
+    
+              .results.active {
+                width: calc(100% + 30px);
+                color: #333;
+                
+                &::after {
+                  display: none;
+                }
+              }
+            }
+    
+            a.leaflet-bar-part {
+              flex: 0 0 30px;
+              width: 30px;
+              mask-image: none;
+              background-image: url(images/ico_search_address_2.png);
+              background-color: #fff;
+              background-size: contain;
+              background-position: center center;
+              background-repeat: no-repeat;
+              border-radius: 0;
+    
+              &::before,
+              &::after {
+                display: none;
+              }
+            }
+          }
+  
+          &.leaflet-geosearch-bar {
+            form {
+              background-image: url(images/ico_search_address_2.png);
+              background-position: right 1px;
+              background-repeat: no-repeat;
+              background-size: 30px;
+              background-color: #fff;
+
+              .results {
+                color: #333;
+
+                > * {
+                  font-size: 12px;
+                }
+              }
+    
+              .results.active {
+                color: #333;
+                
+                &::after {
+                  display: none;
+                }
+              }
+  
+              input[type=text] {
+                width: calc(100% - 35px);
+                padding: 9px 13px 9px 0;
+                min-width: unset;
+                min-height: unset;
+                border: none !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                outline: none !important;
+                font-size: 14px;
+  
+                @media screen and (max-width: 768px) {
+                  padding: 0;
+                  font-size: 16px;
+                }
+              }
+    
+              button.reset {
+                right: 30px;
+                background-color: #ddd;
+                color: black;
+                margin: 0;
+                padding: 0;
+                border: none;
+                box-shadow: none;
+                margin: 0;
+                outline: none;
+                font-size: 18px;
+                line-height: 1;
+                width: 20px;
+                height: 20px;
+                text-align: center;
+                border-radius: 99px;
+                font-family: monospace;
+                top: 5px;
+                opacity: 0.5;
+                text-align: center;
+
+                &:hover {
+                  opacity: 1;
+                }
+              }
+            }
+          }
+        }
+
+        .leaflet-control-attribution {
+          font-size: 10px;
+        }
+      }
+  
+      .open-add-location-overlay {
+        box-sizing: border-box;
+        position: absolute;
+        top: 8px;
+        right: 13px;
+        z-index: 9999;
+        background: map-get($colors, "primary");
+        color: white;
+        box-shadow: 0 0 4px 2px rgba(0,0,0,0.2);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        border-radius: 50px;
+        text-align: center;
+        text-decoration: none;
+        height: 50px;
+        cursor: pointer;
+        padding: 0;
+        width: 50px;
+        overflow: hidden;
+        transition: width 0.1s ease-in;
+  
+        span.btn_icon {
+          display: block;
+          position: absolute;
+          z-index: 1;
+          top: calc(50% - 15px);
+          left: 10px;
+          height: 30px;
+          width: 30px;
+          font-family: sans-serif;
+          font-size: 35px;
+          line-height: 25px;
+        }
+  
+        span.btn_text {
+          font-size: 16px;
+          line-height: 1;
+          padding-left: 45px;
+          width: 140px;
+          text-align: left;
+          word-break: keep-all;
+          opacity: 0;
+        }
+  
+        &:hover,
+        &:active {
+          background: darken(map-get($colors, "primary"), 10%);
+          width: 158px;
+  
+          span.btn_text {
+            opacity: 1;
+            transition: opacity 0.1s ease-in;
+            transition-delay: 0.05s;
+          }
+        }
+      }
+  
+      #oum_search_marker {
+        z-index: 400;
+        position: absolute !important;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+  
+  
+        .leaflet-control-search {
+          box-sizing: border-box;
+          height: 34px;
+          
+          &.search-exp {
+            width: $search_input_width;
+            max-width: 50vw;
+          }
+  
+          .search-input {
+            box-sizing: border-box;
+            width: calc(100% - 34px);
+            min-width: unset;
+            min-height: unset;
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            font-size: 14px;
+  
+            @media screen and (max-width: 768px) {
+              font-size: 16px;
+            }
+          }
+  
+          .search-button {
+            background: url(images/ico_search_marker.png) 0 0 no-repeat #fff;
+            background-size: contain;
+          }
+  
+          .search-tooltip {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+  
+            .search-tip {
+              font-size: 12px;
+              line-height: 24px;
+              border-radius: 0;
+              padding-left: 8px;
+              padding-right: 8px;
+              display: flex;
+  
+              img {
+                width: 20px;
+                height: 20px;
+                margin-right: 5px;
+                object-fit: contain;
+              }
+            }
+          }
+        }
+      }
+
+      #oum_filter_markers {
+        width: $search_input_width;
+        max-width: calc(100% - 120px);
+        height: 34px;
+        z-index: 400;
+        position: absolute !important;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 2px solid rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+        background-clip: padding-box;
+        font-size: 14px;
+        line-height: 1;
+        padding: 0 16px;
+        background-image: url(images/ico_search_marker.png);
+        background-position: right 1px;
+        background-repeat: no-repeat;
+        background-size: 30px;
+        background-color: #fff;
+      }
+
+      .oum-attribution {
+        position: absolute;
+        bottom: -17px;
+        right: 13px;
+        z-index: 999;
+        background: rgba(255, 255, 255, 0.9);
+        font-size: 11px;
+        color: #999;
+        display: inline-block;
+        padding: 3px 6px;
+        margin: 0;
+        line-height: 1;
+        box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.3);
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
+
+        a {
+          color: map-get($colors, "primary");
+          text-decoration: none;
+          display: inline;
+          line-height: 1;
+          margin: 0;
+          padding: 0;
+        }
+      }
+    }
+
+    &.map-size-fullwidth {
+      width: 100vw;
+      margin-left: 50%;
+      transform: translateX(-50%);
+    }
+
+    &.oum-regions-layout-2 {
+      display: flex;
+      flex-direction: row;
+
+      >.tab-wrap {
+        width: 170px;
+  
+        .oum-tabs {
+          flex-direction: column;
+          border-bottom: none;
+          border-right: 1px solid rgba(0, 0, 0, 0.5);
+          height: 100%;
+          justify-content: unset;
+  
+          .nav-item {
+            padding: 10px 10px 10px 20px;
+            line-height: 1.1;
+            border-bottom: none;
+            border-right: 3px solid transparent;
+            color: inherit;
+            hyphens: auto;
+  
+            &.active {
+              font-weight: bold;
+              border-color: black;
+              color: black;
+            }
+  
+            &:hover {
+              border-color: black;
+            }
+          }
+        }
+      }
+  
+      >.map-wrap {
+        width: calc(100% - 150px);
+      }
+    }
+
+    @media screen and (max-width: 768px) {
+      .map-wrap {
+        aspect-ratio: unset;
+        height: 400px;
+      }
+    }
+  }
+
+  .add-location {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    background: radial-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9));
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    overflow: auto;
+
+    * {
+      box-sizing: border-box;
+    }
+
+    @media screen and (max-width: 768px) {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    .location-overlay-content {
+      position: relative;
+      width: 768px;
+      max-width: 80%;
+      display: flex;
+      flex-direction: column;
+      background: #f8f8f8;
+      color: #333;
+      padding: 33px 43px;
+      border-radius: 20px;
+
+      @media screen and (max-width: 768px) {
+        max-width: 100%;
+        padding: 15px;
+        border-radius: 0;
+      }
+
+      #close-add-location-overlay {
+        position: absolute;
+        top: 23px;
+        right: 30px;
+        font-size: 30px;
+        line-height: 1;
+        display: inline-block;
+        color: #333;
+        cursor: pointer;
+  
+        &:hover {
+          color: map-get($colors, "primary");
+        }
+  
+        @media screen and (max-width: 768px) {
+          top: 16px;
+          right: 16px;
+        }
+      }
+
+      #oum_add_location {
+        .oum-required-indicator {
+          color: map-get($colors, "primary");
+          font-size: 18px;
+          line-height: 1;
+          margin-left: 2px;
+          display: inline-block;
+        }
+
+        h2 {
+          text-align: center;
+          font-size: 36px;
+          margin-bottom: 7px;
+          color: map-get($colors, "primary");
+
+          &.oum-add-location-headline {
+            display: block;
+          }
+
+          &.oum-edit-location-headline {
+            display: none;
+          }
+
+          @media screen and (max-width: 768px) {
+            text-align: left;
+            font-size: 26px;
+            margin-bottom: 13px;
+          }
+        }
+
+        .oum-location-type-control {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 12px;
+          margin: 0 0 12px;
+          padding: 0;
+          border: 0;
+
+          legend {
+            grid-column: 1 / -1;
+            margin-bottom: 5px;
+            font-weight: bold;
+          }
+
+          .oum-location-type-card {
+            position: relative;
+            display: flex;
+            box-sizing: border-box;
+            min-height: 120px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin: 0;
+            padding: 18px 12px 15px;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: 9px;
+            background: #fff;
+            color: #333;
+            cursor: pointer;
+            text-align: center;
+            transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+
+            input {
+              position: absolute;
+              opacity: 0;
+              pointer-events: none;
+            }
+
+            &.is-selected,
+            &:has(input:checked) {
+              border-color: map-get($colors, "primary");
+              background-color: rgba(map-get($colors, "primary"), 0.08);
+              box-shadow: 0 0 0 1px rgba(map-get($colors, "primary"), 0.2);
+            }
+
+            &:hover {
+              border-color: map-get($colors, "primary");
+            }
+          }
+
+          .oum-location-type-icon {
+            position: relative;
+            display: block;
+            width: 38px;
+            height: 38px;
+            color: map-get($colors, "primary");
+
+            svg {
+              display: block;
+              width: 100%;
+              height: 100%;
+            }
+          }
+
+          .oum-location-type-icon-point {
+            &::before {
+              content: "";
+              position: absolute;
+              left: 50%;
+              top: 4px;
+              width: 24px;
+              height: 24px;
+              border-radius: 50% 50% 50% 0;
+              background: currentColor;
+              transform: translateX(-50%) rotate(-45deg);
+            }
+
+            &::after {
+              content: "";
+              position: absolute;
+              left: 50%;
+              top: 12px;
+              width: 8px;
+              height: 8px;
+              border-radius: 50%;
+              background: #fff;
+              transform: translateX(-50%);
+            }
+          }
+
+          .oum-location-type-title {
+            display: block;
+            font-weight: bold;
+          }
+
+          .oum-location-type-description {
+            display: block;
+            color: rgba(0, 0, 0, 0.62);
+            font-size: 12px;
+          }
+        }
+
+        .oum-marker-category-option {
+          .oum-category-visual {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            width: 30px;
+            min-width: 30px;
+            height: 30px;
+          }
+
+          .oum-category-line-preview,
+          .oum-category-area-preview {
+            display: none;
+          }
+        }
+
+        .oum-category-line-preview {
+          display: none;
+          position: relative;
+          width: 30px;
+          height: 30px;
+
+          svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+          }
+        }
+
+        .oum-category-area-preview {
+          display: none;
+          position: relative;
+          width: 30px;
+          height: 30px;
+          opacity: 1;
+
+          svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .oum-location-type-control {
+            grid-template-columns: 1fr;
+
+            .oum-location-type-card {
+              min-height: 88px;
+            }
+          }
+        }
+
+        label {
+          font-size: 15px;
+          color: #333;
+          margin-left: 0;
+          margin-right: 0;
+
+          &.oum-label {
+            display: block;
+            font-weight: bold;
+            margin: 0 0 8px 0;
+            line-height: 1.5;
+          }
+        }
+
+        input[type=text],
+        input[type=email],
+        input[type=url],
+        textarea,
+        select,
+        .oum-category-dropdown-display {
+          font-family: inherit;
+          margin: 0 0 25px;
+          font-size: 15px;
+          border: 1px solid #bbb;
+          border-radius: 4px;
+          color: #333;
+          background-color: #fff;
+          outline: none;
+          line-height: 1;
+          padding: 14px;
+          width: 100%;
+
+          &:focus {
+            border-color: map-get($colors, "primary");
+            box-shadow: 0 0 0 2px rgba(map-get($colors, "primary"), 0.1);
+          }
+        }
+
+        select,
+        .oum-category-dropdown-display {
+          appearance: none;
+          background-image: url(data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0Ljk1IDEwIj48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2ZmZjt9LmNscy0ye2ZpbGw6IzQ0NDt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPmFycm93czwvdGl0bGU+PHJlY3QgY2xhc3M9ImNscy0xIiB3aWR0aD0iNC45NSIgaGVpZ2h0PSIxMCIvPjxwb2x5Z29uIGNsYXNzPSJjbHMtMiIgcG9pbnRzPSIxLjQxIDQuNjcgMi40OCAzLjE4IDMuNTQgNC42NyAxLjQxIDQuNjciLz48cG9seWdvbiBjbGFzcz0iY2xzLTIiIHBvaW50cz0iMy41NCA1LjMzIDIuNDggNi44MiAxLjQxIDUuMzMgMy41NCA1LjMzIi8+PC9zdmc+);
+          background-repeat: no-repeat;
+          background-position: right 10px center;
+          background-size: 20px;
+          line-height: 1.1;
+          height: auto;
+          border-color: #bbb;
+        }
+
+        .oum-category-dropdown-display {
+          display: flex;
+          align-items: center;
+          min-height: 50px;
+          box-sizing: border-box;
+          overflow: hidden;
+
+          .oum-category-dropdown-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 4px;
+            object-fit: contain;
+            object-position: center;
+            flex-shrink: 0;
+          }
+
+          .oum-category-line-preview,
+          .oum-category-area-preview {
+            display: none;
+            width: 20px;
+            height: 20px;
+            margin-right: 4px;
+            flex-shrink: 0;
+            line-height: 0;
+
+            svg {
+              display: block;
+              width: 20px;
+              height: 20px;
+            }
+          }
+        }
+
+        fieldset {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          border: none;
+          padding: 0;
+          margin: 0 0 15px;
+          font-size: 15px;
+          color: #333;
+          background-color: transparent;
+          width: 100%;
+
+          legend {
+            padding: 0;
+            margin: 0 0 8px 0;
+            font-weight: bold;
+            font-size: 15px;
+            line-height: 1.5;
+          }
+
+          >div {
+            margin: 0;
+
+            label {
+              display: flex;
+              align-items: center;
+              margin-left: 6px;
+              margin-right: 10px;
+              color: #333;
+    
+              @media screen and (max-width: 768px) {
+                margin-left: 0;
+              }
+
+              // Category icon styles
+              .oum-category-icon {
+                width: 20px;
+                height: 20px;
+                margin-right: 4px;
+                object-fit: contain;
+                object-position: center;
+                flex-shrink: 0;
+              }
+            }
+          }
+
+          input[type=checkbox] {
+            appearance: auto;
+            accent-color: #e82c71;
+            position: relative;
+            width: 20px;
+            height: 20px;
+            flex: 0 0 20px;
+            margin: 0 7px 0 0;
+
+            &::before,
+            &::after {
+              display: none;
+            }
+          }
+
+          input[type=radio] {
+            appearance: auto;
+            accent-color: #e82c71;
+            position: relative;
+            width: 20px;
+            height: 20px;
+            flex: 0 0 20px;
+            margin: 0 10px 0 0;
+
+            &::before,
+            &::after {
+              display: none;
+            }
+          }
+        }
+
+        #oum_location_title {
+          width: 100%;
+        }
+
+        .map-wrap {
+          position: relative;
+          aspect-ratio: 1.77;
+          margin: 0 0 25px;
+      
+          #mapGetLocation {
+            position: absolute;
+            z-index: 1;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0; 
+            border: 1px solid #bbb;
+            border-radius: 4px;
+
+            .leaflet-geosearch-bar .results {
+              font-size: 12px;
+            }
+
+            @media screen and (max-width: 768px) {
+              .leaflet-geosearch-bar {
+                max-width: calc(100% - 67px);
+                margin: 10px 10px 0 auto;
+              }
+            }
+
+            a:not(.leaflet-draw-actions a) {
+              text-decoration: none !important;
+              padding: 0;
+              margin: 0;
+            }
+    
+            .leaflet-tile-pane img.leaflet-tile {
+              box-shadow: none;
+              padding: 0;
+              margin: 0;
+              border: none;
+              border-radius: unset;
+            }
+
+            .leaflet-control-geosearch {
+              &.leaflet-geosearch-bar {
+                form {
+                  background-image: url(images/ico_search_address_2.png);
+                  background-position: right 1px;
+                  background-repeat: no-repeat;
+                  background-size: 30px;
+                  background-color: #fff;
+      
+                  input[type=text] {
+                    width: calc(100% - 35px);
+                    padding: 9px 13px 9px 0;
+                    min-width: unset;
+                    min-height: unset;
+                    border: none !important;
+                    box-shadow: none !important;
+                    margin: 0 !important;
+                    outline: none !important;
+                    font-size: 14px;
+  
+                    @media screen and (max-width: 768px) {
+                      font-size: 16px;
+                    }
+                  }
+        
+                  button.reset {
+                    right: 25px;
+                    background-color: #fff;
+                    color: black;
+                    margin: 0;
+                    padding: 0 8px;
+                    border: none;
+                    box-shadow: none;
+                    margin: 0;
+                    outline: none;
+                    font-size: 14px;
+                    opacity: 0.5;
+
+                    &:hover {
+                      opacity: 1;
+                    }
+                  }
+                }
+              }
+            }
+
+            &.map-style_Custom1 {
+              // map tiles
+              .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+                filter: saturate(3);
+              }
+              // label tiles
+            }
+      
+            &.map-style_Custom2 {
+              // map tiles
+              .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+                filter: sepia(1) invert(0) saturate(28) hue-rotate(-53deg);
+              }
+      
+              // label tiles
+              .leaflet-tile-pane .leaflet-layer:nth-child(2) .leaflet-tile {
+                filter: sepia(0) contrast(1) invert(1) brightness(2);
+              }
+            }
+      
+            &.map-style_Custom3 {
+              // map tiles
+              .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+                filter: sepia(1) invert(1) saturate(100) brightness(1) hue-rotate(-300deg);
+              }
+  
+              // label tiles
+              .leaflet-tile-pane .leaflet-layer:nth-child(2) .leaflet-tile {
+                filter: sepia(0) contrast(1) invert(1) brightness(2);
+              }
+            }
+
+          }
+        }
+
+        #oum_location_address {
+          width: 100%;
+        }
+
+        #oum_location_text {
+          width: 100%;
+          height: 100px;
+          resize: none;
+        }
+
+        .oum_custom_field_description {
+          font-size: 14px;
+          font-style: italic;
+          opacity: 0.6;
+          margin-top: -20px;
+          padding: 0 9px 20px;
+        }
+
+        #oum_location_image {
+          color: map-get($colors, "primary");
+        }
+
+        .oum_media {
+          display: flex;
+          margin-bottom: 35px;
+          flex-direction: column;
+          gap: 25px;
+
+          .media-upload {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 0;
+
+            label {
+              display: flex;
+              width: 32px;
+              align-items: center;
+              gap: 3px;
+              padding: 0;
+              margin: 0;
+              line-height: 1;
+              color: map-get($colors, "primary");
+              cursor: pointer;
+              position: relative;
+              flex-shrink: 0;
+              transition: transform 0.1s ease;
+
+              &:hover {
+                transform: scale(1.05);
+              }
+              
+              .dashicons {
+                width: 32px;
+                height: 32px;
+                font-size: 32px;
+              }
+            }
+
+            input[type=file] {
+              position: absolute;
+              z-index: -1;
+              bottom: 0;
+              left: 0;
+              opacity: 0;
+              height: 100%;
+              width: 100%;
+              overflow: hidden;
+              padding: 0;
+              margin: 0;
+            }
+
+            .preview {
+              display: flex;
+              gap: 5px;
+              align-items: center;
+              position: relative;
+
+              .remove-upload {
+                display: none;
+                opacity: 0.8;
+                width: 20px;
+                height: 20px;
+                border-radius: 100px;
+                cursor: pointer;
+                line-height: 18px;
+                text-align: center;
+                background: indianred;
+                color: #fff;
+                font-family: sans-serif;
+                font-size: 17px;
+                position: absolute;
+                right: -25px;
+                top: 50%;
+                transform: translateY(-50%);
+
+                &:hover {
+                  opacity: 1;
+                }
+              }
+
+              &.active {
+                .remove-upload {
+                  display: block;
+                }
+              }
+            }
+          }
+
+          // Image upload specific styles
+          .oum-image-upload {
+            .media-upload-top {
+              display: flex;
+              align-items: center;
+              gap: 15px;
+              width: 100%;
+
+              label {
+                .multi-upload-indicator {
+                  position: absolute;
+                  top: -3px;
+                  right: -8px;
+                  font-size: 14px;
+                  font-weight: bold;
+                  font-family: math;
+                  color: #fff;
+                  background: map-get($colors, "primary");
+                  width: 18px;
+                  height: 18px;
+                  line-height: 18px;
+                  text-align: center;
+                  border-radius: 50%;
+                  transition: transform 0.2s ease;
+                }
+              }
+
+              .oum-image-upload-description {
+                font-family: sans-serif;
+                font-size: 16px;
+                margin: 0;
+                line-height: 1.3;
+                color: #333;
+                opacity: 1;
+              }
+            }
+          }
+
+          // Video upload specific styles
+          .oum-video-upload {
+            input[type=text] {
+              margin: 0;
+              flex: 1;
+              height: 35px;
+              transition: border-color 0.2s ease;
+
+              &:hover {
+                border-color: map-get($colors, "primary");
+              }
+
+              &:focus {
+                border-color: map-get($colors, "primary");
+                outline: none;
+                box-shadow: 0 0 0 2px rgba(224, 42, 175, 0.1);
+              }
+            }
+          }
+
+          // Audio upload specific styles
+          .oum-audio-upload {
+            input[type=file] {
+              position: absolute;
+              z-index: -1;
+              opacity: 0;
+              width: 0;
+              height: 0;
+              overflow: hidden;
+            }
+
+            .preview {
+              flex: 1;
+              min-width: 0;
+              display: flex;
+              align-items: center;
+              gap: 15px;
+
+              .audio-preview {
+                width: 70%;  // Limit width to prevent x-button from going off-screen
+                margin-top: 2px;  // Slight adjustment to align with x-button
+
+                audio {
+                  width: 100%;
+                  height: 40px;  // Increased height for better visibility
+                  margin: 0;  // Reset margin
+                  vertical-align: middle;  // Help with alignment
+                }
+              }
+
+              .remove-upload {
+                position: static;  // Remove absolute positioning
+                transform: none;  // Remove transform
+                margin-top: 2px;  // Match audio player adjustment
+              }
+
+              &.active {
+                .remove-upload {
+                  display: block;
+                }
+              }
+            }
+          }
+
+          .oum-image-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+            width: 100%;
+            min-height: 50px;
+            padding: 10px;
+            border: 2px dashed #ddd;
+            border-radius: 4px;
+            position: relative;
+
+            &.dragover {
+              background: #f5f5f5;
+              border-color: #999;
+            }
+
+            &:empty {
+              display: none;
+              margin: 0;
+            }
+
+            .image-preview-item {
+              position: relative;
+              aspect-ratio: 1;
+              border-radius: 4px;
+              overflow: hidden;
+              cursor: grab;
+              border: 2px solid #ddd;
+              background: #fff;
+              will-change: transform;
+              user-select: none;
+              
+              &.dragging {
+                cursor: grabbing;
+                background: #fff;
+                border-color: map-get($colors, "primary");
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+              }
+
+              img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+                pointer-events: none;
+              }
+
+              .remove-image {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                width: 20px;
+                height: 20px;
+                background: rgba(255, 255, 255, 0.8);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                font-size: 14px;
+                line-height: 1;
+                color: #666;
+                transition: all 0.2s ease;
+
+                &:hover {
+                  background: #fff;
+                  color: #000;
+                }
+              }
+
+              .drag-handle {
+                position: absolute;
+                bottom: 5px;
+                right: 5px;
+                width: 20px;
+                height: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: grab;
+                font-size: 14px;
+                line-height: 1;
+                color: rgba(255, 255, 255, 0.8);
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+              }
+            }
+          }
+
+          .image-preview-placeholder {
+            border: 2px dashed map-get($colors, "primary");
+            border-radius: 4px;
+            background: rgba(224, 42, 175, 0.05);
+            transition: all 0.15s ease-in-out;
+          }
+        }
+
+        #oum_author {
+          display: none;
+          justify-content: space-between;
+          padding-top: 15px;
+
+          &.active {
+            display: flex;
+          }
+
+          input {
+            width: 49%;
+          }
+        }
+
+        input[type=submit] {
+          cursor: pointer;
+          font-size: 19px;
+          text-align: center;
+          font-weight: bold;
+          border-radius: 4px;
+          margin: 40px 0 10px;
+          background: map-get($colors, "primary");
+          padding: 15px 30px;
+          line-height: 1;
+          border: none;
+          color: white;
+          position: relative;
+          left: 50%;
+          transform: translateX(-50%);
+
+          &.oum-loading {
+            text-indent: -9999px;
+            background-image: url(images/loading.gif);
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: 30px;
+            background-size: 40px;
+            width: 100px;
+            opacity: 0.6;
+          }
+
+          &:hover, 
+          &:active {
+            color: white;
+            background-color: darken(map-get($colors, "primary"), 10%);
+          }
+
+          @media screen and (max-width: 768px) {
+            width: 100%;
+          }
+        }
+
+        #oum_delete_location_btn {
+          display: none;
+          text-align: center;
+
+          span {
+            cursor: pointer;
+            color: map-get($colors, "primary");
+            display: inline-block;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 15px;
+            line-height: 1.2;
+            border-bottom: 1px solid;
+          }
+        }
+      }
+
+      #oum_add_location_error {
+        color: red;
+      }
+
+      #oum_add_location_thankyou {
+        text-align: center;
+
+        h3 {
+          color: map-get($colors, "primary");
+          margin-bottom: 20px;
+        }
+
+        button {
+          margin: 30px 0 0;
+          cursor: pointer;
+          font-size: 19px;
+          text-align: center;
+          font-weight: bold;
+          border-radius: 4px;
+          background: map-get($colors, "primary");
+          padding: 15px 30px;
+          line-height: 1;
+          border: none;
+          color: white;
+          position: relative;
+
+          &:hover, 
+          &:active {
+            color: white;
+            background: darken(map-get($colors, "primary"), 10%);
+          }
+        }
+      }
+    }
+
+    &[data-oum-geometry-type="polyline"] {
+      .location-overlay-content #oum_add_location {
+        .oum-marker-category-option {
+          .oum-category-icon,
+          .oum-category-area-preview {
+            display: none !important;
+          }
+
+          .oum-category-line-preview {
+            display: inline-block;
+          }
+        }
+      }
+    }
+
+    &[data-oum-geometry-type="polygon"] {
+      .location-overlay-content #oum_add_location {
+        .oum-marker-category-option {
+          .oum-category-icon,
+          .oum-category-line-preview {
+            display: none !important;
+          }
+
+          .oum-category-area-preview {
+            display: inline-block;
+          }
+        }
+      }
+    }
+
+    &.active {
+      display: flex;
+    }
+
+    &.edit-location {
+      .location-overlay-content {
+        #oum_add_location {
+          h2 {
+            &.oum-add-location-headline {
+              display: none;
+            }
+  
+            &.oum-edit-location-headline {
+              display: block;
+            }
+          }
+
+          #oum_delete_location_btn {
+            display: block;
+          }
+        }
+      }
+    }
+  }
+
+  .add-user-location {
+    .map-wrap {
+      position: relative;
+      padding-top: 100%;
+      margin: 15px 0;
+
+      @media screen and (max-width: 768px) {
+        padding-top: 100%;
+      }
+  
+      #mapGetLocation {
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0; 
+        border: 1px solid #bbb;
+        border-radius: 2px;
+
+        @media screen and (max-width: 768px) {
+          .leaflet-geosearch-bar {
+            max-width: calc(100% - 67px);
+            margin: 10px 10px 0 auto;
+          }
+        }
+
+        a {
+          text-decoration: none !important;
+          padding: 0;
+          margin: 0;
+        }
+
+        .leaflet-tile-pane img.leaflet-tile {
+          box-shadow: none;
+          padding: 0;
+          margin: 0;
+          border: none;
+          border-radius: unset;
+        }
+
+        .leaflet-control-geosearch {
+          &.leaflet-geosearch-bar {
+            max-width: calc(100% - 67px);
+            margin: 10px 10px 0 auto;
+
+            form {
+              background-image: url(images/ico_search_address_2.png);
+              background-position: right 1px;
+              background-repeat: no-repeat;
+              background-size: 30px;
+              background-color: #fff;
+  
+              input[type=text] {
+                width: calc(100% - 35px);
+                padding: 9px 13px 9px 0;
+                min-width: unset;
+                min-height: unset;
+                border: none !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                outline: none !important;
+                font-size: 14px;
+
+                @media screen and (max-width: 768px) {
+                  font-size: 16px;
+                }
+              }
+        
+              button.reset {
+                right: 25px;
+                background-color: #fff;
+                color: black;
+                margin: 0;
+                padding: 0 8px;
+                border: none;
+                box-shadow: none;
+                margin: 0;
+                outline: none;
+                font-size: 14px;
+                opacity: 0.5;
+
+                &:hover {
+                  opacity: 1;
+                }
+              }
+            }
+          }
+        }
+
+        &.map-style_Custom1 {
+          // map tiles
+          .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+            filter: saturate(3);
+          }
+          // label tiles
+        }
+  
+        &.map-style_Custom2 {
+          // map tiles
+          .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+            filter: sepia(1) invert(0) saturate(28) hue-rotate(-53deg);
+          }
+  
+          // label tiles
+          .leaflet-tile-pane .leaflet-layer:nth-child(2) .leaflet-tile {
+            filter: sepia(0) contrast(1) invert(1) brightness(2);
+          }
+        }
+  
+        &.map-style_Custom3 {
+          // map tiles
+          .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+            filter: sepia(1) invert(1) saturate(100) brightness(1) hue-rotate(-300deg);
+          }
+  
+          // label tiles
+          .leaflet-tile-pane .leaflet-layer:nth-child(2) .leaflet-tile {
+            filter: sepia(0) contrast(1) invert(1) brightness(2);
+          }
+        }
+      }
+    }
+  }
+
+  &.oum-container-for-fullscreen {
+    z-index: 99999999;
+
+    #location-fullscreen-container { 
+      display: none;
+      position: fixed;
+      left:0;
+      right: 0;
+      top:0;
+      bottom: 0;
+      overflow: hidden;
+      
+      .location-content-wrap {
+        background-color: #fff;
+        color: #333;
+        height: 100%;
+        overflow: auto;
+  
+        // Add carousel styles for fullscreen container
+        .oum-carousel {
+          @include oum-carousel;
+        }
+
+        .oum_location_video {
+          > * {
+            margin: 0;
+            padding-top: 60px;
+            line-height: 1;
+
+            > p {
+              width: 100%;
+              line-height: 1;
+              margin: 0 auto;
+            }
+
+            iframe {
+              width: 100%;
+              margin: 0 auto;
+            }
+          }
+        }
+    
+        .oum_location_text {
+          padding: 35px 20px;
+          line-height: 1.5;
+  
+          * {
+            color: #000;
+          }
+
+          .oum_location_categories {
+            margin: 8px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            
+            .oum_category_icon {
+              width: 20px;
+              height: 20px;
+              object-fit: contain;
+              border-radius: 2px;
+            }
+          }
+
+          .oum_location_title {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px;
+
+            .oum_location_name {
+              font-size: 20px;
+              line-height: 1.4;
+              font-weight: bold;
+              margin-top: 0;
+              margin-bottom: 0;
+            }
+
+            .oum_location_measurement {
+              display: inline-flex;
+              align-items: center;
+              height: 20px;
+              padding: 0 9px;
+              border-radius: 10px;
+              background: rgba(0, 0, 0, 0.08);
+              font-size: 13px;
+              line-height: 20px;
+              font-weight: bold;
+            }
+            
+            .oum_location_category_icons {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 4px;
+          
+              .oum_category_icon {
+                width: 20px;
+                height: 20px;
+                object-fit: contain;
+                object-position: center;
+                flex-shrink: 0;
+              }
+            }
+          }
+  
+          a {
+            color: map-get($colors, "primary");
+          }
+    
+          .oum_location_date {
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 11px;
+            margin-bottom: 5px;
+          }
+    
+          .oum_location_address {
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 11px;
+            margin-bottom: 10px;
+          }
+    
+          .oum_location_custom_fields {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 10px;
+
+            .oum_custom_field {
+              margin-bottom: 10px;
+            }
+    
+            a {
+              display: inline-block;
+              hyphens: auto;
+            }
+    
+            a[href*=facebook] {
+              display: inline-block;
+              margin: 6px 1px;
+              top: -2px;
+              position: relative;
+              width: 20px;
+              height: 20px;
+              background: url(images/ico_facebook_50x50.png) no-repeat center center transparent;
+              background-size: contain;
+              text-indent: -9999px;
+              margin: 6px 0;
+            }
+    
+            a[href*=instagram] {
+              display: inline-block;
+              margin: 6px 1px;
+              top: -2px;
+              position: relative;
+              width: 20px;
+              height: 20px;
+              background: url(images/ico_instagram_50x50.png) no-repeat center center transparent;
+              background-size: contain;
+              text-indent: -9999px;
+              margin: 6px 0;
+            }
+    
+            a[href*=linkedin] {
+              display: inline-block;
+              margin: 6px 1px;
+              top: -2px;
+              position: relative;
+              width: 20px;
+              height: 20px;
+              background: url(images/ico_linkedin_50x50.png) no-repeat center center transparent;
+              background-size: contain;
+              text-indent: -9999px;
+              margin: 6px 0;
+            }
+    
+            a[href*=twitter] {
+              display: inline-block;
+              margin: 6px 1px;
+              top: -2px;
+              position: relative;
+              width: 20px;
+              height: 20px;
+              background: url(images/ico_twitter_50x50.png) no-repeat center center transparent;
+              background-size: contain;
+              text-indent: -9999px;
+              margin: 6px 0;
+            }
+    
+            a[href*=youtube] {
+              display: inline-block;
+              margin: 6px 1px;
+              top: -2px;
+              position: relative;
+              width: 20px;
+              height: 20px;
+              background: url(images/ico_youtube_50x50.png) no-repeat center center transparent;
+              background-size: contain;
+              text-indent: -9999px;
+              margin: 6px 0;
+            }
+    
+            a[href*=soundcloud] {
+              display: inline-block;
+              margin: 6px 1px;
+              top: -2px;
+              position: relative;
+              width: 20px;
+              height: 20px;
+              background: url(images/ico_soundcloud_50x50.png) no-repeat center center transparent;
+              background-size: contain;
+              text-indent: -9999px;
+              margin: 6px 0;
+            }
+  
+            .oum_custom_field:has(span):not(.oum_custom_field_type_opening_hours) {
+              display: flex;
+              flex-wrap: wrap;
+              align-items: center;
+              gap: 5px;
+
+              span {
+                background:rgba(0, 0, 0, 0.1);
+                display: inline-block;
+                padding: 3px 5px;
+                border-radius: 5px;
+                font-size: 13px;
+              }
+            }
+
+            // Opening hours field styling
+            .oum-opening-hours-header {
+              display: flex;
+              align-items: center;
+              gap: 6px;
+              margin-bottom: 8px;
+              cursor: pointer;
+              user-select: none;
+              
+              &:hover {
+                opacity: 0.8;
+              }
+              
+              .oum-opening-hours-label {
+                margin-right: 0;
+              }
+              
+              .oum-opening-hours-status-indicator {
+                display: inline-block;
+                
+                &.oum-opening-hours-status-open {
+                  color: #28a745; // Green for open
+                }
+                
+                &.oum-opening-hours-status-closed {
+                  color: #dc3545; // Red for closed
+                }
+              }
+              
+              .oum-opening-hours-toggle-icon {
+                width: 16px;
+                height: 16px;
+                margin-left: auto;
+                transition: transform 0.2s ease;
+                opacity: 0.7;
+              }
+              
+              // Rotate icon when expanded
+              &.oum-opening-hours-expanded .oum-opening-hours-toggle-icon {
+                transform: rotate(180deg);
+              }
+            }
+            
+            .oum-opening-hours-wrapper {
+              margin-top: 8px;
+              
+              .oum-opening-hours-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: start;
+                margin-bottom: 5px;
+                font-size: 13px;
+
+                &:has(.closed) {
+                  opacity: 0.5;
+                }
+
+                .oum-opening-hours-day-name {
+                  margin-right: 10px;
+                }
+                
+                .oum-opening-hours-times,
+                .oum-opening-hours-status {
+                  text-align: right;
+                  flex: 1;
+                }
+              }
+              
+              &.oum-opening-hours-expanded {
+                display: block !important;
+              }
+            }
+          }
+    
+          .oum_location_description {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 10px;
+
+            &:empty {
+              display: none;
+            }
+          }
+    
+          audio {
+            margin-top: 15px;
+          }
+  
+          .oum_location_text_bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-top: 14px;
+
+            &:empty {
+              display: none;
+            }
+          }
+
+          .oum_read_more a {
+            font-size: 14px;
+          }
+
+          .oum_vote_button_wrap {
+            .oum_vote_button {
+              background: #f8f9fa;
+              border: 1px solid #dee2e6;
+              border-radius: 20px;
+              height: 27px;
+              padding: 4px 11px;
+              cursor: pointer;
+              transition: all 0.2s ease;
+              display: inline-flex;
+              align-items: center;
+              gap: 6px;
+              font-size: 14px;
+              color: #6c757d;
+        
+              &:hover {
+                background: #e9ecef;
+                border-color: #adb5bd;
+              }
+        
+              &.voted {
+                background: #dc3545;
+                border-color: #dc3545;
+                
+                * {
+                  color: white;
+                }
+              }
+        
+              .oum_vote_count {
+                background: rgba(0, 0, 0, 0.3);
+                color: #fff;
+                border-radius: 10px;
+                padding: 2px 6px;
+                font-size: 12px;
+                font-weight: bold;
+                min-width: 20px;
+                text-align: center;
+                margin-left: 4px;
+              }
+            }
+          }
+
+          // Star Rating Styles for Fullscreen
+          .oum_star_rating_wrap {
+            .oum_star_rating {
+              display: inline-flex;
+              align-items: center;
+              gap: 8px;
+              font-size: 14px;
+
+              .oum_stars {
+                display: inline-flex;
+                gap: 2px;
+                cursor: pointer;
+
+                .oum_star {
+                  color: #ddd;
+                  font-size: 18px;
+                  line-height: 1;
+                  transition: color 0.2s ease;
+                  user-select: none;
+
+                  &.active {
+                    color: #ffc107;
+                  }
+
+                  &.hover {
+                    color: #ff9800;
+                  }
+
+                  &.half {
+                    background: linear-gradient(90deg, #ffc107 50%, #ddd 50%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                  }
+                }
+              }
+
+              .oum_star_rating_count {
+                color: #6c757d;
+                font-size: 12px;
+              }
+            }
+          }
+        }
+      }
+
+      .edit-location-button {
+        background: url(images/ico_pen.png) no-repeat 58% 36% #eee;
+        background-size: 60%;
+        border-radius: 99px;
+        height: 30px;
+        width: 30px;
+        text-align: center;
+        top: 16px;
+        right: 57px;
+        z-index: 2;
+        position: absolute;
+        cursor: pointer;
+      }
+  
+      #close-location-fullscreen {
+        position: absolute;
+        z-index: 1;
+        top: 16px;
+        right: 16px;
+        font-size: 18px;
+        line-height: 30px;
+        display: inline-block;
+        color: #333;
+        background: #eee;
+        border-radius: 99px;
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        cursor: pointer;
+  
+        &:hover {
+          color: map-get($colors, "primary");
+        }
+      }
+  
+      @media (max-width: 768px) { 
+        &.visible { 
+          display: block;
+        }
+      }
+    }
+  }
+}
+
+.open-user-map-image-gallery {
+  /* resets */
+  img {
+    display: inherit;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    max-width: inherit;
+  }
+  /* end resets */
+
+  position: relative;
+  opacity: 0; // Start hidden, will be shown when masonry is initialized
+  margin-bottom: 40px;
+
+  .oum-gallery-item {
+    width: calc(25% - 15px); // Default to 4 columns with gap
+    margin-bottom: 20px;
+    break-inside: avoid;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background: #fff;
+    transition: box-shadow 0.2s ease-in-out;
+
+    &:hover {
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+
+      img {
+        transform: scale(1.02);
+      }
+    }
+
+    a {
+      display: block;
+      width: 100%;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      transition: transform 0.2s ease-in-out;
+    }
+  }
+
+  // Pagination styles
+  .oum-gallery-pagination {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 40px; // Increased margin to separate from masonry items
+    padding-top: 20px; // Added padding to ensure space after last masonry items
+    gap: 5px;
+    clear: both;
+    border-top: 1px solid #eee; // Added separator line
+
+    .page-numbers {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 36px;
+      height: 36px;
+      padding: 0 12px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      color: #333;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #f5f5f5;
+        border-color: #ccc;
+      }
+
+      &.current {
+        background: #e82c71;
+        border-color: #e82c71;
+        color: #fff;
+      }
+
+      &.prev,
+      &.next {
+        font-size: 13px;
+      }
+
+      &.dots {
+        border: none;
+        padding: 0 8px;
+
+        &:hover {
+          background: transparent;
+        }
+      }
+    }
+  }
+
+  // Responsive adjustments
+  @media (max-width: 1200px) {
+    .oum-gallery-item {
+      width: calc(33.333% - 14px); // 3 columns
+    }
+  }
+
+  @media (max-width: 768px) {
+    .oum-gallery-item {
+      width: calc(50% - 10px); // 2 columns
+    }
+  }
+
+  @media (max-width: 480px) {
+    .oum-gallery-item {
+      width: 100%; // 1 column
+    }
+  }
+}
+
+.open-user-map-location-map {
+  aspect-ratio: 1.5;
+
+  .leaflet-marker-icon:not(.marker-cluster) {
+    height: 40px !important;
+    width: 40px !important;
+    margin-top: -40px !important;
+    margin-left: -20px !important;
+    object-fit: contain;
+    object-position: center bottom;
+    outline: none !important;
+
+    &:hover {
+      width: 44px !important;
+      height: 44px !important;
+      margin-top: -44px !important;
+      margin-left: -22px !important;
+    }
+  }
+}
+
+.open-user-map-locations-list {
+  $colors: (primary : #e82c71,
+      highlight: red);
+
+  /* resets */
+  img {
+    display: inherit;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    max-width: inherit;
+  }
+
+  input[type="radio"], 
+  input[type="checkbox"] {
+    margin: inherit;
+    padding: inherit;
+  }
+
+  input[type=text] {
+    background-color: #fff;
+    color: #333;
+    border-radius: 0;
+    font-size: 16px;
+  }
+
+  h1, h2, h3, h4 {
+    margin: 0;
+    padding: 0;
+    display: inherit;
+  }
+
+  button {
+    margin: 0;
+    padding: 0;
+  }
+
+  .elementor-widget-open_user_map_widget {
+    width: 100%;
+  }
+  /* end resets */
+
+  .oum-locations-list-item {
+    display: grid;
+    grid-template-columns: minmax(0, 290px) 1fr;
+    margin-bottom: 30px;
+    background: #fff;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+
+    // Use the carousel mixin for list view
+    .oum-carousel {
+      @include oum-carousel;
+    }
+
+    .oum_location_media {
+      padding: 15px;
+    }
+
+    .oum_location_image {
+      img {
+        width: 100%;
+        margin: 0 auto;
+      }
+    }
+
+    .oum_location_video {
+
+      > div {
+        aspect-ratio: 4/3;
+
+        > p {
+          width: 100%;
+          height: 100%;
+          margin: 0 auto;
+        }
+      }
+
+      iframe {
+        width: 100%;
+        height: 100%;
+        margin: 0 auto;
+      }
+    }
+
+    .oum_location_text {
+      padding: 15px;
+      overflow: auto;
+
+      * {
+        color: #000;
+        hyphens: auto;
+      }
+
+      .oum_location_title {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px;
+
+        .oum_location_name {
+          font-size: 20px;
+          line-height: 1.4;
+          font-weight: bold;
+          margin-top: 0;
+          margin-bottom: 0;
+        }
+
+        .oum_location_measurement {
+          display: inline-flex;
+          align-items: center;
+          height: 20px;
+          padding: 0 9px;
+          border-radius: 10px;
+          background: rgba(0, 0, 0, 0.08);
+          font-size: 13px;
+          line-height: 20px;
+          font-weight: bold;
+        }
+        
+        .oum_location_category_icons {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 4px;
+      
+          .oum_category_icon {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            object-position: center;
+            flex-shrink: 0;
+          }
+        }
+      }
+
+      a {
+        color: map-get($colors, "primary");
+      }
+
+      .oum_location_date {
+        opacity: 0.8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 11px;
+        margin-bottom: 5px;
+      }
+
+      .oum_location_address {
+        opacity: 0.8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 11px;
+        margin-bottom: 10px;
+      }
+
+      .oum_location_custom_fields {
+        font-size: 14px;
+        opacity: 0.8;
+        margin-top: 10px;
+
+        .oum_custom_field {
+          margin-bottom: 10px;
+        }
+
+        a {
+          display: inline-block;
+          hyphens: auto;
+        }
+
+        a[href*=facebook] {
+          display: inline-block;
+          margin: 6px 1px;
+          top: -2px;
+          position: relative;
+          width: 20px;
+          height: 20px;
+          background: url(images/ico_facebook_50x50.png) no-repeat center center transparent;
+          background-size: contain;
+          text-indent: -9999px;
+          margin: 6px 0;
+        }
+
+        a[href*=instagram] {
+          display: inline-block;
+          margin: 6px 1px;
+          top: -2px;
+          position: relative;
+          width: 20px;
+          height: 20px;
+          background: url(images/ico_instagram_50x50.png) no-repeat center center transparent;
+          background-size: contain;
+          text-indent: -9999px;
+          margin: 6px 0;
+        }
+
+        a[href*=linkedin] {
+          display: inline-block;
+          margin: 6px 1px;
+          top: -2px;
+          position: relative;
+          width: 20px;
+          height: 20px;
+          background: url(images/ico_linkedin_50x50.png) no-repeat center center transparent;
+          background-size: contain;
+          text-indent: -9999px;
+          margin: 6px 0;
+        }
+
+        a[href*=twitter] {
+          display: inline-block;
+          margin: 6px 1px;
+          top: -2px;
+          position: relative;
+          width: 20px;
+          height: 20px;
+          background: url(images/ico_twitter_50x50.png) no-repeat center center transparent;
+          background-size: contain;
+          text-indent: -9999px;
+          margin: 6px 0;
+        }
+
+        a[href*=youtube] {
+          display: inline-block;
+          margin: 6px 1px;
+          top: -2px;
+          position: relative;
+          width: 20px;
+          height: 20px;
+          background: url(images/ico_youtube_50x50.png) no-repeat center center transparent;
+          background-size: contain;
+          text-indent: -9999px;
+          margin: 6px 0;
+        }
+
+        a[href*=soundcloud] {
+          display: inline-block;
+          margin: 6px 1px;
+          top: -2px;
+          position: relative;
+          width: 20px;
+          height: 20px;
+          background: url(images/ico_soundcloud_50x50.png) no-repeat center center transparent;
+          background-size: contain;
+          text-indent: -9999px;
+          margin: 6px 0;
+        }
+
+        .oum_custom_field:has(span):not(.oum_custom_field_type_opening_hours) {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 5px;
+
+          span {
+            background:rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            padding: 3px 5px;
+            border-radius: 5px;
+            font-size: 13px;
+          }
+        }
+
+        // Opening hours field styling
+        .oum-opening-hours-header {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-bottom: 8px;
+          cursor: pointer;
+          user-select: none;
+          
+          &:hover {
+            opacity: 0.8;
+          }
+          
+          .oum-opening-hours-label {
+            margin-right: 0;
+          }
+          
+          .oum-opening-hours-status-indicator {
+            display: inline-block;
+            
+            &.oum-opening-hours-status-open {
+              color: #28a745; // Green for open
+            }
+            
+            &.oum-opening-hours-status-closed {
+              color: #dc3545; // Red for closed
+            }
+          }
+          
+          .oum-opening-hours-toggle-icon {
+            width: 16px;
+            height: 16px;
+            margin-left: auto;
+            transition: transform 0.2s ease;
+            opacity: 0.7;
+          }
+          
+          // Rotate icon when expanded
+          &.oum-opening-hours-expanded .oum-opening-hours-toggle-icon {
+            transform: rotate(180deg);
+          }
+        }
+        
+        .oum-opening-hours-wrapper {
+          margin-top: 8px;
+          
+          &.oum-opening-hours-expanded {
+            display: block !important;
+          }
+          
+          .oum-opening-hours-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 5px;
+            font-size: 13px;
+
+            &:has(.closed) {
+              opacity: 0.5;
+            }
+
+            .oum-opening-hours-day-name {
+              margin-right: 10px;
+            }
+            
+            .oum-opening-hours-times,
+            .oum-opening-hours-status {
+              text-align: right;
+              flex: 1;
+            }
+          }
+        }
+      }
+
+      .oum_location_description {
+        font-size: 14px;
+        opacity: 0.8;
+        margin-top: 10px;
+
+        &:empty {
+          display: none;
+        }
+      }
+
+      audio {
+        margin-top: 15px;
+      }
+
+      .oum_location_text_bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-top: 14px;
+
+        &:empty {
+          display: none;
+        }
+      }
+
+      .oum_read_more a {
+        font-size: 14px;
+      }
+
+      .oum_vote_button_wrap {
+        .oum_vote_button {
+          background: #f8f9fa;
+          border: 1px solid #dee2e6;
+          border-radius: 20px;
+          height: 27px;
+          padding: 4px 11px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 14px;
+          color: #6c757d;
+    
+          &:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+          }
+    
+          &.voted {
+            background: #dc3545;
+            border-color: #dc3545;
+            
+            * {
+              color: white;
+            }
+          }
+    
+          .oum_vote_count {
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 12px;
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+            margin-left: 4px;
+          }
+        }
+      }
+
+      // Star Rating Styles for Locations List
+      .oum_star_rating_wrap {
+        .oum_star_rating {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 14px;
+
+          .oum_stars {
+            display: inline-flex;
+            gap: 2px;
+            cursor: pointer;
+
+            .oum_star {
+              color: #ddd;
+              font-size: 18px;
+              line-height: 1;
+              transition: color 0.2s ease;
+              user-select: none;
+
+              &.active {
+                color: #ffc107;
+              }
+
+              &.hover {
+                color: #ff9800;
+              }
+
+              &.half {
+                background: linear-gradient(90deg, #ffc107 50%, #ddd 50%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+              }
+            }
+          }
+
+          .oum_star_rating_count {
+            color: #6c757d;
+            font-size: 12px;
+          }
+        }
+      }
+    }
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .oum-locations-list-pagination {
+    display: flex;
+    padding-left: 0;
+    list-style: none;
+    gap: 10px;
+    justify-content: center;
+  }
+}
+
+.open-user-map-single-default-template-media {
+  &.has-video {
+    aspect-ratio: 16/9;
+
+    p {
+      width: 100%;
+      height: 100%;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      margin: 0 auto;
+    }
+  }
+}
+
+.oum-location-value {
+  margin-bottom: 16px;
+
+  // Add carousel styles
+  .oum-carousel {
+      @include oum-carousel;
+      pointer-events: all;
+  }
+
+  // Opening hours field styling for single location value
+  .oum_custom_field_type_opening_hours {
+    .oum-opening-hours-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      user-select: none;
+      outline: none;
+      
+      &:hover {
+        opacity: 0.8;
+      }
+      
+      .oum-opening-hours-label {
+        margin-right: 0;
+      }
+      
+      .oum-opening-hours-status-indicator {
+        display: inline-block;
+        font-weight: bolder;
+        
+        &.oum-opening-hours-status-open {
+          color: #28a745; // Green for open
+        }
+        
+        &.oum-opening-hours-status-closed {
+          color: #dc3545; // Red for closed
+        }
+      }
+      
+      .oum-opening-hours-toggle-icon {
+        width: 16px;
+        height: 16px;
+        margin-left: auto;
+        transition: transform 0.2s ease;
+        opacity: 0.7;
+      }
+      
+      // Rotate icon when expanded
+      &.oum-opening-hours-expanded .oum-opening-hours-toggle-icon {
+        transform: rotate(180deg);
+      }
+    }
+    
+    .oum-opening-hours-wrapper {
+      margin-top: 8px;
+      
+      &.oum-opening-hours-expanded {
+        display: block !important;
+      }
+      
+      .oum-opening-hours-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 5px;
+        font-size: 13px;
+
+        &:has(.closed) {
+          opacity: 0.5;
+        }
+
+        .oum-opening-hours-day-name {
+          margin-right: 10px;
+        }
+        
+        .oum-opening-hours-times,
+        .oum-opening-hours-status {
+          text-align: right;
+          flex: 1;
+        }
+      }
+    }
+  }
+
+  // Star Rating Styles for shortcode output
+  .oum_star_rating_wrap {
+    .oum_star_rating {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+
+      .oum_stars {
+        display: inline-flex;
+        gap: 2px;
+        cursor: pointer;
+
+        .oum_star {
+          color: #ddd;
+          font-size: 18px;
+          line-height: 1;
+          transition: color 0.2s ease;
+          user-select: none;
+
+          &.active {
+            color: #ffc107;
+          }
+
+          &.hover {
+            color: #ff9800;
+          }
+
+          &.half {
+            background: linear-gradient(90deg, #ffc107 50%, #ddd 50%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+          }
+        }
+      }
+
+      .oum_star_rating_count {
+        color: #6c757d;
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+.oum-location-value[data-value=type] {
+  display: inline-block;
+  border-radius: 99px;
+  padding: 0 13px;
+  border: 1px solid;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.oum-location-value[data-value=type_icons] {
+  .oum_location_category_icons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+
+    .oum_category_icon {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+      object-position: center;
+      flex-shrink: 0;
+    }
+  }
+}
+.oum-location-value[data-value=map] {
+  .leaflet-map {
+    a {
+      text-decoration: none !important;
+      padding: 0;
+      margin: 0;
+    }
+
+    .leaflet-tile-pane img.leaflet-tile {
+      box-shadow: none;
+      padding: 0;
+      margin: 0;
+      border: none;
+      border-radius: unset;
+    }
+
+    .leaflet-marker-icon:not(.marker-cluster) {
+      height: 40px !important;
+      width: 40px !important;
+      margin-top: -40px !important;
+      margin-left: -20px !important;
+      object-fit: contain;
+      object-position: center bottom;
+      outline: none !important;
+
+      &:hover {
+        width: 44px !important;
+        height: 44px !important;
+        margin-top: -44px !important;
+        margin-left: -22px !important;
+      }
+    }
+
+    &.map-style_Custom1 {
+      // map tiles
+      .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+        filter: saturate(3);
+      }
+      // label tiles
+    }
+
+    &.map-style_Custom2 {
+      // map tiles
+      .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+        filter: sepia(1) invert(0) saturate(28) hue-rotate(-53deg);
+      }
+
+      // label tiles
+      .leaflet-tile-pane .leaflet-layer:nth-child(2) .leaflet-tile {
+        filter: sepia(0) contrast(1) invert(1) brightness(2);
+      }
+    }
+
+    &.map-style_Custom3 {
+      // map tiles
+      .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+        filter: sepia(1) invert(1) saturate(100) brightness(1) hue-rotate(-300deg);
+      }
+
+      // label tiles
+      .leaflet-tile-pane .leaflet-layer:nth-child(2) .leaflet-tile {
+        filter: sepia(0) contrast(1) invert(1) brightness(2);
+      }
+    }
+
+    .leaflet-control-zoom {
+      a {
+        background-color: #fff;
+
+        &:hover {
+          background-color: #f4f4f4;
+        }
+      }
+    }
+
+    .leaflet-control-attribution {
+      font-size: 10px;
+    }
+  }
+}
+
+body.oum-location-opened {
+  @media (max-width: 768px) {
+    overflow: hidden;
+  }
+}
+
+body.oum-add-location-opened {
+  overflow: hidden;
+}
+
+@keyframes carouselFadeIn {
+  from {
+    opacity: 0.7;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// Delete confirmation styles
+.oum-delete-confirmation {
+  text-align: center;
+  padding: 40px 20px;
+
+  h3 {
+    color: #333;
+    margin-bottom: 20px;
+  }
+
+  p {
+    margin-bottom: 30px;
+  }
+
+  button {
+    display: inline-block !important;
+    margin: 0 auto !important;
+    padding: 12px 24px !important;
+    background-color: #e82c71 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    font-size: 16px !important;
+    transition: background-color 0.3s ease !important;
+
+    &:hover {
+      background-color: darken(#e82c71, 10%) !important;
+    }
+  }
+}
+
+// Single Location Template Styles
+.open-user-map-single-default-template {
+  .wp-block-post-featured-image {
+    aspect-ratio: auto !important;
+  }
+
+  // Use WordPress block gap variable for column spacing
+  .wp-block-columns {
+    gap: var(--wp--style--block-gap, 2em);
+  }
+  
+  // Add vertical spacing between elements
+  .wp-block-shortcode {
+    margin-bottom: 1.5em;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  
+  // Basic responsive adjustment
+  @media (max-width: 781px) {
+    .wp-block-columns {
+      gap: 1.5em;
+    }
+  }
+}
+
+// Inline form: show form, remove overlay behavior and hide main map
+.oum-inline-form {
+  .add-location {
+    display: block;
+    position: static;
+    background: transparent;
+    z-index: auto;
+    padding: 0;
+    overflow: visible;
+
+    .location-overlay-content {
+      position: static;
+      transform: none;
+      max-width: none;
+      width: 100%;
+      max-height: none;
+      overflow: visible;
+      padding: 0;
+      background: transparent;
+
+      #close-add-location-overlay {
+        display: none;
+      }
+    }
+  }
+}
+
+// Form-only: hide main map/controls (inside .box-wrap) but keep the form map visible
+.oum-hide-map {
+  .box-wrap {
+    display: none;
+  }
+}
+
+// Advanced Filter Interface Styles
+.oum-advanced-filter-sidebar {
+  background: #f8f8f8;
+  border: 1px solid #ddd;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+
+  .oum-advanced-filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 0;
+    margin-bottom: 0;
+    flex-shrink: 0;
+
+    .oum-advanced-filter-title {
+      font-size: 20px;
+      flex: 1;
+    }
+  }
+
+  .oum-advanced-filter-separator {
+    height: 1px;
+    background-color: rgba(0, 0, 0, 0.1);
+    margin: 12px 0;
+    flex-shrink: 0;
+  }
+
+      .oum-filter-section {
+    margin-bottom: 20px;
+
+    // Marker Categories section: same checkbox/spacing as other Advanced Filter sections
+    .oum-marker-categories-filter {
+      font-size: 15px;
+      color: #333;
+
+      .oum-label {
+        display: block;
+        font-weight: bold;
+        margin: 0 0 8px 0px;
+        line-height: 1.5;
+        color: #333;
+        font-size: 15px;
+      }
+
+      .oum-toggle-all-wrapper {
+        margin: 0;
+      }
+
+      label {
+        display: flex;
+        align-items: center;
+        margin: 0 10px 10px 0;
+        margin-left: 6px;
+        padding: 0;
+        font-weight: normal;
+        cursor: pointer;
+        color: #333;
+
+        @media screen and (max-width: 768px) {
+          display: flex;
+          margin-left: 0;
+          margin-bottom: 5px;
+        }
+
+        input[type='checkbox'] {
+          appearance: auto;
+          accent-color: #e82c71;
+          position: relative;
+          width: 20px;
+          height: 20px;
+          margin: 0 7px 0 0;
+          flex-shrink: 0;
+
+          &::before,
+          &::after {
+            display: none;
+          }
+        }
+
+        img {
+          height: 22px;
+          width: 22px;
+          object-fit: contain;
+          object-position: center;
+          margin-right: 6px;
+          flex-shrink: 0;
+        }
+
+        .oum-filter-category-shape-icon {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          height: 22px;
+          width: 22px;
+          margin: 0 6px 0 0;
+          flex-shrink: 0;
+
+          svg {
+            display: block;
+            height: 22px;
+            width: 22px;
+          }
+        }
+
+        span {
+          font-size: 15px;
+          line-height: 1.5;
+          margin: 0;
+        }
+      }
+    }
+
+    // Searchbar section: full-width search inside Advanced Filter
+    .oum-searchbar-filter {
+      position: relative;
+      z-index: 6;
+      overflow: visible;
+
+      #oum_search_marker,
+      #oum_search_address,
+      #oum_filter_markers {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        transform: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        z-index: 5;
+      }
+
+      #oum_filter_markers {
+        display: block;
+        box-sizing: border-box;
+        height: auto;
+        font-family: inherit;
+        font-size: 16px;
+        border: 1px solid #bbb;
+        border-radius: 2px;
+        color: #333;
+        background-color: #fff;
+        background-image: url(images/ico_search_marker.png);
+        background-position: right 8px center;
+        background-repeat: no-repeat;
+        background-size: 22px;
+        outline: none;
+        line-height: 1;
+        padding: 14px 40px 14px 14px;
+        opacity: 1;
+        visibility: visible;
+
+        &:focus {
+          border-color: map-get($colors, "primary");
+          box-shadow: 0 0 0 2px rgba(232, 44, 113, 0.1);
+        }
+      }
+
+      .leaflet-control-search {
+        position: relative !important;
+        float: none;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        height: auto;
+        box-shadow: none;
+        background: #fff;
+        border: 1px solid #bbb;
+        border-radius: 2px;
+
+        // leaflet-search floats the input and button; clear so the control keeps height
+        &::after {
+          content: "";
+          display: table;
+          clear: both;
+        }
+
+        &.search-exp {
+          width: 100%;
+          max-width: 100%;
+        }
+
+        .search-input {
+          box-sizing: border-box;
+          float: none;
+          width: 100%;
+          min-width: unset;
+          min-height: unset;
+          height: auto;
+          line-height: 1;
+          border: none !important;
+          box-shadow: none !important;
+          outline: none !important;
+          font-size: 16px;
+          padding: 14px 58px 14px 14px;
+          margin: 0;
+        }
+
+        // Center the leaflet-search icons in the taller sidebar input
+        .search-button {
+          position: absolute;
+          top: 50%;
+          right: 8px;
+          float: none;
+          width: 22px;
+          height: 22px;
+          margin: 0;
+          padding: 0;
+          transform: translateY(-50%);
+          background: url(images/ico_search_marker.png) center center no-repeat transparent;
+          background-size: 22px;
+
+          &:hover {
+            background: url(images/ico_search_marker.png) center center no-repeat transparent;
+            background-size: 22px;
+          }
+        }
+
+        .search-cancel {
+          top: 50%;
+          right: 34px;
+          width: 22px;
+          height: 22px;
+          margin: 0;
+          transform: translateY(-50%);
+        }
+
+        .search-tooltip {
+          width: 100%;
+          margin: 0;
+          padding: 0;
+          list-style: none;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          z-index: 30;
+          max-height: 220px;
+          overflow-x: hidden;
+          overflow-y: auto;
+          background: #fff;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+          box-sizing: border-box;
+
+          // Compact rows: constrain 2x marker images and keep title beside the icon
+          .search-tip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+            padding: 8px 10px;
+            font-size: 14px;
+            line-height: 1.4;
+            color: #333;
+            background: #fff;
+            border-radius: 0;
+            white-space: normal;
+            box-sizing: border-box;
+
+            > div {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              min-width: 0;
+            }
+
+            img {
+              width: 20px;
+              height: 20px;
+              flex-shrink: 0;
+              margin: 0;
+              object-fit: contain;
+            }
+
+            &:hover,
+            &.search-tip-select {
+              background: #f5f5f5;
+            }
+          }
+        }
+      }
+
+      .leaflet-control-geosearch.leaflet-geosearch-bar {
+        display: block;
+        position: relative;
+        float: none;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        height: auto;
+
+        form {
+          width: 100%;
+          box-sizing: border-box;
+          padding: 0;
+          background-color: #fff;
+          border: 1px solid #bbb;
+          border-radius: 2px;
+          box-shadow: none;
+
+          input[type=text] {
+            display: block;
+            width: 100%;
+            min-width: unset;
+            min-height: unset;
+            height: auto;
+            line-height: 1;
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            font-size: 16px;
+            padding: 14px 58px 14px 14px;
+            margin: 0 !important;
+            background-color: #fff;
+            background-image: url(images/ico_search_address_2.png);
+            background-position: right 8px center;
+            background-repeat: no-repeat;
+            background-size: 22px;
+          }
+
+          button.reset {
+            right: 34px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            padding: 0;
+            margin: 0;
+            font-size: 18px;
+            font-family: monospace;
+            text-align: center;
+            border: none;
+            border-radius: 99px;
+            background-color: #ddd;
+            color: #000;
+            opacity: 0.5;
+
+            &:hover {
+              opacity: 1;
+            }
+          }
+
+          .results {
+            color: #333;
+            width: 100%;
+            box-sizing: border-box;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 100%;
+            z-index: 20;
+
+            > * {
+              font-size: 12px;
+            }
+          }
+        }
+      }
+    }
+
+    .oum-custom-field-filter {
+      .oum-label {
+        display: block;
+        font-weight: bold;
+        margin: 0 0 8px 0px;
+        line-height: 1.5;
+        color: #333;
+        font-size: 15px;
+      }
+
+      input[type="text"],
+      input[type="email"],
+      input[type="url"],
+      textarea,
+      select {
+        font-family: inherit;
+        margin: 0;
+        font-size: 16px;
+        border: 1px solid #bbb;
+        border-radius: 2px;
+        color: #333;
+        background-color: #fff;
+        outline: none;
+        line-height: 1;
+        padding: 14px;
+        width: 100%;
+        box-sizing: border-box;
+
+        &:focus {
+          border-color: map-get($colors, "primary");
+          box-shadow: 0 0 0 2px rgba(232, 44, 113, 0.1);
+        }
+
+        @media screen and (max-width: 480px) {
+          font-size: 16px; // Prevent zoom on iOS
+          padding: 12px;
+        }
+      }
+
+      select {
+        appearance: none;
+        background-image: url(data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0Ljk1IDEwIj48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2ZmZjt9LmNscy0ye2ZpbGw6IzQ0NDt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPmFycm93czwvdGl0bGU+PHJlY3QgY2xhc3M9ImNscy0xIiB3aWR0aD0iNC45NSIgaGVpZ2h0PSIxMCIvPjxwb2x5Z29uIGNsYXNzPSJjbHMtMiIgcG9pbnRzPSIxLjQxIDQuNjcgMi40OCAzLjE4IDMuNTQgNC42NyAxLjQxIDQuNjciLz48cG9seWdvbiBjbGFzcz0iY2xzLTIiIHBvaW50cz0iMy41NCA1LjMzIDIuNDggNi44MiAxLjQxIDUuMzMgMy41NCA1LjMzIi8+PC9zdmc+);
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 20px;
+        line-height: 1.1;
+        height: auto;
+        border-color: #bbb;
+      }
+
+      fieldset {
+        display: flex;
+        flex-wrap: wrap;
+        border: none;
+        padding: 0;
+        margin: 0;
+        font-size: 15px;
+        color: #333;
+        background-color: transparent;
+        width: 100%;
+
+        legend {
+          padding: 0;
+          margin: 0 0 8px 0px;
+          font-weight: bold;
+          font-size: 15px;
+          line-height: 1.5;
+        }
+
+        >div {
+          margin: 0 10px 10px 0;
+
+          label {
+            display: flex;
+            align-items: center;
+            margin-left: 6px;
+            margin-right: 10px;
+            cursor: pointer;
+            color: #333;
+      
+            @media screen and (max-width: 768px) {
+              display: block;
+              margin-left: 0;
+              margin-bottom: 5px;
+            }
+          }
+        }
+
+        input[type=checkbox] {
+          appearance: auto;
+          accent-color: #e82c71;
+          position: relative;
+          width: 20px;
+          height: 20px;
+          margin: 0 7px 0 0;
+
+          &::before,
+          &::after {
+            display: none;
+          }
+        }
+
+        input[type=radio] {
+          appearance: auto;
+          accent-color: #e82c71;
+          position: relative;
+          width: 20px;
+          height: 20px;
+          margin: 0 10px 0 0;
+
+          &::before,
+          &::after {
+            display: none;
+          }
+        }
+      }
+
+      // Opening hours open_now checkbox styling (matches fieldset checkbox styles)
+      > div {
+        margin: 0 10px 10px 0;
+
+        label {
+          display: flex;
+          align-items: center;
+          margin-left: 6px;
+          margin-right: 10px;
+          cursor: pointer;
+          color: #333;
+    
+          @media screen and (max-width: 768px) {
+            display: block;
+            margin-left: 0;
+            margin-bottom: 5px;
+          }
+        }
+
+        input[type=checkbox] {
+          appearance: auto;
+          accent-color: #e82c71;
+          position: relative;
+          width: 20px;
+          height: 20px;
+          margin: 0 7px 0 0;
+
+          &::before,
+          &::after {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+
+  .oum-filter-reset-section {
+    padding-top: 5px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    text-align: center;
+
+    .oum-reset-button {
+      cursor: pointer;
+      font-size: 16px;
+      background: none;
+      border: none;
+      color: map-get($colors, "primary");
+      text-decoration: none;
+      padding: 0;
+      line-height: 1;
+
+      &:hover {
+        color: darken(map-get($colors, "primary"), 10%);
+        text-decoration: underline;
+      }
+
+      &:active {
+        color: darken(map-get($colors, "primary"), 20%);
+      }
+    }
+  }
+}
+
+// Button Layout for Advanced Filter
+// Position relative to map container
+.oum-map-container {
+  position: relative; // Ensure button filter can be positioned relative to this
+}
+
+.oum-advanced-filter-button {
+  position: relative;
+  z-index: 9998;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  gap: 8px;
+
+  &.active {
+    width: 250px;
+  }
+
+  .oum-advanced-filter-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.9);
+    width: 44px;
+    height: 44px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    cursor: pointer;
+    color: #333;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 1);
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .oum-advanced-filter-content {
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column;
+    position: relative;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+
+    .oum-advanced-filter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 16px 0 15px;
+      height: 44px;
+      flex-shrink: 0;
+
+      .oum-advanced-filter-title {
+        font-size: 20px;
+        flex: 1;
+      }
+
+      .close-advanced-filter {
+        cursor: pointer;
+        font-size: 18px;
+        color: #333;
+        line-height: 1;
+        padding: 0;
+        margin: 0;
+        margin-left: auto;
+        background: none;
+        border: none;
+        flex-shrink: 0;
+
+        &:hover {
+          color: map-get($colors, 'primary');
+        }
+      }
+    }
+
+    .oum-advanced-filter-separator {
+      height: 1px;
+      background-color: rgba(0, 0, 0, 0.1);
+      margin: 0;
+      flex-shrink: 0;
+    }
+
+    .oum-advanced-filter-sidebar {
+      border: none;
+      background: transparent;
+      margin: 0;
+    }
+  }
+
+  &:not(.use-collapse) {
+    .oum-advanced-filter-toggle {
+      display: none;
+    }
+  }
+
+  &.use-collapse {
+    .oum-advanced-filter-content {
+      display: none;
+    }
+
+    &.active {
+      .oum-advanced-filter-content {
+        display: flex;
+      }
+      .oum-advanced-filter-toggle {
+        display: none;
+      }
+    }
+  }
+
+  // Hide toggle when active (regardless of use-collapse)
+  &.active {
+    .oum-advanced-filter-toggle {
+      display: none;
+    }
+  }
+}
+
+// Panel Layout for Advanced Filter - similar to button but toggle looks like header
+.oum-advanced-filter-panel {
+  @extend .oum-advanced-filter-button;
+
+  .oum-advanced-filter-toggle {
+    box-sizing: border-box;
+    width: 250px;
+    height: 48px;
+    justify-content: space-between;
+    padding: 2px 13px 2px 15px;
+
+    .oum-advanced-filter-toggle-label {
+      font-size: 20px;
+      flex: 1;
+    }
+  }
+}
+
+// When button or panel layout is used, the filter is positioned absolutely inside the map container
+// No additional styles needed here as it's handled by .oum-advanced-filter-button and .oum-advanced-filter-panel
+
+// Responsive layout for map with sidebar
+.oum-map-with-sidebar {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+
+  &:has(.map-size-fullwidth) {
+    width: 100vw;
+    margin-left: 50% !important;
+    transform: translateX(-50%);
+    max-width: none;
+
+    .box-wrap.map-size-fullwidth {
+      width: 100%;
+      margin: 0;
+      transform: none;
+    }
+  }
+
+  .oum-map-container {
+    flex: 1;
+    width: 100%;
+    min-width: 0; // Allow flex item to shrink below content size
+  }
+
+  .oum-sidebar {
+    width: 25%;
+    flex-shrink: 0;
+
+    &.oum-sidebar-left {
+      order: -1;
+    }
+
+    &.oum-sidebar-right {
+      order: 1;
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    .oum-sidebar {
+      width: 100%;
+      order: 0;
+      margin-bottom: 15px;
+    }
+
+    .oum-map-container {
+      order: 1;
+    }
+  }
+
+  // Additional responsive improvements for very small screens
+  @media (max-width: 480px) {
+    gap: 10px;
+
+    .oum-sidebar {
+      padding: 15px;
+      margin-bottom: 10px;
+    }
+  }
+}
+
+.open-user-map .box-wrap .map-wrap .leaflet-map.oum-custom-image-click-through .leaflet-image-layer,
+.open-user-map .box-wrap .map-wrap .leaflet-map.oum-custom-image-click-through .leaflet-image-layer * {
+  pointer-events: none;
+}
+
+// Lazy-loaded map popup: centered spinner while bubble HTML loads
+.open-user-map .leaflet-popup-content .oum-bubble-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 80px;
+  min-width: 140px;
+  padding: 28px 32px;
+  margin: 0 auto;
+}
+
+.open-user-map .leaflet-popup-content .oum-bubble-loading-spinner {
+  display: block;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(0, 0, 0, 0.12);
+  border-top-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  animation: oum-bubble-spin 0.75s linear infinite;
+}
+
+.open-user-map .leaflet-popup-content .oum-bubble-error {
+  min-height: 36px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #b32d2e;
+}
+
+@keyframes oum-bubble-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

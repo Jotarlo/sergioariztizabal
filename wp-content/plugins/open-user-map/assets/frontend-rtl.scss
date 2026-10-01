@@ -1,0 +1,41 @@
+/**
+ * Open User Map — RTL overrides (frontend)
+ *
+ * Loaded automatically on RTL locales via wp_style_add_data() in Enqueue.php.
+ * Compile this file to frontend-rtl.css (same workflow as frontend.scss).
+ *
+ * Scope rules under plugin wrappers, e.g. .open-user-map, .oum-*, so overrides
+ * stay specific and do not affect unrelated theme markup.
+ *
+ * Example:
+ * .open-user-map {
+ *   .oum-carousel-prev {
+ *     left: auto;
+ *     right: 10px;
+ *   }
+ * }
+ */
+
+ .open-user-map .add-location .location-overlay-content #oum_add_location input[type=submit] {
+  left: auto;
+  right: 50%;
+  transform: translateX(50%);
+ }
+
+ .open-user-map .add-location .location-overlay-content #oum_add_location .map-wrap #mapGetLocation .leaflet-control-geosearch.leaflet-geosearch-bar form input[type=text] {
+  padding: 9px 0 9px 13px;
+  margin-right: 35px !important;
+ }
+
+ .marker-cluster div {
+  margin-right: 5px;
+ }
+
+ .leaflet-popup-pane, 
+ .leaflet-control {
+  direction: ltr;
+
+  * {
+    direction: rtl;
+  }
+ }

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" class="route-icon" aria-hidden="true">
+  <path
+    d="M18 42L33 32L43 14"
+    stroke="currentColor"
+    stroke-width="4.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <circle cx="18" cy="42" r="5.5" fill="currentColor" />
+  <circle cx="33" cy="32" r="5.5" fill="currentColor" />
+  <circle cx="43" cy="14" r="5.5" fill="currentColor" />
+</svg>

@@ -1,0 +1,3225 @@
+@charset "UTF-8";
+.oum-pro {
+  display: inline-block;
+  background: #dc3232;
+  color: white;
+  font-size: 11px;
+  text-align: center;
+  padding: 0px 4px;
+}
+
+.oum-getting-started-notice {
+  border-left-color: #1d8cb9;
+}
+.oum-getting-started-notice .oum-getting-started-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 11px 0;
+}
+.oum-getting-started-notice .oum-getting-started-icon-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+.oum-getting-started-notice .oum-getting-started-icon {
+  width: 75px;
+  height: 75px;
+  display: block;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 3px solid #fff;
+}
+.oum-getting-started-notice .oum-getting-started-text {
+  flex: 1;
+  min-width: 0;
+}
+.oum-getting-started-notice h3 {
+  margin-top: 2px;
+  margin-bottom: 6px;
+  font-size: 18px;
+  line-height: 1.7;
+}
+.oum-getting-started-notice ol {
+  margin: 0;
+  padding-left: 15px;
+}
+.oum-getting-started-notice ol li {
+  margin-bottom: 6px;
+  line-height: 2.4;
+}
+.oum-getting-started-notice ol li:last-child {
+  margin-bottom: 0;
+}
+.oum-getting-started-notice input.shortcode-display {
+  padding: 6px 7px;
+  background: #f3f3f3 !important;
+  border: 1px solid #e5e5e5;
+  border-radius: 3px;
+  line-height: 1;
+  font-size: 13px;
+  font-family: Consolas, Monaco, monospace;
+}
+@media (max-width: 782px) {
+  .oum-getting-started-notice .oum-getting-started-content {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .oum-getting-started-notice .oum-getting-started-icon-wrapper {
+    align-self: flex-start;
+  }
+  .oum-getting-started-notice .oum-getting-started-icon {
+    width: 48px;
+    height: 48px;
+  }
+  .oum-getting-started-notice .oum-badge {
+    font-size: 9px;
+    padding: 2px 6px;
+    top: -4px;
+    right: -4px;
+  }
+}
+
+.post-php.post-type-oum-location #location_customfields .inside .form-table > tbody > tr,
+.post-new-php.post-type-oum-location #location_customfields .inside .form-table > tbody > tr {
+  margin-bottom: 20px;
+  border-bottom: 1px solid #E8E8EB;
+}
+.post-php.post-type-oum-location #location_customfields .inside .form-table > tbody > tr > th, .post-php.post-type-oum-location #location_customfields .inside .form-table > tbody > tr > td,
+.post-new-php.post-type-oum-location #location_customfields .inside .form-table > tbody > tr > th,
+.post-new-php.post-type-oum-location #location_customfields .inside .form-table > tbody > tr > td {
+  padding: 20px 10px;
+}
+.post-php.post-type-oum-location #location_customfields .inside .form-table > tbody > tr:last-child,
+.post-new-php.post-type-oum-location #location_customfields .inside .form-table > tbody > tr:last-child {
+  border-bottom: none;
+}
+.post-php.post-type-oum-location .oum_custom_field_description,
+.post-new-php.post-type-oum-location .oum_custom_field_description {
+  font-style: italic;
+  font-size: 14px;
+  opacity: 0.8;
+  padding: 8px;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .map-wrap,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .map-wrap {
+  position: relative;
+  width: 520px;
+  aspect-ratio: 1.77;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 1px solid #888;
+  border-radius: 2px;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation .leaflet-control-attribution,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation .leaflet-control-attribution {
+  display: none;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation .leaflet-control-geosearch.leaflet-geosearch-bar form,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation .leaflet-control-geosearch.leaflet-geosearch-bar form {
+  background-image: url(images/ico_search_address_2.png);
+  background-position: right 1px;
+  background-repeat: no-repeat;
+  background-size: 30px;
+  background-color: #fff;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation .leaflet-control-geosearch.leaflet-geosearch-bar form input[type=text],
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation .leaflet-control-geosearch.leaflet-geosearch-bar form input[type=text] {
+  width: calc(100% - 35px);
+  padding: 9px 13px 9px 0;
+  min-width: unset;
+  min-height: unset;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  outline: none !important;
+  font-size: 14px;
+}
+@media screen and (max-width: 768px) {
+  .post-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation .leaflet-control-geosearch.leaflet-geosearch-bar form input[type=text],
+  .post-new-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation .leaflet-control-geosearch.leaflet-geosearch-bar form input[type=text] {
+    font-size: 16px;
+  }
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation .leaflet-control-geosearch.leaflet-geosearch-bar form button.reset,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation .leaflet-control-geosearch.leaflet-geosearch-bar form button.reset {
+  right: 25px;
+  background-color: #fff;
+  color: black;
+  margin: 0;
+  padding: 0 8px;
+  border: none;
+  box-shadow: none;
+  margin: 0;
+  outline: none;
+  font-size: 14px;
+  opacity: 0.5;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation .leaflet-control-geosearch.leaflet-geosearch-bar form button.reset:hover,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation .leaflet-control-geosearch.leaflet-geosearch-bar form button.reset:hover {
+  opacity: 1;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation a:not(.leaflet-draw-actions a),
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation a:not(.leaflet-draw-actions a) {
+  text-decoration: none !important;
+  padding: 0;
+  margin: 0;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation .leaflet-tile-pane img.leaflet-tile,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation .leaflet-tile-pane img.leaflet-tile {
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: unset;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation.map-style_Custom1 .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation.map-style_Custom1 .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+  filter: saturate(3);
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation.map-style_Custom2 .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation.map-style_Custom2 .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+  filter: sepia(1) invert(0) saturate(28) hue-rotate(-53deg);
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation.map-style_Custom2 .leaflet-tile-pane .leaflet-layer:nth-child(2) .leaflet-tile,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation.map-style_Custom2 .leaflet-tile-pane .leaflet-layer:nth-child(2) .leaflet-tile {
+  filter: sepia(0) contrast(1) invert(1) brightness(2);
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation.map-style_Custom3 .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation.map-style_Custom3 .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+  filter: sepia(1) invert(1) saturate(100) brightness(1) hue-rotate(-300deg);
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation.map-style_Custom3 .leaflet-tile-pane .leaflet-layer:nth-child(2) .leaflet-tile,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation.map-style_Custom3 .leaflet-tile-pane .leaflet-layer:nth-child(2) .leaflet-tile {
+  filter: sepia(0) contrast(1) invert(1) brightness(2);
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation .leaflet-control-locate-location-arrow,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .map-wrap #mapGetLocation .leaflet-control-locate-location-arrow {
+  mask-image: none;
+  background-image: url(images/ico_mylocation.svg);
+  background-color: transparent;
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .input-wrap,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .input-wrap {
+  width: 330px;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-control,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-control {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 10px;
+  padding: 0;
+  border: 0;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-card,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-card {
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
+  min-height: 92px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0;
+  padding: 12px 8px 10px;
+  border: 1px solid #c3c4c7;
+  border-radius: 6px;
+  background: #fff;
+  color: #1d2327;
+  cursor: pointer;
+  text-align: center;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-card input,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-card input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-card.is-selected, .post-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-card:has(input:checked),
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-card.is-selected,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-card:has(input:checked) {
+  border-color: #e82c71;
+  background-color: rgba(232, 44, 113, 0.08);
+  box-shadow: 0 0 0 1px rgba(232, 44, 113, 0.2);
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-icon,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-icon {
+  position: relative;
+  display: block;
+  width: 32px;
+  height: 32px;
+  color: #e82c71;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-icon svg,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-icon-point::before,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-icon-point::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50% 50% 50% 0;
+  background: currentColor;
+  transform: translateX(-50%) rotate(-45deg);
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-icon-point::after,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-icon-point::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fff;
+  transform: translateX(-50%);
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-title,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-title {
+  font-weight: 700;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-description,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .oum-location-type-description {
+  color: #646970;
+  font-size: 11px;
+  line-height: 1.3;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .geo-coordinates-hint,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .geo-coordinates-hint {
+  box-sizing: border-box;
+  margin-bottom: 30px;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .geo-coordinates-hint div.hint,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .geo-coordinates-hint div.hint {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .geo-coordinates-hint .latlng-wrap .oum-latlng-fields,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .geo-coordinates-hint .latlng-wrap .oum-latlng-fields {
+  display: flex;
+  gap: 15px;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .geo-coordinates-hint .latlng-wrap .oum-latlng-fields > div,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .geo-coordinates-hint .latlng-wrap .oum-latlng-fields > div {
+  width: 100px;
+}
+.post-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .geo-coordinates-hint .latlng-wrap .oum-geometry-fields textarea,
+.post-new-php.post-type-oum-location .geo-coordinates-wrap .input-wrap .geo-coordinates-hint .latlng-wrap .oum-geometry-fields textarea {
+  width: 100%;
+  min-height: 180px;
+}
+@media (max-width: 768px) {
+  .post-php.post-type-oum-location .geo-coordinates-wrap,
+  .post-new-php.post-type-oum-location .geo-coordinates-wrap {
+    flex-direction: column;
+  }
+  .post-php.post-type-oum-location .geo-coordinates-wrap .map-wrap,
+  .post-php.post-type-oum-location .geo-coordinates-wrap .input-wrap,
+  .post-new-php.post-type-oum-location .geo-coordinates-wrap .map-wrap,
+  .post-new-php.post-type-oum-location .geo-coordinates-wrap .input-wrap {
+    width: 100%;
+  }
+}
+.post-php.post-type-oum-location #oum_location_image_preview .image-preview-grid,
+.post-new-php.post-type-oum-location #oum_location_image_preview .image-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  margin: 10px 0;
+  width: 100%;
+  min-height: 50px;
+  padding: 10px;
+  border: 2px dashed #ddd;
+  border-radius: 4px;
+  position: relative;
+}
+.post-php.post-type-oum-location #oum_location_image_preview .image-preview-grid.dragover,
+.post-new-php.post-type-oum-location #oum_location_image_preview .image-preview-grid.dragover {
+  background: #f5f5f5;
+  border-color: #999;
+}
+.post-php.post-type-oum-location #oum_location_image_preview .image-preview-grid:empty,
+.post-new-php.post-type-oum-location #oum_location_image_preview .image-preview-grid:empty {
+  display: none;
+  margin: 0;
+}
+.post-php.post-type-oum-location #oum_location_image_preview .image-preview-grid .image-preview-item,
+.post-new-php.post-type-oum-location #oum_location_image_preview .image-preview-grid .image-preview-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: grab;
+  border: 2px solid #ddd;
+  background: #fff;
+  will-change: transform;
+  user-select: none;
+  transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+}
+.post-php.post-type-oum-location #oum_location_image_preview .image-preview-grid .image-preview-item.dragging,
+.post-new-php.post-type-oum-location #oum_location_image_preview .image-preview-grid .image-preview-item.dragging {
+  cursor: grabbing;
+  background: #fff;
+  border-color: #e82c71;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  opacity: 0.9;
+  transform: scale(1.05) rotate(1deg);
+  z-index: 1000;
+}
+.post-php.post-type-oum-location #oum_location_image_preview .image-preview-grid .image-preview-item img,
+.post-new-php.post-type-oum-location #oum_location_image_preview .image-preview-grid .image-preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+.post-php.post-type-oum-location #oum_location_image_preview .image-preview-grid .image-preview-item .remove-image,
+.post-new-php.post-type-oum-location #oum_location_image_preview .image-preview-grid .image-preview-item .remove-image {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  color: #666;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+.post-php.post-type-oum-location #oum_location_image_preview .image-preview-grid .image-preview-item .remove-image:hover,
+.post-new-php.post-type-oum-location #oum_location_image_preview .image-preview-grid .image-preview-item .remove-image:hover {
+  background: #fff;
+  color: #000;
+}
+.post-php.post-type-oum-location #oum_location_image_preview .image-preview-grid .image-preview-item .drag-handle,
+.post-new-php.post-type-oum-location #oum_location_image_preview .image-preview-grid .image-preview-item .drag-handle {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  font-size: 14px;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
+.post-php.post-type-oum-location #oum_location_image_preview .image-preview-placeholder,
+.post-new-php.post-type-oum-location #oum_location_image_preview .image-preview-placeholder {
+  border: 2px dashed #e82c71;
+  border-radius: 4px;
+  background: rgba(224, 42, 175, 0.05);
+  transition: all 0.15s ease-in-out;
+}
+.post-php.post-type-oum-location #oum_location_video_preview .remove-upload,
+.post-new-php.post-type-oum-location #oum_location_video_preview .remove-upload {
+  display: none;
+}
+.post-php.post-type-oum-location #oum_location_video_preview.has-video,
+.post-new-php.post-type-oum-location #oum_location_video_preview.has-video {
+  width: 500px;
+  max-width: 100%;
+  position: relative;
+}
+.post-php.post-type-oum-location #oum_location_video_preview.has-video iframe,
+.post-new-php.post-type-oum-location #oum_location_video_preview.has-video iframe {
+  position: relative;
+  width: 100%;
+}
+.post-php.post-type-oum-location #oum_location_video_preview.has-video .remove-upload,
+.post-new-php.post-type-oum-location #oum_location_video_preview.has-video .remove-upload {
+  display: block;
+  position: absolute;
+  z-index: 10;
+  top: 10px;
+  right: -30px;
+  cursor: pointer;
+  opacity: 0.8;
+  width: 20px;
+  height: 20px;
+  border-radius: 100px;
+  line-height: 18px;
+  text-align: center;
+  background: indianred;
+  color: #fff;
+  font-family: sans-serif;
+  font-size: 17px;
+}
+.post-php.post-type-oum-location #oum_location_video_preview.has-video .remove-upload:hover,
+.post-new-php.post-type-oum-location #oum_location_video_preview.has-video .remove-upload:hover {
+  opacity: 1;
+}
+.post-php.post-type-oum-location #oum_location_audio_preview .remove-upload,
+.post-new-php.post-type-oum-location #oum_location_audio_preview .remove-upload {
+  display: none;
+}
+.post-php.post-type-oum-location #oum_location_audio_preview.has-audio,
+.post-new-php.post-type-oum-location #oum_location_audio_preview.has-audio {
+  width: 400px;
+  max-width: 100%;
+  margin-top: 15px;
+  margin-left: 3px;
+  position: relative;
+}
+.post-php.post-type-oum-location #oum_location_audio_preview.has-audio .remove-upload,
+.post-new-php.post-type-oum-location #oum_location_audio_preview.has-audio .remove-upload {
+  display: block;
+  position: absolute;
+  z-index: 10;
+  top: 10px;
+  right: -30px;
+  cursor: pointer;
+  opacity: 0.8;
+  width: 20px;
+  height: 20px;
+  border-radius: 100px;
+  line-height: 18px;
+  text-align: center;
+  background: indianred;
+  color: #fff;
+  font-family: sans-serif;
+  font-size: 17px;
+}
+.post-php.post-type-oum-location #oum_location_audio_preview.has-audio .remove-upload:hover,
+.post-new-php.post-type-oum-location #oum_location_audio_preview.has-audio .remove-upload:hover {
+  opacity: 1;
+}
+.post-php.post-type-oum-location input.oum-switch[type=checkbox],
+.post-new-php.post-type-oum-location input.oum-switch[type=checkbox] {
+  position: relative;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  appearance: none;
+  visibility: hidden;
+}
+.post-php.post-type-oum-location input.oum-switch[type=checkbox] + label,
+.post-new-php.post-type-oum-location input.oum-switch[type=checkbox] + label {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  font-family: sans-serif;
+  font-size: 14px;
+  line-height: 23px;
+  padding-left: 50px;
+  position: relative;
+  margin-top: -18px;
+}
+.post-php.post-type-oum-location input.oum-switch[type=checkbox] + label::before,
+.post-new-php.post-type-oum-location input.oum-switch[type=checkbox] + label::before {
+  box-sizing: border-box;
+  width: 40px;
+  height: 20px;
+  border-radius: 30px;
+  border: 2px solid #ddd;
+  background-color: #eee;
+  content: "";
+  margin-right: 15px;
+  transition: background-color 0.5s linear;
+  z-index: 5;
+  position: absolute;
+  left: 0px;
+  top: 1px;
+}
+.post-php.post-type-oum-location input.oum-switch[type=checkbox] + label::after,
+.post-new-php.post-type-oum-location input.oum-switch[type=checkbox] + label::after {
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  border-radius: 30px;
+  background-color: #fff;
+  content: "";
+  transition: margin 0.1s linear;
+  box-shadow: 0px 0px 5px #aaa;
+  position: absolute;
+  left: 2px;
+  top: 3px;
+  z-index: 10;
+}
+.post-php.post-type-oum-location input.oum-switch[type=checkbox]:checked + label::before,
+.post-new-php.post-type-oum-location input.oum-switch[type=checkbox]:checked + label::before {
+  background-color: #e82c71;
+}
+.post-php.post-type-oum-location input.oum-switch[type=checkbox]:checked + label::after,
+.post-new-php.post-type-oum-location input.oum-switch[type=checkbox]:checked + label::after {
+  margin: 0 0 0 20px;
+}
+.post-php.post-type-oum-location .marker_icons,
+.post-new-php.post-type-oum-location .marker_icons {
+  display: flex;
+  flex-wrap: wrap;
+}
+.post-php.post-type-oum-location .marker_icons label,
+.post-new-php.post-type-oum-location .marker_icons label {
+  width: 25%;
+  overflow: hidden;
+  border: 4px solid lightgrey;
+  margin: 5px;
+  position: relative;
+}
+.post-php.post-type-oum-location .marker_icons label input,
+.post-new-php.post-type-oum-location .marker_icons label input {
+  display: none;
+}
+.post-php.post-type-oum-location .marker_icons label.checked, .post-php.post-type-oum-location .marker_icons label:not(.pro-only):hover,
+.post-new-php.post-type-oum-location .marker_icons label.checked,
+.post-new-php.post-type-oum-location .marker_icons label:not(.pro-only):hover {
+  border-color: #e82c71;
+}
+.post-php.post-type-oum-location .marker_icons label .marker_icon_preview,
+.post-new-php.post-type-oum-location .marker_icons label .marker_icon_preview {
+  height: 40px;
+  margin: 5px;
+  background-position: center center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.post-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=default],
+.post-new-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=default] {
+  background-image: url("../src/leaflet/images/marker-icon_default-2x.png");
+}
+.post-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=custom1],
+.post-new-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=custom1] {
+  background-image: url("../src/leaflet/images/marker-icon_custom1-2x.png");
+}
+.post-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=custom2],
+.post-new-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=custom2] {
+  background-image: url("../src/leaflet/images/marker-icon_custom2-2x.png");
+}
+.post-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=custom3],
+.post-new-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=custom3] {
+  background-image: url("../src/leaflet/images/marker-icon_custom3-2x.png");
+}
+.post-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=custom4],
+.post-new-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=custom4] {
+  background-image: url("../src/leaflet/images/marker-icon_custom4-2x.png");
+}
+.post-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=custom5],
+.post-new-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=custom5] {
+  background-image: url("../src/leaflet/images/marker-icon_custom5-2x.png");
+}
+.post-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=custom6],
+.post-new-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=custom6] {
+  background-image: url("../src/leaflet/images/marker-icon_custom6-2x.png");
+}
+.post-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=custom7],
+.post-new-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=custom7] {
+  background-image: url("../src/leaflet/images/marker-icon_custom7-2x.png");
+}
+.post-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=custom8],
+.post-new-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=custom8] {
+  background-image: url("../src/leaflet/images/marker-icon_custom8-2x.png");
+}
+.post-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=custom9],
+.post-new-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=custom9] {
+  background-image: url("../src/leaflet/images/marker-icon_custom9-2x.png");
+}
+.post-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=custom10],
+.post-new-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=custom10] {
+  background-image: url("../src/leaflet/images/marker-icon_custom10-2x.png");
+}
+.post-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=user1],
+.post-new-php.post-type-oum-location .marker_icons label .marker_icon_preview[data-style=user1] {
+  background-image: url("../src/leaflet/images/marker-icon_user1-2x.png");
+}
+.post-php.post-type-oum-location .marker_icons label .name,
+.post-new-php.post-type-oum-location .marker_icons label .name {
+  text-align: center;
+  padding: 0 5px 5px;
+}
+
+.taxonomy-oum-type .term-description-wrap {
+  display: none;
+}
+.taxonomy-oum-type .marker_icons {
+  display: flex;
+  flex-wrap: wrap;
+}
+.taxonomy-oum-type .marker_icons label {
+  width: 50px;
+  height: 82px;
+  overflow: hidden;
+  border: 4px solid white;
+  margin: 5px;
+  position: relative;
+}
+.taxonomy-oum-type .marker_icons label input {
+  display: none;
+}
+.taxonomy-oum-type .marker_icons label.pro-only {
+  cursor: default;
+  overflow: visible;
+}
+.taxonomy-oum-type .marker_icons label.pro-only:before {
+  content: "PRO";
+  display: inline-block;
+  position: absolute;
+  background: #dc3232;
+  color: white;
+  right: 0;
+  top: 0;
+  font-size: 11px;
+  text-align: center;
+  padding: 0px 4px;
+}
+.taxonomy-oum-type .marker_icons label.pro-only .oum-gopro-text {
+  position: absolute;
+  top: 15px;
+  right: -130px;
+  width: 115px;
+}
+.taxonomy-oum-type .marker_icons label.pro:before {
+  content: "PRO";
+  display: inline-block;
+  position: absolute;
+  background: #dc3232;
+  color: white;
+  right: 0;
+  top: 0;
+  font-size: 11px;
+  text-align: center;
+  padding: 0px 4px;
+}
+.taxonomy-oum-type .marker_icons label.checked, .taxonomy-oum-type .marker_icons label:not(.pro-only):hover {
+  border-color: #e82c71;
+}
+.taxonomy-oum-type .marker_icons label .marker_icon_preview {
+  width: 50px;
+  height: 82px;
+  background-position: center center;
+  background-size: 50%;
+  background-repeat: no-repeat;
+}
+.taxonomy-oum-type .marker_icons label .marker_icon_preview[data-style=default] {
+  background-image: url("../src/leaflet/images/marker-icon_default-2x.png");
+}
+.taxonomy-oum-type .marker_icons label .marker_icon_preview[data-style=custom1] {
+  background-image: url("../src/leaflet/images/marker-icon_custom1-2x.png");
+}
+.taxonomy-oum-type .marker_icons label .marker_icon_preview[data-style=custom2] {
+  background-image: url("../src/leaflet/images/marker-icon_custom2-2x.png");
+}
+.taxonomy-oum-type .marker_icons label .marker_icon_preview[data-style=custom3] {
+  background-image: url("../src/leaflet/images/marker-icon_custom3-2x.png");
+}
+.taxonomy-oum-type .marker_icons label .marker_icon_preview[data-style=custom4] {
+  background-image: url("../src/leaflet/images/marker-icon_custom4-2x.png");
+}
+.taxonomy-oum-type .marker_icons label .marker_icon_preview[data-style=custom5] {
+  background-image: url("../src/leaflet/images/marker-icon_custom5-2x.png");
+}
+.taxonomy-oum-type .marker_icons label .marker_icon_preview[data-style=custom6] {
+  background-image: url("../src/leaflet/images/marker-icon_custom6-2x.png");
+}
+.taxonomy-oum-type .marker_icons label .marker_icon_preview[data-style=custom7] {
+  background-image: url("../src/leaflet/images/marker-icon_custom7-2x.png");
+}
+.taxonomy-oum-type .marker_icons label .marker_icon_preview[data-style=custom8] {
+  background-image: url("../src/leaflet/images/marker-icon_custom8-2x.png");
+}
+.taxonomy-oum-type .marker_icons label .marker_icon_preview[data-style=custom9] {
+  background-image: url("../src/leaflet/images/marker-icon_custom9-2x.png");
+}
+.taxonomy-oum-type .marker_icons label .marker_icon_preview[data-style=custom10] {
+  background-image: url("../src/leaflet/images/marker-icon_custom10-2x.png");
+}
+.taxonomy-oum-type .marker_icons label .marker_icon_preview[data-style=user1] {
+  background-image: url("../src/leaflet/images/marker-icon_user1-2x.png");
+}
+.taxonomy-oum-type .marker_icons label.label_marker_user_icon {
+  width: 170px;
+}
+.taxonomy-oum-type .marker_icons label.label_marker_user_icon .icon_upload {
+  position: absolute;
+  width: 115px;
+  right: 3px;
+  top: 62%;
+  transform: translateY(-50%);
+}
+.taxonomy-oum-type .marker_icons label.label_marker_user_icon .icon_upload .button {
+  cursor: pointer;
+  line-height: 1.5;
+  padding: 5px;
+  text-align: center;
+  white-space: pre-wrap;
+}
+.taxonomy-oum-type .marker_icons label.label_marker_user_icon .icon_upload .description {
+  font-style: italic;
+  font-size: 11px;
+  opacity: 0.8;
+}
+.taxonomy-oum-type .column-oum_category_type {
+  width: 140px;
+}
+.taxonomy-oum-type .oum-category-type-column-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.taxonomy-oum-type .oum-category-type-column-icon img,
+.taxonomy-oum-type .oum-category-type-column-icon svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.taxonomy-oum-region .term-description-wrap,
+.taxonomy-oum-region .term-slug-wrap {
+  display: none;
+}
+.taxonomy-oum-region .geo-coordinates-wrap .map-wrap {
+  position: relative;
+  width: 520px;
+  aspect-ratio: 1.77;
+}
+.taxonomy-oum-region .geo-coordinates-wrap .map-wrap #mapGetRegion {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+.taxonomy-oum-region .geo-coordinates-wrap .map-wrap #mapGetRegion .leaflet-control-attribution {
+  display: none;
+}
+.taxonomy-oum-region .geo-coordinates-wrap .map-wrap #mapGetRegion .leaflet-control-geosearch.leaflet-geosearch-bar form {
+  background-image: url(images/ico_search_address_2.png);
+  background-position: right 1px;
+  background-repeat: no-repeat;
+  background-size: 30px;
+  background-color: #fff;
+}
+.taxonomy-oum-region .geo-coordinates-wrap .map-wrap #mapGetRegion .leaflet-control-geosearch.leaflet-geosearch-bar form input[type=text] {
+  width: calc(100% - 35px);
+  padding: 9px 13px 9px 0;
+  min-width: unset;
+  min-height: unset;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  outline: none !important;
+  font-size: 14px;
+}
+@media screen and (max-width: 768px) {
+  .taxonomy-oum-region .geo-coordinates-wrap .map-wrap #mapGetRegion .leaflet-control-geosearch.leaflet-geosearch-bar form input[type=text] {
+    font-size: 16px;
+  }
+}
+.taxonomy-oum-region .geo-coordinates-wrap .map-wrap #mapGetRegion .leaflet-control-geosearch.leaflet-geosearch-bar form button.reset {
+  right: 25px;
+  background-color: #fff;
+  color: black;
+  margin: 0;
+  padding: 0 8px;
+  border: none;
+  box-shadow: none;
+  margin: 0;
+  outline: none;
+  font-size: 14px;
+  opacity: 0.5;
+}
+.taxonomy-oum-region .geo-coordinates-wrap .map-wrap #mapGetRegion .leaflet-control-geosearch.leaflet-geosearch-bar form button.reset:hover {
+  opacity: 1;
+}
+.taxonomy-oum-region .geo-coordinates-wrap .map-wrap #mapGetRegion a {
+  text-decoration: none !important;
+  padding: 0;
+  margin: 0;
+}
+.taxonomy-oum-region .geo-coordinates-wrap .map-wrap #mapGetRegion .leaflet-tile-pane img.leaflet-tile {
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: unset;
+}
+.taxonomy-oum-region .geo-coordinates-wrap .map-wrap #mapGetRegion input.glass {
+  box-shadow: none !important;
+  border: none !important;
+}
+.taxonomy-oum-region .geo-coordinates-wrap .map-wrap #mapGetRegion.map-style_Custom1 .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+  filter: saturate(3);
+}
+.taxonomy-oum-region .geo-coordinates-wrap .map-wrap #mapGetRegion.map-style_Custom2 .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+  filter: sepia(1) invert(0) saturate(28) hue-rotate(-53deg);
+}
+.taxonomy-oum-region .geo-coordinates-wrap .map-wrap #mapGetRegion.map-style_Custom2 .leaflet-tile-pane .leaflet-layer:nth-child(2) .leaflet-tile {
+  filter: sepia(0) contrast(1) invert(1) brightness(2);
+}
+.taxonomy-oum-region .geo-coordinates-wrap .map-wrap #mapGetRegion.map-style_Custom3 .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+  filter: sepia(1) invert(1) saturate(100) brightness(1) hue-rotate(-300deg);
+}
+.taxonomy-oum-region .geo-coordinates-wrap .map-wrap #mapGetRegion.map-style_Custom3 .leaflet-tile-pane .leaflet-layer:nth-child(2) .leaflet-tile {
+  filter: sepia(0) contrast(1) invert(1) brightness(2);
+}
+.taxonomy-oum-region .geo-coordinates-wrap .input-wrap .latlng-wrap {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 1rem;
+}
+.taxonomy-oum-region .geo-coordinates-wrap .input-wrap .latlng-wrap > div input {
+  width: 100%;
+}
+.taxonomy-oum-region .geo-coordinates-wrap .input-wrap .latlng-wrap > div.zoom-wrap {
+  width: 100px;
+}
+.taxonomy-oum-region .geo-coordinates-wrap .input-wrap .geo-coordinates-hint {
+  box-sizing: border-box;
+  padding: 15px;
+  border: 1px solid lightgrey;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  background-color: floralwhite;
+}
+@media (max-width: 768px) {
+  .taxonomy-oum-region .geo-coordinates-wrap {
+    flex-direction: column;
+  }
+  .taxonomy-oum-region .geo-coordinates-wrap .map-wrap,
+  .taxonomy-oum-region .geo-coordinates-wrap .input-wrap {
+    width: 100%;
+  }
+  .taxonomy-oum-region .geo-coordinates-wrap .input-wrap {
+    padding: 0;
+  }
+}
+
+.oum-location_page_open-user-map-settings.oum-settings-wizard,
+.toplevel_page_open-user-map.oum-settings-wizard {
+  background: #fff;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard #adminmenu li#menu-settings a::after,
+.toplevel_page_open-user-map.oum-settings-wizard #adminmenu li#menu-settings a::after {
+  border-right-color: rgb(109, 189, 230);
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard #wpwrap,
+.toplevel_page_open-user-map.oum-settings-wizard #wpwrap {
+  height: 100%;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard #wpwrap #wpbody,
+.toplevel_page_open-user-map.oum-settings-wizard #wpwrap #wpbody {
+  height: 100%;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard {
+  position: absolute;
+  z-index: 999;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: -20px;
+  padding: 0;
+  background: #fff;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard > *,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard > * {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 9%;
+  box-sizing: border-box;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .oum-inline-plus,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .oum-inline-plus {
+  display: inline-block;
+  background: #e82c71;
+  color: #fff;
+  border-radius: 15px;
+  width: 16px;
+  height: 16px;
+  line-height: 13px;
+  text-align: center;
+  font-size: 17px;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .hero,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .hero {
+  background: url(images/block-bg.jpg) no-repeat center #26aee7;
+  background-size: cover;
+  color: white;
+  width: 100%;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .hero .logo,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .hero .logo {
+  background: url(images/icon-256x256.png) no-repeat top left transparent;
+  background-size: 50px;
+  width: 330px;
+  height: 50px;
+  margin-bottom: 30px;
+  padding-left: 60px;
+  position: absolute;
+  top: 50px;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 50px;
+  letter-spacing: -1px;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .hero ul.steps,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .hero ul.steps {
+  display: flex;
+  gap: 15px;
+  position: absolute;
+  top: 85vh;
+  left: 22%;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .hero ul.steps li,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .hero ul.steps li {
+  display: block;
+  border: 2px solid #fff;
+  border-radius: 100px;
+  width: 8px;
+  height: 8px;
+  background: none;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .hero ul.steps li.done,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .hero ul.steps li.done {
+  background: #fff;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .hero .overline,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .hero .overline {
+  font-weight: bold;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 22px;
+  opacity: 0.7;
+  margin-bottom: 30px;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .hero h1,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .hero h1 {
+  color: #fff;
+  font-size: 70px;
+  font-weight: bold;
+  letter-spacing: 4px;
+  line-height: 1;
+  margin: 0;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content {
+  width: 100%;
+  max-width: 900px;
+  margin: 0;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .intro,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .intro {
+  margin-bottom: 30px;
+  text-align: center;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .map-types,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .map-types {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .map-types .option,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .map-types .option {
+  flex-basis: 300px;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .map-types .option label,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .map-types .option label {
+  cursor: pointer;
+  display: block;
+  height: calc(100% - 8px);
+  position: relative;
+  padding: 0;
+  background: #fff;
+  border: 4px solid #f0f0f1;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .map-types .option label .map-type-preview,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .map-types .option label .map-type-preview {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: top right;
+  aspect-ratio: 2;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .map-types .option label .map-type-preview[data-type=interactive],
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .map-types .option label .map-type-preview[data-type=interactive] {
+  background-image: url(images/map_type_interactive_2.png);
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .map-types .option label .map-type-preview[data-type=simple],
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .map-types .option label .map-type-preview[data-type=simple] {
+  background-image: url(images/map_type_simple.jpg);
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .map-types .option label .label-text,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .map-types .option label .label-text {
+  padding: 23px 30px 20px 56px;
+  position: relative;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .map-types .option label .label-text h2,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .map-types .option label .label-text h2 {
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .map-types .option label .label-text p,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .map-types .option label .label-text p {
+  margin: 0 0 10px 0;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .map-types .option label .label-text ul,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .map-types .option label .label-text ul {
+  margin: 0 0 10px 18px;
+  list-style: disc;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .map-types .option label .label-text li,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .map-types .option label .label-text li {
+  margin-bottom: 6px;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .map-types .option label .label-text p.description,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .map-types .option label .label-text p.description {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: #666;
+  font-style: normal;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .map-types .option label .label-text input[type=radio],
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .map-types .option label .label-text input[type=radio] {
+  position: absolute;
+  left: 25px;
+  top: 29px;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .map-types .option label:has(input[type=radio]:checked),
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .map-types .option label:has(input[type=radio]:checked) {
+  border-color: #e82c71;
+  opacity: 1;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .map-types .option label:has(input[type=radio]:not(:checked)),
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .map-types .option label:has(input[type=radio]:not(:checked)) {
+  opacity: 0.6;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .map-types .option label:has(input[type=radio]:not(:checked)):hover,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .map-types .option label:has(input[type=radio]:not(:checked)):hover {
+  border-color: #e82c71;
+  opacity: 1;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .next-steps,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .next-steps {
+  margin-bottom: 30px;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .next-steps li,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .next-steps li {
+  margin-bottom: 20px;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .next-steps li input.shortcode-display,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .next-steps li input.shortcode-display {
+  background: #f3f3f3 !important;
+}
+.oum-location_page_open-user-map-settings.oum-settings-wizard .oum-wizard .step-content .button-primary,
+.toplevel_page_open-user-map.oum-settings-wizard .oum-wizard .step-content .button-primary {
+  font-size: 16px;
+  height: 49px;
+  line-height: 49px;
+  padding: 0 20px !important;
+}
+.oum-location_page_open-user-map-settings:not(.oum-settings-wizard) .oum-wizard .hero,
+.toplevel_page_open-user-map:not(.oum-settings-wizard) .oum-wizard .hero {
+  display: none;
+}
+.oum-location_page_open-user-map-settings .new-feature,
+.toplevel_page_open-user-map .new-feature {
+  display: inline-block;
+  background: #50aa96;
+  color: white;
+  padding: 0px 4px;
+  font-size: 12px;
+}
+.oum-location_page_open-user-map-settings .oum-nav-tab-wrapper .nav-tab,
+.toplevel_page_open-user-map .oum-nav-tab-wrapper .nav-tab {
+  outline: none;
+  box-shadow: none;
+}
+.oum-location_page_open-user-map-settings .oum-tab-content .oum-tab-pane,
+.toplevel_page_open-user-map .oum-tab-content .oum-tab-pane {
+  display: none;
+  padding: 1rem;
+}
+.oum-location_page_open-user-map-settings .oum-tab-content .oum-tab-pane.active,
+.toplevel_page_open-user-map .oum-tab-content .oum-tab-pane.active {
+  display: block;
+}
+.oum-location_page_open-user-map-settings .oum_support_hint,
+.toplevel_page_open-user-map .oum_support_hint {
+  opacity: 0.7;
+  margin-left: 5px;
+}
+.oum-location_page_open-user-map-settings .form-table th,
+.toplevel_page_open-user-map .form-table th {
+  width: 230px;
+  padding-top: 17px;
+}
+.oum-location_page_open-user-map-settings,
+.toplevel_page_open-user-map {
+  /* Custom fields wrapper table keeps default column widths */
+}
+.oum-location_page_open-user-map-settings .oum_custom_fields_wrapper table th,
+.toplevel_page_open-user-map .oum_custom_fields_wrapper table th {
+  width: auto;
+}
+.oum-location_page_open-user-map-settings .form-table td,
+.toplevel_page_open-user-map .form-table td {
+  vertical-align: top;
+  padding-bottom: 60px;
+}
+.oum-location_page_open-user-map-settings .form-table td.top-padding-20,
+.toplevel_page_open-user-map .form-table td.top-padding-20 {
+  padding-top: 20px;
+}
+.oum-location_page_open-user-map-settings .form-table td.top-padding-20 ol,
+.toplevel_page_open-user-map .form-table td.top-padding-20 ol {
+  margin-top: 0;
+  margin-left: 20px;
+}
+.oum-location_page_open-user-map-settings .oum_2cols,
+.toplevel_page_open-user-map .oum_2cols {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.oum-location_page_open-user-map-settings .oum_3cols,
+.toplevel_page_open-user-map .oum_3cols {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.oum-location_page_open-user-map-settings code.block,
+.toplevel_page_open-user-map code.block {
+  white-space: pre-line;
+  display: inherit;
+  padding: 15px;
+}
+.oum-location_page_open-user-map-settings input.shortcode-display,
+.toplevel_page_open-user-map input.shortcode-display {
+  padding: 6px 7px;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 3px;
+  line-height: 1;
+  font-size: 13px;
+  font-family: Consolas, Monaco, monospace;
+  unicode-bidi: embed;
+}
+.oum-location_page_open-user-map-settings textarea.code-display,
+.toplevel_page_open-user-map textarea.code-display {
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 3px;
+  line-height: 1;
+  font-size: 13px;
+  font-family: Consolas, Monaco, monospace;
+  unicode-bidi: embed;
+}
+.oum-location_page_open-user-map-settings .oum-code-snippet,
+.toplevel_page_open-user-map .oum-code-snippet {
+  position: relative;
+  margin: 25px 0 15px;
+  width: 100%;
+}
+.oum-location_page_open-user-map-settings .oum-code-snippet .oum-code-label,
+.toplevel_page_open-user-map .oum-code-snippet .oum-code-label {
+  position: absolute;
+  top: -24px;
+  left: 0;
+  display: inline-block;
+  padding: 5px 12px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #e82c71;
+}
+.oum-location_page_open-user-map-settings .oum-code-snippet textarea.code-display,
+.toplevel_page_open-user-map .oum-code-snippet textarea.code-display {
+  margin-top: 0;
+  border-top-left-radius: 0;
+}
+.oum-location_page_open-user-map-settings .description,
+.toplevel_page_open-user-map .description {
+  font-style: italic;
+  font-weight: normal;
+}
+.oum-location_page_open-user-map-settings .description ul,
+.toplevel_page_open-user-map .description ul {
+  list-style: disc;
+  padding: 0 15px;
+}
+.oum-location_page_open-user-map-settings .map-types,
+.toplevel_page_open-user-map .map-types {
+  display: flex;
+  gap: 30px;
+}
+.oum-location_page_open-user-map-settings .map-types .option,
+.toplevel_page_open-user-map .map-types .option {
+  width: 300px;
+}
+.oum-location_page_open-user-map-settings .map-types .option label,
+.toplevel_page_open-user-map .map-types .option label {
+  display: block;
+  height: 100%;
+  position: relative;
+  padding: 0;
+  background: #fff;
+  border: 4px solid white;
+}
+.oum-location_page_open-user-map-settings .map-types .option label .map-type-preview,
+.toplevel_page_open-user-map .map-types .option label .map-type-preview {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: top right;
+  aspect-ratio: 2;
+}
+.oum-location_page_open-user-map-settings .map-types .option label .map-type-preview[data-type=interactive],
+.toplevel_page_open-user-map .map-types .option label .map-type-preview[data-type=interactive] {
+  background-image: url(images/map_type_interactive_2.png);
+}
+.oum-location_page_open-user-map-settings .map-types .option label .map-type-preview[data-type=simple],
+.toplevel_page_open-user-map .map-types .option label .map-type-preview[data-type=simple] {
+  background-image: url(images/map_type_simple.jpg);
+}
+.oum-location_page_open-user-map-settings .map-types .option label .label-text,
+.toplevel_page_open-user-map .map-types .option label .label-text {
+  padding: 23px 30px 20px 56px;
+  position: relative;
+}
+.oum-location_page_open-user-map-settings .map-types .option label .label-text h2,
+.toplevel_page_open-user-map .map-types .option label .label-text h2 {
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+.oum-location_page_open-user-map-settings .map-types .option label .label-text input[type=radio],
+.toplevel_page_open-user-map .map-types .option label .label-text input[type=radio] {
+  position: absolute;
+  left: 25px;
+  top: 31px;
+}
+.oum-location_page_open-user-map-settings .map-types .option label .label-text #plus_button_label,
+.toplevel_page_open-user-map .map-types .option label .label-text #plus_button_label {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+.oum-location_page_open-user-map-settings .map-types .option label .label-text #plus_button_label input,
+.toplevel_page_open-user-map .map-types .option label .label-text #plus_button_label input {
+  max-width: 100%;
+}
+.oum-location_page_open-user-map-settings .map-types .option label:has(input[type=radio]:checked),
+.toplevel_page_open-user-map .map-types .option label:has(input[type=radio]:checked) {
+  border-color: #e82c71;
+  opacity: 1;
+}
+.oum-location_page_open-user-map-settings .map-types .option label:has(input[type=radio]:not(:checked)),
+.toplevel_page_open-user-map .map-types .option label:has(input[type=radio]:not(:checked)) {
+  opacity: 0.6;
+}
+.oum-location_page_open-user-map-settings .map-types .option label:has(input[type=radio]:not(:checked)):hover,
+.toplevel_page_open-user-map .map-types .option label:has(input[type=radio]:not(:checked)):hover {
+  border-color: #e82c71;
+  opacity: 1;
+}
+.oum-location_page_open-user-map-settings #oum_enable_add_location,
+.toplevel_page_open-user-map #oum_enable_add_location {
+  display: none;
+}
+.oum-location_page_open-user-map-settings,
+.toplevel_page_open-user-map {
+  /* Community Contributions card (General tab) */
+}
+.oum-location_page_open-user-map-settings .oum-community-contributions-card,
+.toplevel_page_open-user-map .oum-community-contributions-card {
+  display: flex;
+  align-items: stretch;
+  gap: 24px;
+  max-width: 1070px;
+  padding: 24px;
+  background: #fff;
+  outline: 1px solid #d0d7de;
+  border-radius: 6px;
+}
+.oum-location_page_open-user-map-settings .oum-community-contributions-card .oum-community-contributions-content,
+.toplevel_page_open-user-map .oum-community-contributions-card .oum-community-contributions-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.oum-location_page_open-user-map-settings .oum-community-contributions-card .oum-community-contributions-title,
+.toplevel_page_open-user-map .oum-community-contributions-card .oum-community-contributions-title {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1d2327;
+}
+.oum-location_page_open-user-map-settings .oum-community-contributions-card .oum-community-contributions-intro,
+.toplevel_page_open-user-map .oum-community-contributions-card .oum-community-contributions-intro {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #50575e;
+}
+.oum-location_page_open-user-map-settings .oum-community-contributions-card,
+.toplevel_page_open-user-map .oum-community-contributions-card {
+  /* Toggle uses existing input.oum-switch[type=checkbox] + label styles */
+}
+.oum-location_page_open-user-map-settings .oum-community-contributions-card .oum-community-contributions-toggle-wrap,
+.toplevel_page_open-user-map .oum-community-contributions-card .oum-community-contributions-toggle-wrap {
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+.oum-location_page_open-user-map-settings .oum-community-contributions-card .community-enabled-tip,
+.oum-location_page_open-user-map-settings .oum-community-contributions-card .community-disabled-tip,
+.toplevel_page_open-user-map .oum-community-contributions-card .community-enabled-tip,
+.toplevel_page_open-user-map .oum-community-contributions-card .community-disabled-tip {
+  margin: 0 0 40px 0;
+}
+.oum-location_page_open-user-map-settings .oum-community-contributions-card .oum-community-contributions-advanced,
+.toplevel_page_open-user-map .oum-community-contributions-card .oum-community-contributions-advanced {
+  margin: auto 0 0 0;
+  font-size: 13px;
+  color: #646970;
+  border-top: 1px solid #dee4ea;
+  padding-top: 10px;
+}
+.oum-location_page_open-user-map-settings .oum-community-contributions-card .oum-community-contributions-teaser,
+.toplevel_page_open-user-map .oum-community-contributions-card .oum-community-contributions-teaser {
+  flex-shrink: 0;
+  width: 350px;
+}
+.oum-location_page_open-user-map-settings .oum-community-contributions-card .oum-community-contributions-teaser .oum-community-contributions-teaser-img,
+.toplevel_page_open-user-map .oum-community-contributions-card .oum-community-contributions-teaser .oum-community-contributions-teaser-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 4px solid white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.oum-location_page_open-user-map-settings,
+.toplevel_page_open-user-map {
+  /* Location Submissions tab */
+}
+.oum-location_page_open-user-map-settings #oum_plus_button_label,
+.toplevel_page_open-user-map #oum_plus_button_label {
+  max-width: 100%;
+}
+.oum-location_page_open-user-map-settings .community-tab-disabled-message,
+.toplevel_page_open-user-map .community-tab-disabled-message {
+  margin: 20px 0;
+  max-width: 700px;
+  padding: 12px 14px;
+  border-left: 4px solid #dba617;
+  background: #fff8e5;
+}
+.oum-location_page_open-user-map-settings .community-quick-links,
+.toplevel_page_open-user-map .community-quick-links {
+  margin: 10px 0 18px;
+  padding: 10px 14px;
+  border: 1px solid #dcdcde;
+  background: #fff;
+  max-width: 860px;
+  border-radius: 4px;
+}
+.oum-location_page_open-user-map-settings .community-quick-links strong,
+.toplevel_page_open-user-map .community-quick-links strong {
+  margin-right: 8px;
+}
+.oum-location_page_open-user-map-settings .community-quick-links a,
+.toplevel_page_open-user-map .community-quick-links a {
+  margin-right: 10px;
+  text-decoration: none;
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+.oum-location_page_open-user-map-settings .community-quick-links a:hover,
+.toplevel_page_open-user-map .community-quick-links a:hover {
+  background: #f6f7f7;
+}
+.oum-location_page_open-user-map-settings .community-quick-links a:focus, .oum-location_page_open-user-map-settings .community-quick-links a:active, .oum-location_page_open-user-map-settings .community-quick-links a:focus-visible,
+.toplevel_page_open-user-map .community-quick-links a:focus,
+.toplevel_page_open-user-map .community-quick-links a:active,
+.toplevel_page_open-user-map .community-quick-links a:focus-visible {
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+}
+.oum-location_page_open-user-map-settings .community-group-heading td,
+.toplevel_page_open-user-map .community-group-heading td {
+  padding: 0 !important;
+  border-top: 0 !important;
+}
+.oum-location_page_open-user-map-settings .community-group-heading .community-group-heading-inner,
+.toplevel_page_open-user-map .community-group-heading .community-group-heading-inner {
+  padding: 20px;
+  border-bottom: 1px solid #e2e5e8;
+  background: #f8f9fb;
+}
+.oum-location_page_open-user-map-settings .community-group-heading .community-group-heading-inner h3,
+.toplevel_page_open-user-map .community-group-heading .community-group-heading-inner h3 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #1d2327;
+}
+.oum-location_page_open-user-map-settings .community-group-heading .community-group-heading-inner p,
+.toplevel_page_open-user-map .community-group-heading .community-group-heading-inner p {
+  margin: 0;
+  color: #50575e;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.oum-location_page_open-user-map-settings .wrap-community-tab-settings .form-table,
+.toplevel_page_open-user-map .wrap-community-tab-settings .form-table {
+  display: flex;
+  flex-direction: column;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 0;
+}
+.oum-location_page_open-user-map-settings .wrap-community-tab-settings .community-group-box,
+.toplevel_page_open-user-map .wrap-community-tab-settings .community-group-box {
+  display: table;
+  width: 100%;
+  background: #fff;
+  outline: 1px solid #d0d7de;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.oum-location_page_open-user-map-settings .wrap-community-tab-settings .community-group-box > tr > th,
+.oum-location_page_open-user-map-settings .wrap-community-tab-settings .community-group-box > tr > td,
+.toplevel_page_open-user-map .wrap-community-tab-settings .community-group-box > tr > th,
+.toplevel_page_open-user-map .wrap-community-tab-settings .community-group-box > tr > td {
+  background: #fff;
+  padding: 30px 20px 30px;
+}
+.oum-location_page_open-user-map-settings .wrap-community-tab-settings .community-group-box td .community-guest-publish-warning,
+.toplevel_page_open-user-map .wrap-community-tab-settings .community-group-box td .community-guest-publish-warning {
+  color: #646970;
+  font-style: italic;
+}
+.oum-location_page_open-user-map-settings .wrap-community-tab-settings .community-group-box td .description,
+.toplevel_page_open-user-map .wrap-community-tab-settings .community-group-box td .description {
+  margin-bottom: 4px;
+  display: block;
+}
+.oum-location_page_open-user-map-settings .wrap-community-tab-settings .community-group-box td strong,
+.toplevel_page_open-user-map .wrap-community-tab-settings .community-group-box td strong {
+  margin-top: 10px;
+  margin-bottom: 4px;
+  display: inline-block;
+}
+.oum-location_page_open-user-map-settings .wrap-community-tab-settings .community-group-box td strong:first-of-type,
+.toplevel_page_open-user-map .wrap-community-tab-settings .community-group-box td strong:first-of-type {
+  margin-top: 0;
+}
+.oum-location_page_open-user-map-settings #tab-2 > .wrap-community-tab-settings:last-child .community-group-box:last-child,
+.toplevel_page_open-user-map #tab-2 > .wrap-community-tab-settings:last-child .community-group-box:last-child {
+  margin-bottom: 0;
+}
+.oum-location_page_open-user-map-settings .map_styles,
+.toplevel_page_open-user-map .map_styles {
+  max-width: 1070px;
+}
+.oum-location_page_open-user-map-settings .map_styles .map_style_provider_group,
+.toplevel_page_open-user-map .map_styles .map_style_provider_group {
+  padding: 24px;
+  margin-bottom: 16px;
+  background: #fff;
+  outline: 1px solid #d0d7de;
+  border-radius: 6px;
+}
+.oum-location_page_open-user-map-settings .map_styles .map_style_provider_header,
+.toplevel_page_open-user-map .map_styles .map_style_provider_header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.oum-location_page_open-user-map-settings .map_styles .map_style_provider_heading,
+.toplevel_page_open-user-map .map_styles .map_style_provider_heading {
+  margin: 0;
+}
+.oum-location_page_open-user-map-settings .map_styles .map_style_provider_api_key,
+.toplevel_page_open-user-map .map_styles .map_style_provider_api_key {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+}
+.oum-location_page_open-user-map-settings .map_styles .map_style_provider_api_key label,
+.toplevel_page_open-user-map .map_styles .map_style_provider_api_key label {
+  width: auto;
+  height: auto;
+  overflow: visible;
+  border: 1px solid #8c8f94;
+  border-right: 0;
+  box-shadow: none;
+  font-weight: 600;
+  background: #f0f6fc;
+  border-radius: 4px 0 0 4px;
+  color: #135e96;
+  min-height: 30px;
+  line-height: 30px;
+  padding: 0 10px;
+}
+.oum-location_page_open-user-map-settings .map_styles .map_style_provider_api_key input.regular-text,
+.toplevel_page_open-user-map .map_styles .map_style_provider_api_key input.regular-text {
+  border-radius: 0 4px 4px 0;
+  min-height: 32px;
+}
+.oum-location_page_open-user-map-settings .map_styles .map_style_provider_api_key a,
+.toplevel_page_open-user-map .map_styles .map_style_provider_api_key a {
+  margin-left: 12px;
+}
+.oum-location_page_open-user-map-settings .map_styles .map_style_provider_notice,
+.toplevel_page_open-user-map .map_styles .map_style_provider_notice {
+  display: inline-block;
+  margin: 0 0 16px;
+  padding: 8px 10px;
+  background: #fff8e5;
+  border-left: 4px solid #dba617;
+  color: #3c434a;
+}
+.oum-location_page_open-user-map-settings .map_styles .map_style_provider_styles,
+.toplevel_page_open-user-map .map_styles .map_style_provider_styles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.oum-location_page_open-user-map-settings .map_styles label,
+.toplevel_page_open-user-map .map_styles label {
+  width: 188px;
+  height: 188px;
+  overflow: hidden;
+  border: 4px solid #fff;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+.oum-location_page_open-user-map-settings .map_styles label input,
+.toplevel_page_open-user-map .map_styles label input {
+  display: none;
+}
+.oum-location_page_open-user-map-settings .map_styles label.pro-only,
+.toplevel_page_open-user-map .map_styles label.pro-only {
+  cursor: default;
+}
+.oum-location_page_open-user-map-settings .map_styles label.pro:before,
+.toplevel_page_open-user-map .map_styles label.pro:before {
+  content: "PRO";
+  display: inline-block;
+  position: absolute;
+  background: #dc3232;
+  color: white;
+  right: 5px;
+  bottom: 5px;
+  padding: 0px 4px;
+  font-size: 11px;
+  border: 1px solid;
+}
+.oum-location_page_open-user-map-settings .map_styles label.checked, .oum-location_page_open-user-map-settings .map_styles label:not(.pro-only):hover,
+.toplevel_page_open-user-map .map_styles label.checked,
+.toplevel_page_open-user-map .map_styles label:not(.pro-only):hover {
+  border-color: #e82c71;
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview,
+.toplevel_page_open-user-map .map_styles label .map_style_preview {
+  width: 188px;
+  height: 188px;
+  position: relative;
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview > div,
+.toplevel_page_open-user-map .map_styles label .map_style_preview > div {
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  padding: 5px;
+  background: #fff;
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview.vector,
+.toplevel_page_open-user-map .map_styles label .map_style_preview.vector {
+  background-image: url("images/map_style_custom_image.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview.vector::after,
+.toplevel_page_open-user-map .map_styles label .map_style_preview.vector::after {
+  content: "VECTOR";
+  display: inline-block;
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  background: #2271b1;
+  color: #fff;
+  padding: 2px 3px;
+  font-size: 10px;
+  line-height: 13px;
+  border-radius: 2px;
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style="OpenFreeMap.liberty"],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style="OpenFreeMap.liberty"] {
+  background-image: url("images/map_style_OpenFreeMap.liberty.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style="OpenFreeMap.bright"],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style="OpenFreeMap.bright"] {
+  background-image: url("images/map_style_OpenFreeMap.bright.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style="OpenFreeMap.positron"],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style="OpenFreeMap.positron"] {
+  background-image: url("images/map_style_OpenFreeMap.positron.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style="OpenFreeMap.dark"],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style="OpenFreeMap.dark"] {
+  background-image: url("images/map_style_OpenFreeMap.dark.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style="OpenFreeMap.fiord"],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style="OpenFreeMap.fiord"] {
+  background-image: url("images/map_style_OpenFreeMap.fiord.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style="Stadia.StamenTonerLite"],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style="Stadia.StamenTonerLite"] {
+  background-image: url("images/map_style_Stamen.TonerLite.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style="Esri.WorldStreetMap"],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style="Esri.WorldStreetMap"] {
+  background-image: url("images/map_style_Esri.WorldStreetMap.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style="OpenStreetMap.Mapnik"],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style="OpenStreetMap.Mapnik"] {
+  background-image: url("images/map_style_OpenStreetMap.Mapnik.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style="OpenStreetMap.DE"],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style="OpenStreetMap.DE"] {
+  background-image: url("images/map_style_OpenStreetMap.DE.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style="CartoDB.Positron"],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style="CartoDB.Positron"] {
+  background-image: url("images/map_style_CartoDB.Positron.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style="CartoDB.DarkMatter"],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style="CartoDB.DarkMatter"] {
+  background-image: url("images/map_style_CartoDB.DarkMatter.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style="Esri.WorldImagery"],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style="Esri.WorldImagery"] {
+  background-image: url("images/map_style_Esri.WorldImagery.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style=Custom1],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style=Custom1] {
+  background-image: url("images/map_style_Custom1.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style=Custom2],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style=Custom2] {
+  background-image: url("images/map_style_Custom2.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style=Custom3],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style=Custom3] {
+  background-image: url("images/map_style_Custom3.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style="MapBox.streets"],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style="MapBox.streets"] {
+  background-image: url("images/map_style_MapBox.streets.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style="MapBox.outdoors"],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style="MapBox.outdoors"] {
+  background-image: url("images/map_style_MapBox.outdoors.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style="MapBox.light"],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style="MapBox.light"] {
+  background-image: url("images/map_style_MapBox.light.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style="MapBox.dark"],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style="MapBox.dark"] {
+  background-image: url("images/map_style_MapBox.dark.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style="MapBox.satellite"],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style="MapBox.satellite"] {
+  background-image: url("images/map_style_MapBox.satellite.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style="MapBox.satellite-streets"],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style="MapBox.satellite-streets"] {
+  background-image: url("images/map_style_MapBox.satellite-streets.png");
+}
+.oum-location_page_open-user-map-settings .map_styles label .map_style_preview[data-style=CustomImage],
+.toplevel_page_open-user-map .map_styles label .map_style_preview[data-style=CustomImage] {
+  background-image: url("images/map_style_custom_image.png");
+}
+.oum-location_page_open-user-map-settings .wrap-custom-image-settings,
+.toplevel_page_open-user-map .wrap-custom-image-settings {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f9f9f9;
+}
+.oum-location_page_open-user-map-settings .wrap-custom-image-settings .custom-image-upload-section,
+.oum-location_page_open-user-map-settings .wrap-custom-image-settings .image-bounds-section,
+.oum-location_page_open-user-map-settings .wrap-custom-image-settings .image-display-options,
+.toplevel_page_open-user-map .wrap-custom-image-settings .custom-image-upload-section,
+.toplevel_page_open-user-map .wrap-custom-image-settings .image-bounds-section,
+.toplevel_page_open-user-map .wrap-custom-image-settings .image-display-options {
+  margin-bottom: 25px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #ffffff;
+}
+.oum-location_page_open-user-map-settings .wrap-custom-image-settings .custom-image-upload-section h5,
+.oum-location_page_open-user-map-settings .wrap-custom-image-settings .image-bounds-section h5,
+.oum-location_page_open-user-map-settings .wrap-custom-image-settings .image-display-options h5,
+.toplevel_page_open-user-map .wrap-custom-image-settings .custom-image-upload-section h5,
+.toplevel_page_open-user-map .wrap-custom-image-settings .image-bounds-section h5,
+.toplevel_page_open-user-map .wrap-custom-image-settings .image-display-options h5 {
+  margin-top: 0;
+}
+.oum-location_page_open-user-map-settings .wrap-custom-image-settings .image-display-options,
+.toplevel_page_open-user-map .wrap-custom-image-settings .image-display-options {
+  margin-bottom: 0;
+}
+.oum-location_page_open-user-map-settings .wrap-custom-image-settings .custom-image-hide-tiles-option,
+.toplevel_page_open-user-map .wrap-custom-image-settings .custom-image-hide-tiles-option {
+  margin-bottom: 20px;
+}
+.oum-location_page_open-user-map-settings .wrap-custom-image-settings .custom-image-hide-tiles-option .description,
+.toplevel_page_open-user-map .wrap-custom-image-settings .custom-image-hide-tiles-option .description {
+  margin-top: 5px;
+}
+.oum-location_page_open-user-map-settings .wrap-custom-image-settings .custom-image-clickable-option,
+.toplevel_page_open-user-map .wrap-custom-image-settings .custom-image-clickable-option {
+  margin-bottom: 20px;
+}
+.oum-location_page_open-user-map-settings .wrap-custom-image-settings .custom-image-clickable-option .description,
+.toplevel_page_open-user-map .wrap-custom-image-settings .custom-image-clickable-option .description {
+  margin-top: 5px;
+}
+.oum-location_page_open-user-map-settings .wrap-custom-image-settings #image_preview img,
+.toplevel_page_open-user-map .wrap-custom-image-settings #image_preview img {
+  max-width: 300px;
+  max-height: 200px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.oum-location_page_open-user-map-settings .wrap-custom-image-settings .image-bounds-section .grid-inputs,
+.toplevel_page_open-user-map .wrap-custom-image-settings .image-bounds-section .grid-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+.oum-location_page_open-user-map-settings .wrap-custom-image-settings .image-bounds-section .grid-inputs .input-group label,
+.toplevel_page_open-user-map .wrap-custom-image-settings .image-bounds-section .grid-inputs .input-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+.oum-location_page_open-user-map-settings .wrap-custom-image-settings .image-bounds-section .grid-inputs .input-group input,
+.toplevel_page_open-user-map .wrap-custom-image-settings .image-bounds-section .grid-inputs .input-group input {
+  width: 100%;
+}
+.oum-location_page_open-user-map-settings .wrap-custom-image-settings .image-bounds-section .grid-inputs .input-group input.oum-invalid-bounds,
+.toplevel_page_open-user-map .wrap-custom-image-settings .image-bounds-section .grid-inputs .input-group input.oum-invalid-bounds {
+  border-color: #dc3232;
+  background-color: #fff5f5;
+}
+.oum-location_page_open-user-map-settings .wrap-custom-image-settings .image-bounds-section .grid-inputs .input-group input.oum-invalid-bounds:focus,
+.toplevel_page_open-user-map .wrap-custom-image-settings .image-bounds-section .grid-inputs .input-group input.oum-invalid-bounds:focus {
+  border-color: #dc3232;
+  box-shadow: 0 0 0 1px #dc3232;
+}
+.oum-location_page_open-user-map-settings .wrap-custom-image-settings .image-bounds-section .grid-inputs .input-group small,
+.toplevel_page_open-user-map .wrap-custom-image-settings .image-bounds-section .grid-inputs .input-group small {
+  color: #666;
+  font-size: 12px;
+}
+.oum-location_page_open-user-map-settings .marker_icons,
+.toplevel_page_open-user-map .marker_icons {
+  display: flex;
+  flex-wrap: wrap;
+}
+.oum-location_page_open-user-map-settings .marker_icons label,
+.toplevel_page_open-user-map .marker_icons label {
+  width: 50px;
+  height: 82px;
+  overflow: hidden;
+  border: 4px solid white;
+  margin: 5px;
+  position: relative;
+}
+.oum-location_page_open-user-map-settings .marker_icons label input,
+.toplevel_page_open-user-map .marker_icons label input {
+  display: none;
+}
+.oum-location_page_open-user-map-settings .marker_icons label.pro-only,
+.toplevel_page_open-user-map .marker_icons label.pro-only {
+  cursor: default;
+  overflow: visible;
+}
+.oum-location_page_open-user-map-settings .marker_icons label.pro-only:before,
+.toplevel_page_open-user-map .marker_icons label.pro-only:before {
+  content: "PRO";
+  display: inline-block;
+  position: absolute;
+  background: #dc3232;
+  color: white;
+  right: 0;
+  top: 0;
+  font-size: 11px;
+  text-align: center;
+  padding: 0px 4px;
+}
+.oum-location_page_open-user-map-settings .marker_icons label.pro-only .oum-gopro-text,
+.toplevel_page_open-user-map .marker_icons label.pro-only .oum-gopro-text {
+  position: absolute;
+  top: 15px;
+  right: -130px;
+  width: 115px;
+}
+.oum-location_page_open-user-map-settings .marker_icons label.pro:before,
+.toplevel_page_open-user-map .marker_icons label.pro:before {
+  content: "PRO";
+  display: inline-block;
+  position: absolute;
+  background: #dc3232;
+  color: white;
+  right: 0;
+  top: 0;
+  font-size: 11px;
+  text-align: center;
+  padding: 0px 4px;
+}
+.oum-location_page_open-user-map-settings .marker_icons label.checked, .oum-location_page_open-user-map-settings .marker_icons label:not(.pro-only):hover,
+.toplevel_page_open-user-map .marker_icons label.checked,
+.toplevel_page_open-user-map .marker_icons label:not(.pro-only):hover {
+  border-color: #e82c71;
+}
+.oum-location_page_open-user-map-settings .marker_icons label .marker_icon_preview,
+.toplevel_page_open-user-map .marker_icons label .marker_icon_preview {
+  width: 50px;
+  height: 82px;
+  background-position: center center;
+  background-size: 50%;
+  background-repeat: no-repeat;
+}
+.oum-location_page_open-user-map-settings .marker_icons label .marker_icon_preview[data-style=default],
+.toplevel_page_open-user-map .marker_icons label .marker_icon_preview[data-style=default] {
+  background-image: url("../src/leaflet/images/marker-icon_default-2x.png");
+}
+.oum-location_page_open-user-map-settings .marker_icons label .marker_icon_preview[data-style=custom1],
+.toplevel_page_open-user-map .marker_icons label .marker_icon_preview[data-style=custom1] {
+  background-image: url("../src/leaflet/images/marker-icon_custom1-2x.png");
+}
+.oum-location_page_open-user-map-settings .marker_icons label .marker_icon_preview[data-style=custom2],
+.toplevel_page_open-user-map .marker_icons label .marker_icon_preview[data-style=custom2] {
+  background-image: url("../src/leaflet/images/marker-icon_custom2-2x.png");
+}
+.oum-location_page_open-user-map-settings .marker_icons label .marker_icon_preview[data-style=custom3],
+.toplevel_page_open-user-map .marker_icons label .marker_icon_preview[data-style=custom3] {
+  background-image: url("../src/leaflet/images/marker-icon_custom3-2x.png");
+}
+.oum-location_page_open-user-map-settings .marker_icons label .marker_icon_preview[data-style=custom4],
+.toplevel_page_open-user-map .marker_icons label .marker_icon_preview[data-style=custom4] {
+  background-image: url("../src/leaflet/images/marker-icon_custom4-2x.png");
+}
+.oum-location_page_open-user-map-settings .marker_icons label .marker_icon_preview[data-style=custom5],
+.toplevel_page_open-user-map .marker_icons label .marker_icon_preview[data-style=custom5] {
+  background-image: url("../src/leaflet/images/marker-icon_custom5-2x.png");
+}
+.oum-location_page_open-user-map-settings .marker_icons label .marker_icon_preview[data-style=custom6],
+.toplevel_page_open-user-map .marker_icons label .marker_icon_preview[data-style=custom6] {
+  background-image: url("../src/leaflet/images/marker-icon_custom6-2x.png");
+}
+.oum-location_page_open-user-map-settings .marker_icons label .marker_icon_preview[data-style=custom7],
+.toplevel_page_open-user-map .marker_icons label .marker_icon_preview[data-style=custom7] {
+  background-image: url("../src/leaflet/images/marker-icon_custom7-2x.png");
+}
+.oum-location_page_open-user-map-settings .marker_icons label .marker_icon_preview[data-style=custom8],
+.toplevel_page_open-user-map .marker_icons label .marker_icon_preview[data-style=custom8] {
+  background-image: url("../src/leaflet/images/marker-icon_custom8-2x.png");
+}
+.oum-location_page_open-user-map-settings .marker_icons label .marker_icon_preview[data-style=custom9],
+.toplevel_page_open-user-map .marker_icons label .marker_icon_preview[data-style=custom9] {
+  background-image: url("../src/leaflet/images/marker-icon_custom9-2x.png");
+}
+.oum-location_page_open-user-map-settings .marker_icons label .marker_icon_preview[data-style=custom10],
+.toplevel_page_open-user-map .marker_icons label .marker_icon_preview[data-style=custom10] {
+  background-image: url("../src/leaflet/images/marker-icon_custom10-2x.png");
+}
+.oum-location_page_open-user-map-settings .marker_icons label .marker_icon_preview[data-style=user1],
+.toplevel_page_open-user-map .marker_icons label .marker_icon_preview[data-style=user1] {
+  background-image: url("../src/leaflet/images/marker-icon_user1-2x.png");
+}
+.oum-location_page_open-user-map-settings .marker_icons label.label_marker_user_icon,
+.toplevel_page_open-user-map .marker_icons label.label_marker_user_icon {
+  width: 170px;
+}
+.oum-location_page_open-user-map-settings .marker_icons label.label_marker_user_icon .icon_upload,
+.toplevel_page_open-user-map .marker_icons label.label_marker_user_icon .icon_upload {
+  position: absolute;
+  width: 115px;
+  right: 3px;
+  top: 62%;
+  transform: translateY(-50%);
+}
+.oum-location_page_open-user-map-settings .marker_icons label.label_marker_user_icon .icon_upload .button,
+.toplevel_page_open-user-map .marker_icons label.label_marker_user_icon .icon_upload .button {
+  cursor: pointer;
+  line-height: 1.5;
+  padding: 5px;
+  text-align: center;
+  white-space: pre-wrap;
+}
+.oum-location_page_open-user-map-settings .marker_icons label.label_marker_user_icon .icon_upload .description,
+.toplevel_page_open-user-map .marker_icons label.label_marker_user_icon .icon_upload .description {
+  font-style: italic;
+  font-size: 11px;
+  opacity: 0.8;
+}
+.oum-location_page_open-user-map-settings .wrapper_marker_multicategories_icon,
+.toplevel_page_open-user-map .wrapper_marker_multicategories_icon {
+  width: 170px;
+  height: 82px;
+  position: relative;
+}
+.oum-location_page_open-user-map-settings .wrapper_marker_multicategories_icon input,
+.toplevel_page_open-user-map .wrapper_marker_multicategories_icon input {
+  display: none;
+}
+.oum-location_page_open-user-map-settings .wrapper_marker_multicategories_icon .marker_icon_preview,
+.toplevel_page_open-user-map .wrapper_marker_multicategories_icon .marker_icon_preview {
+  height: 50px;
+  width: 50px;
+  background-position: center center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.oum-location_page_open-user-map-settings .wrapper_marker_multicategories_icon .icon_upload,
+.toplevel_page_open-user-map .wrapper_marker_multicategories_icon .icon_upload {
+  position: absolute;
+  width: 225px;
+  left: 60px;
+  top: 8px;
+}
+.oum-location_page_open-user-map-settings .wrapper_marker_multicategories_icon .icon_upload .button,
+.toplevel_page_open-user-map .wrapper_marker_multicategories_icon .icon_upload .button {
+  cursor: pointer;
+  line-height: 1.5;
+  padding: 5px;
+  text-align: center;
+  white-space: pre-wrap;
+}
+.oum-location_page_open-user-map-settings .wrapper_marker_multicategories_icon .icon_upload .description,
+.toplevel_page_open-user-map .wrapper_marker_multicategories_icon .icon_upload .description {
+  font-style: italic;
+  font-size: 11px;
+  opacity: 0.8;
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap,
+.toplevel_page_open-user-map .geo-coordinates-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap .map-wrap,
+.toplevel_page_open-user-map .geo-coordinates-wrap .map-wrap {
+  position: relative;
+  flex: 0 0 520px;
+  aspect-ratio: 1.77;
+  margin-bottom: auto;
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap .map-wrap #mapGetInitial,
+.toplevel_page_open-user-map .geo-coordinates-wrap .map-wrap #mapGetInitial {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap .map-wrap #mapGetInitial .leaflet-control-attribution,
+.toplevel_page_open-user-map .geo-coordinates-wrap .map-wrap #mapGetInitial .leaflet-control-attribution {
+  display: none;
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap .map-wrap #mapGetInitial .leaflet-control-geosearch.leaflet-geosearch-bar form,
+.toplevel_page_open-user-map .geo-coordinates-wrap .map-wrap #mapGetInitial .leaflet-control-geosearch.leaflet-geosearch-bar form {
+  background-image: url(images/ico_search_address_2.png);
+  background-position: right 1px;
+  background-repeat: no-repeat;
+  background-size: 30px;
+  background-color: #fff;
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap .map-wrap #mapGetInitial .leaflet-control-geosearch.leaflet-geosearch-bar form input[type=text],
+.toplevel_page_open-user-map .geo-coordinates-wrap .map-wrap #mapGetInitial .leaflet-control-geosearch.leaflet-geosearch-bar form input[type=text] {
+  width: calc(100% - 35px);
+  padding: 9px 13px 9px 0;
+  min-width: unset;
+  min-height: unset;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  outline: none !important;
+  font-size: 14px;
+}
+@media screen and (max-width: 768px) {
+  .oum-location_page_open-user-map-settings .geo-coordinates-wrap .map-wrap #mapGetInitial .leaflet-control-geosearch.leaflet-geosearch-bar form input[type=text],
+  .toplevel_page_open-user-map .geo-coordinates-wrap .map-wrap #mapGetInitial .leaflet-control-geosearch.leaflet-geosearch-bar form input[type=text] {
+    font-size: 16px;
+  }
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap .map-wrap #mapGetInitial .leaflet-control-geosearch.leaflet-geosearch-bar form button.reset,
+.toplevel_page_open-user-map .geo-coordinates-wrap .map-wrap #mapGetInitial .leaflet-control-geosearch.leaflet-geosearch-bar form button.reset {
+  right: 25px;
+  background-color: #fff;
+  color: black;
+  margin: 0;
+  padding: 0 8px;
+  border: none;
+  box-shadow: none;
+  margin: 0;
+  outline: none;
+  font-size: 14px;
+  opacity: 0.5;
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap .map-wrap #mapGetInitial .leaflet-control-geosearch.leaflet-geosearch-bar form button.reset:hover,
+.toplevel_page_open-user-map .geo-coordinates-wrap .map-wrap #mapGetInitial .leaflet-control-geosearch.leaflet-geosearch-bar form button.reset:hover {
+  opacity: 1;
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap .map-wrap #mapGetInitial a,
+.toplevel_page_open-user-map .geo-coordinates-wrap .map-wrap #mapGetInitial a {
+  text-decoration: none !important;
+  padding: 0;
+  margin: 0;
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap .map-wrap #mapGetInitial .leaflet-tile-pane img.leaflet-tile,
+.toplevel_page_open-user-map .geo-coordinates-wrap .map-wrap #mapGetInitial .leaflet-tile-pane img.leaflet-tile {
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: unset;
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap .map-wrap #mapGetInitial.map-style_Custom1 .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile,
+.toplevel_page_open-user-map .geo-coordinates-wrap .map-wrap #mapGetInitial.map-style_Custom1 .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+  filter: saturate(3);
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap .map-wrap #mapGetInitial.map-style_Custom2 .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile,
+.toplevel_page_open-user-map .geo-coordinates-wrap .map-wrap #mapGetInitial.map-style_Custom2 .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+  filter: sepia(1) invert(0) saturate(28) hue-rotate(-53deg);
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap .map-wrap #mapGetInitial.map-style_Custom2 .leaflet-tile-pane .leaflet-layer:nth-child(2) .leaflet-tile,
+.toplevel_page_open-user-map .geo-coordinates-wrap .map-wrap #mapGetInitial.map-style_Custom2 .leaflet-tile-pane .leaflet-layer:nth-child(2) .leaflet-tile {
+  filter: sepia(0) contrast(1) invert(1) brightness(2);
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap .map-wrap #mapGetInitial.map-style_Custom3 .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile,
+.toplevel_page_open-user-map .geo-coordinates-wrap .map-wrap #mapGetInitial.map-style_Custom3 .leaflet-tile-pane .leaflet-layer:first-of-type .leaflet-tile {
+  filter: sepia(1) invert(1) saturate(100) brightness(1) hue-rotate(-300deg);
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap .map-wrap #mapGetInitial.map-style_Custom3 .leaflet-tile-pane .leaflet-layer:nth-child(2) .leaflet-tile,
+.toplevel_page_open-user-map .geo-coordinates-wrap .map-wrap #mapGetInitial.map-style_Custom3 .leaflet-tile-pane .leaflet-layer:nth-child(2) .leaflet-tile {
+  filter: sepia(0) contrast(1) invert(1) brightness(2);
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap .input-wrap,
+.toplevel_page_open-user-map .geo-coordinates-wrap .input-wrap {
+  width: 520px;
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap .input-wrap .latlng-wrap,
+.toplevel_page_open-user-map .geo-coordinates-wrap .input-wrap .latlng-wrap {
+  display: flex;
+  gap: 15px;
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap .input-wrap .latlng-wrap > div,
+.toplevel_page_open-user-map .geo-coordinates-wrap .input-wrap .latlng-wrap > div {
+  width: 100px;
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap .input-wrap .latlng-wrap > div input,
+.toplevel_page_open-user-map .geo-coordinates-wrap .input-wrap .latlng-wrap > div input {
+  width: 100%;
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap .input-wrap .geo-coordinates-hint,
+.toplevel_page_open-user-map .geo-coordinates-wrap .input-wrap .geo-coordinates-hint {
+  box-sizing: border-box;
+  padding: 15px;
+  border: 1px solid lightgrey;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  background-color: floralwhite;
+}
+.oum-location_page_open-user-map-settings .geo-coordinates-wrap .input-wrap .additional-map-settings input[type=number],
+.toplevel_page_open-user-map .geo-coordinates-wrap .input-wrap .additional-map-settings input[type=number] {
+  max-width: 70px;
+}
+@media (max-width: 768px) {
+  .oum-location_page_open-user-map-settings .geo-coordinates-wrap,
+  .toplevel_page_open-user-map .geo-coordinates-wrap {
+    flex-direction: column;
+  }
+  .oum-location_page_open-user-map-settings .geo-coordinates-wrap .map-wrap,
+  .oum-location_page_open-user-map-settings .geo-coordinates-wrap .input-wrap,
+  .toplevel_page_open-user-map .geo-coordinates-wrap .map-wrap,
+  .toplevel_page_open-user-map .geo-coordinates-wrap .input-wrap {
+    width: 100%;
+  }
+  .oum-location_page_open-user-map-settings .geo-coordinates-wrap .input-wrap,
+  .toplevel_page_open-user-map .geo-coordinates-wrap .input-wrap {
+    padding: 0;
+  }
+}
+.oum-location_page_open-user-map-settings .oum_custom_fields_wrapper table,
+.toplevel_page_open-user-map .oum_custom_fields_wrapper table {
+  border-collapse: collapse;
+  border: 1px solid #c3c4c7;
+  margin-bottom: 15px;
+}
+.oum-location_page_open-user-map-settings .oum_custom_fields_wrapper table th,
+.oum-location_page_open-user-map-settings .oum_custom_fields_wrapper table td,
+.toplevel_page_open-user-map .oum_custom_fields_wrapper table th,
+.toplevel_page_open-user-map .oum_custom_fields_wrapper table td {
+  border: 1px solid #c3c4c7;
+  padding: 12px;
+  width: auto;
+  margin: 0;
+}
+.oum-location_page_open-user-map-settings .oum_custom_fields_wrapper table thead tr th,
+.toplevel_page_open-user-map .oum_custom_fields_wrapper table thead tr th {
+  background: #e82c71;
+  color: #fff;
+}
+.oum-location_page_open-user-map-settings .oum_custom_fields_wrapper table tbody tr td .oum-custom-field-allow-empty,
+.toplevel_page_open-user-map .oum_custom_fields_wrapper table tbody tr td .oum-custom-field-allow-empty {
+  display: block;
+  margin-top: 10px;
+}
+.oum-location_page_open-user-map-settings .oum_custom_fields_wrapper table tbody tr td .oum-custom-field-use-label-as-text,
+.toplevel_page_open-user-map .oum_custom_fields_wrapper table tbody tr td .oum-custom-field-use-label-as-text {
+  display: block;
+  margin-top: 10px;
+}
+.oum-location_page_open-user-map-settings .oum_custom_fields_wrapper table tbody tr td.actions a,
+.toplevel_page_open-user-map .oum_custom_fields_wrapper table tbody tr td.actions a {
+  text-decoration: none !important;
+  display: inline-block;
+}
+.oum-location_page_open-user-map-settings .oum_custom_fields_wrapper table tbody tr td.actions a.up, .oum-location_page_open-user-map-settings .oum_custom_fields_wrapper table tbody tr td.actions a.down,
+.toplevel_page_open-user-map .oum_custom_fields_wrapper table tbody tr td.actions a.up,
+.toplevel_page_open-user-map .oum_custom_fields_wrapper table tbody tr td.actions a.down {
+  color: green;
+}
+.oum-location_page_open-user-map-settings .oum_custom_fields_wrapper table tbody tr td.actions a.remove_button,
+.toplevel_page_open-user-map .oum_custom_fields_wrapper table tbody tr td.actions a.remove_button {
+  color: #dc3232;
+}
+.oum-location_page_open-user-map-settings input.oum-switch[type=checkbox],
+.toplevel_page_open-user-map input.oum-switch[type=checkbox] {
+  position: relative;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  appearance: none;
+  visibility: hidden;
+}
+.oum-location_page_open-user-map-settings input.oum-switch[type=checkbox] + label,
+.toplevel_page_open-user-map input.oum-switch[type=checkbox] + label {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  font-family: sans-serif;
+  font-size: 14px;
+  line-height: 23px;
+  padding-left: 50px;
+  position: relative;
+  margin-top: -18px;
+}
+.oum-location_page_open-user-map-settings input.oum-switch[type=checkbox] + label::before,
+.toplevel_page_open-user-map input.oum-switch[type=checkbox] + label::before {
+  box-sizing: border-box;
+  width: 40px;
+  height: 20px;
+  border-radius: 30px;
+  border: 2px solid #ddd;
+  background-color: #eee;
+  content: "";
+  margin-right: 15px;
+  transition: background-color 0.5s linear;
+  z-index: 5;
+  position: absolute;
+  left: 0px;
+  top: 1px;
+}
+.oum-location_page_open-user-map-settings input.oum-switch[type=checkbox] + label::after,
+.toplevel_page_open-user-map input.oum-switch[type=checkbox] + label::after {
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  border-radius: 30px;
+  background-color: #fff;
+  content: "";
+  transition: margin 0.1s linear;
+  box-shadow: 0px 0px 5px #aaa;
+  position: absolute;
+  left: 2px;
+  top: 3px;
+  z-index: 10;
+}
+.oum-location_page_open-user-map-settings input.oum-switch[type=checkbox]:checked + label::before,
+.toplevel_page_open-user-map input.oum-switch[type=checkbox]:checked + label::before {
+  background-color: #e82c71;
+}
+.oum-location_page_open-user-map-settings input.oum-switch[type=checkbox]:checked + label::after,
+.toplevel_page_open-user-map input.oum-switch[type=checkbox]:checked + label::after {
+  margin: 0 0 0 20px;
+}
+.oum-location_page_open-user-map-settings .oum-tooltip,
+.toplevel_page_open-user-map .oum-tooltip {
+  position: relative;
+  display: inline-block;
+  margin-left: 5px;
+}
+.oum-location_page_open-user-map-settings .oum-tooltip .oum-tooltip-trigger,
+.toplevel_page_open-user-map .oum-tooltip .oum-tooltip-trigger {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background: #666;
+  color: white;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 16px;
+  font-size: 11px;
+  cursor: help;
+}
+.oum-location_page_open-user-map-settings .oum-tooltip .oum-tooltip-content,
+.toplevel_page_open-user-map .oum-tooltip .oum-tooltip-content {
+  display: none;
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  min-width: 200px;
+  max-width: 300px;
+}
+.oum-location_page_open-user-map-settings .oum-tooltip .oum-tooltip-content h4,
+.toplevel_page_open-user-map .oum-tooltip .oum-tooltip-content h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+.oum-location_page_open-user-map-settings .oum-tooltip .oum-tooltip-content p,
+.toplevel_page_open-user-map .oum-tooltip .oum-tooltip-content p {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+.oum-location_page_open-user-map-settings .oum-tooltip .oum-tooltip-content a,
+.toplevel_page_open-user-map .oum-tooltip .oum-tooltip-content a {
+  color: #e82c71;
+}
+.oum-location_page_open-user-map-settings .oum-tooltip .oum-tooltip-content::after,
+.toplevel_page_open-user-map .oum-tooltip .oum-tooltip-content::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #333;
+}
+.oum-location_page_open-user-map-settings .csv_upload,
+.toplevel_page_open-user-map .csv_upload {
+  position: relative;
+}
+.oum-location_page_open-user-map-settings .csv_upload .oum-import-actions,
+.toplevel_page_open-user-map .csv_upload .oum-import-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 10px;
+}
+.oum-location_page_open-user-map-settings .csv_upload .oum-import-loading,
+.toplevel_page_open-user-map .csv_upload .oum-import-loading {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 0 1 auto;
+}
+.oum-location_page_open-user-map-settings .csv_upload .oum-import-loading.is-visible,
+.toplevel_page_open-user-map .csv_upload .oum-import-loading.is-visible {
+  display: flex;
+}
+.oum-location_page_open-user-map-settings .csv_upload .oum-import-loading .oum-spinner,
+.toplevel_page_open-user-map .csv_upload .oum-import-loading .oum-spinner {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(34, 113, 177, 0.15);
+  border-top: 2px solid #2271b1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+.oum-location_page_open-user-map-settings .csv_upload .oum-import-loading .oum-import-loading-text,
+.toplevel_page_open-user-map .csv_upload .oum-import-loading .oum-import-loading-text {
+  color: #2271b1;
+  font-style: italic;
+  white-space: nowrap;
+  animation: oum-import-text-blink 1.2s ease-in-out infinite;
+}
+.oum-location_page_open-user-map-settings .csv_upload .oum-import-loading .oum-import-loading-progress,
+.toplevel_page_open-user-map .csv_upload .oum-import-loading .oum-import-loading-progress {
+  color: #646970;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+@keyframes oum-import-text-blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+.oum-location_page_open-user-map-settings .oum-pro,
+.toplevel_page_open-user-map .oum-pro {
+  display: inline-block;
+  background: #dc3232;
+  color: white;
+  font-size: 11px;
+  text-align: center;
+  padding: 0px 4px;
+}
+.oum-location_page_open-user-map-settings .oum-gopro-tr td,
+.oum-location_page_open-user-map-settings .oum-gopro-div,
+.toplevel_page_open-user-map .oum-gopro-tr td,
+.toplevel_page_open-user-map .oum-gopro-div {
+  opacity: 0.65;
+}
+.oum-location_page_open-user-map-settings .oum-marker-categories-settings-panel,
+.toplevel_page_open-user-map .oum-marker-categories-settings-panel {
+  max-width: 740px;
+}
+.oum-location_page_open-user-map-settings .oum-marker-categories-section,
+.toplevel_page_open-user-map .oum-marker-categories-section {
+  padding: 18px 0;
+}
+.oum-location_page_open-user-map-settings .oum-marker-categories-section + .oum-marker-categories-section,
+.toplevel_page_open-user-map .oum-marker-categories-section + .oum-marker-categories-section {
+  border-top: 1px solid #dcdcde;
+}
+.oum-location_page_open-user-map-settings .oum-marker-categories-section h3,
+.toplevel_page_open-user-map .oum-marker-categories-section h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+.oum-location_page_open-user-map-settings .oum-marker-categories-section > .description,
+.toplevel_page_open-user-map .oum-marker-categories-section > .description {
+  margin: 0 0 12px;
+}
+.oum-location_page_open-user-map-settings .oum-settings-control,
+.toplevel_page_open-user-map .oum-settings-control {
+  margin-top: 18px;
+}
+.oum-location_page_open-user-map-settings .oum-settings-control > .description,
+.toplevel_page_open-user-map .oum-settings-control > .description {
+  margin: 6px 0 0 50px;
+}
+.oum-location_page_open-user-map-settings .oum-location-shapes-panel,
+.toplevel_page_open-user-map .oum-location-shapes-panel {
+  max-width: 740px;
+  border: 1px solid #dcdcde;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.oum-location_page_open-user-map-settings .oum-location-shape-row,
+.toplevel_page_open-user-map .oum-location-shape-row {
+  padding: 18px 20px;
+}
+.oum-location_page_open-user-map-settings .oum-location-shape-row + .oum-location-shape-row,
+.toplevel_page_open-user-map .oum-location-shape-row + .oum-location-shape-row {
+  border-top: 1px solid #e5e5e5;
+}
+.oum-location_page_open-user-map-settings .oum-location-shape-row.is-locked,
+.toplevel_page_open-user-map .oum-location-shape-row.is-locked {
+  opacity: 0.65;
+}
+.oum-location_page_open-user-map-settings .oum-location-shape-row > .description,
+.toplevel_page_open-user-map .oum-location-shape-row > .description {
+  margin: 4px 0 0 50px;
+}
+.oum-location_page_open-user-map-settings .oum-location-shape-title,
+.toplevel_page_open-user-map .oum-location-shape-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+.oum-location_page_open-user-map-settings .oum-category-type-icon,
+.toplevel_page_open-user-map .oum-category-type-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin: -3px 8px -6px 0;
+  color: #2c3338;
+  vertical-align: middle;
+}
+.oum-location_page_open-user-map-settings .oum-category-type-icon svg,
+.toplevel_page_open-user-map .oum-category-type-icon svg {
+  display: block;
+  width: 26px;
+  height: 26px;
+}
+.oum-location_page_open-user-map-settings .oum-category-type-icon-marker,
+.toplevel_page_open-user-map .oum-category-type-icon-marker {
+  background-image: url("../src/leaflet/images/marker-icon_custom4-2x.png");
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+.oum-location_page_open-user-map-settings .oum-location-shape-suboption,
+.toplevel_page_open-user-map .oum-location-shape-suboption {
+  margin-top: 12px;
+  margin-left: 50px;
+}
+.oum-location_page_open-user-map-settings .oum-location-shape-suboption input,
+.toplevel_page_open-user-map .oum-location-shape-suboption input {
+  vertical-align: middle;
+  margin-right: 8px;
+}
+.oum-location_page_open-user-map-settings .oum-location-shapes-note,
+.toplevel_page_open-user-map .oum-location-shapes-note {
+  max-width: 740px;
+  margin-top: 12px;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info,
+.toplevel_page_open-user-map .oum-debug-info {
+  opacity: 0.5;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info ul,
+.toplevel_page_open-user-map .oum-debug-info ul {
+  margin: 0;
+  padding: 0;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-error-config,
+.toplevel_page_open-user-map .oum-debug-info .oum-error-config {
+  margin-top: 8px;
+  max-width: 800px;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-status-badge,
+.toplevel_page_open-user-map .oum-debug-info .oum-status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  margin: 2px 4px 2px 0;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-status-badge.enabled,
+.toplevel_page_open-user-map .oum-debug-info .oum-status-badge.enabled {
+  background: #d4edda;
+  color: #28a745;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-status-badge.disabled,
+.toplevel_page_open-user-map .oum-debug-info .oum-status-badge.disabled {
+  background: #fff3cd;
+  color: #fd7e14;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-log-paths,
+.toplevel_page_open-user-map .oum-debug-info .oum-log-paths {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-left: 3px solid #6c757d;
+  font-size: 12px;
+  color: #495057;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-log-paths strong,
+.toplevel_page_open-user-map .oum-debug-info .oum-log-paths strong {
+  font-weight: 600;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-log-paths .status-icon.success,
+.toplevel_page_open-user-map .oum-debug-info .oum-log-paths .status-icon.success {
+  color: #28a745;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-log-paths .status-icon.warning,
+.toplevel_page_open-user-map .oum-debug-info .oum-log-paths .status-icon.warning {
+  color: #fd7e14;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-errors-container,
+.toplevel_page_open-user-map .oum-debug-info .oum-errors-container {
+  margin-top: 10px;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-error-alert,
+.toplevel_page_open-user-map .oum-debug-info .oum-error-alert {
+  max-width: 900px;
+  padding: 12px 16px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-error-alert.warning,
+.toplevel_page_open-user-map .oum-debug-info .oum-error-alert.warning {
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-error-alert.warning strong,
+.toplevel_page_open-user-map .oum-debug-info .oum-error-alert.warning strong {
+  color: #856404;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-error-alert.warning .source-label,
+.toplevel_page_open-user-map .oum-debug-info .oum-error-alert.warning .source-label {
+  color: #666;
+  font-size: 0.85em;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-error-alert.warning .help-text,
+.toplevel_page_open-user-map .oum-debug-info .oum-error-alert.warning .help-text {
+  color: #495057;
+  font-size: 13px;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-error-alert.warning .help-text a,
+.toplevel_page_open-user-map .oum-debug-info .oum-error-alert.warning .help-text a {
+  color: #007bff;
+  text-decoration: none;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-error-alert.warning .help-text a:hover,
+.toplevel_page_open-user-map .oum-debug-info .oum-error-alert.warning .help-text a:hover {
+  text-decoration: underline;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-error-alert.success,
+.toplevel_page_open-user-map .oum-debug-info .oum-error-alert.success {
+  background: #d4edda;
+  border-left: 4px solid #28a745;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-error-alert.success strong,
+.toplevel_page_open-user-map .oum-debug-info .oum-error-alert.success strong {
+  color: #155724;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-error-alert.success .success-text,
+.toplevel_page_open-user-map .oum-debug-info .oum-error-alert.success .success-text {
+  color: #155724;
+  font-size: 13px;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-error-alert.info,
+.toplevel_page_open-user-map .oum-debug-info .oum-error-alert.info {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-error-alert.info em,
+.toplevel_page_open-user-map .oum-debug-info .oum-error-alert.info em {
+  color: #6c757d;
+}
+.oum-location_page_open-user-map-settings .oum-debug-info .oum-error-log,
+.toplevel_page_open-user-map .oum-debug-info .oum-error-log {
+  max-width: 900px;
+  max-height: 300px;
+  overflow-x: auto;
+  overflow-y: auto;
+  background: #f8f9fa;
+  padding: 12px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.oum-location_page_open-user-map-settings #oum_searchbar_type_options,
+.toplevel_page_open-user-map #oum_searchbar_type_options {
+  display: flex;
+  flex-direction: column;
+  gap: 35px;
+  margin-top: 15px;
+}
+.oum-location_page_open-user-map-settings .oum-shortcode-docs h4,
+.toplevel_page_open-user-map .oum-shortcode-docs h4 {
+  margin-top: 25px;
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  background: #f1f1f1;
+  border-left: 4px solid #2271b1;
+  font-size: 14px;
+  font-weight: 600;
+}
+.oum-location_page_open-user-map-settings .oum-shortcode-docs .oum-attribute-table,
+.toplevel_page_open-user-map .oum-shortcode-docs .oum-attribute-table {
+  margin-bottom: 30px;
+  border-collapse: collapse;
+  border: 1px solid #e5e5e5;
+}
+.oum-location_page_open-user-map-settings .oum-shortcode-docs .oum-attribute-table th,
+.toplevel_page_open-user-map .oum-shortcode-docs .oum-attribute-table th {
+  background: #f8f8f8;
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+}
+.oum-location_page_open-user-map-settings .oum-shortcode-docs .oum-attribute-table td,
+.toplevel_page_open-user-map .oum-shortcode-docs .oum-attribute-table td {
+  vertical-align: top;
+  padding: 15px;
+  border-bottom: 1px solid #e5e5e5;
+}
+.oum-location_page_open-user-map-settings .oum-shortcode-docs .oum-attribute-table td:first-child,
+.toplevel_page_open-user-map .oum-shortcode-docs .oum-attribute-table td:first-child {
+  width: 25%;
+}
+.oum-location_page_open-user-map-settings .oum-shortcode-docs .oum-attribute-table td:nth-child(2),
+.toplevel_page_open-user-map .oum-shortcode-docs .oum-attribute-table td:nth-child(2) {
+  width: 35%;
+}
+.oum-location_page_open-user-map-settings .oum-shortcode-docs .oum-attribute-table tr:last-child td,
+.toplevel_page_open-user-map .oum-shortcode-docs .oum-attribute-table tr:last-child td {
+  border-bottom: none;
+}
+.oum-location_page_open-user-map-settings .oum-shortcode-docs .oum-attribute-table code,
+.toplevel_page_open-user-map .oum-shortcode-docs .oum-attribute-table code {
+  display: inline-block;
+  margin: 3px 0;
+  padding: 4px 8px;
+  background: #f7f7f7;
+  font-size: 12px;
+}
+.oum-location_page_open-user-map-settings .oum-shortcode-docs .oum-examples,
+.toplevel_page_open-user-map .oum-shortcode-docs .oum-examples {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 4px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+.oum-location_page_open-user-map-settings .oum-shortcode-docs .oum-examples p,
+.toplevel_page_open-user-map .oum-shortcode-docs .oum-examples p {
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+.oum-location_page_open-user-map-settings .oum-shortcode-docs .oum-examples p:first-child,
+.toplevel_page_open-user-map .oum-shortcode-docs .oum-examples p:first-child {
+  margin-top: 0;
+}
+.oum-location_page_open-user-map-settings .oum-shortcode-docs .oum-examples code,
+.toplevel_page_open-user-map .oum-shortcode-docs .oum-examples code {
+  display: block;
+  padding: 12px 15px;
+  background: #fff;
+  margin-bottom: 15px;
+  border: 1px solid #e5e5e5;
+  border-radius: 3px;
+  word-break: break-all;
+}
+.oum-location_page_open-user-map-settings .oum-pro-trial-tab,
+.toplevel_page_open-user-map .oum-pro-trial-tab {
+  background: linear-gradient(90deg, #ff9800 0%, #ffc107 100%);
+}
+.oum-location_page_open-user-map-settings #tab-pro-trial .oum-trial-cta,
+.toplevel_page_open-user-map #tab-pro-trial .oum-trial-cta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.oum-location_page_open-user-map-settings #tab-pro-trial,
+.toplevel_page_open-user-map #tab-pro-trial {
+  /* Card-style box around feature list */
+}
+.oum-location_page_open-user-map-settings #tab-pro-trial .wrap-pro-feature-list,
+.toplevel_page_open-user-map #tab-pro-trial .wrap-pro-feature-list {
+  width: 1100px;
+  max-width: 80%;
+  background: #fff;
+  border: 1px solid #ccd0d4;
+  border-radius: 8px;
+  padding: 30px;
+  margin-top: 20px;
+  margin-bottom: 500px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+.oum-location_page_open-user-map-settings #tab-pro-trial,
+.toplevel_page_open-user-map #tab-pro-trial {
+  /* Grid layout for features */
+}
+.oum-location_page_open-user-map-settings #tab-pro-trial #oum-pro-features-list,
+.toplevel_page_open-user-map #tab-pro-trial #oum-pro-features-list {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
+  gap: 30px 40px; /* row-gap | column-gap */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+@media (max-width: 1000px) {
+  .oum-location_page_open-user-map-settings #tab-pro-trial #oum-pro-features-list,
+  .toplevel_page_open-user-map #tab-pro-trial #oum-pro-features-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .oum-location_page_open-user-map-settings #tab-pro-trial #oum-pro-features-list,
+  .toplevel_page_open-user-map #tab-pro-trial #oum-pro-features-list {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+.oum-location_page_open-user-map-settings #tab-pro-trial #oum-pro-features-list::after,
+.toplevel_page_open-user-map #tab-pro-trial #oum-pro-features-list::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(0, #ffffff 0%, transparent 50%);
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  left: 0;
+}
+.oum-location_page_open-user-map-settings #tab-pro-trial #oum-pro-features-list.open::after,
+.toplevel_page_open-user-map #tab-pro-trial #oum-pro-features-list.open::after {
+  display: none;
+}
+.oum-location_page_open-user-map-settings #tab-pro-trial #oum-pro-features-list li,
+.toplevel_page_open-user-map #tab-pro-trial #oum-pro-features-list li {
+  margin: 0;
+}
+.oum-location_page_open-user-map-settings #tab-pro-trial #oum-pro-features-list li p,
+.toplevel_page_open-user-map #tab-pro-trial #oum-pro-features-list li p {
+  margin: 0;
+  padding-left: 22px;
+  position: relative;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.oum-location_page_open-user-map-settings #tab-pro-trial #oum-pro-features-list li p::before,
+.toplevel_page_open-user-map #tab-pro-trial #oum-pro-features-list li p::before {
+  content: "✅";
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.oum-location_page_open-user-map-settings #tab-pro-trial,
+.toplevel_page_open-user-map #tab-pro-trial {
+  /* Toggle visibility for hidden items */
+}
+.oum-location_page_open-user-map-settings #tab-pro-trial .hidden-feature,
+.toplevel_page_open-user-map #tab-pro-trial .hidden-feature {
+  display: none;
+}
+.oum-location_page_open-user-map-settings #tab-pro-trial,
+.toplevel_page_open-user-map #tab-pro-trial {
+  /* Show/hide link */
+}
+.oum-location_page_open-user-map-settings #tab-pro-trial .toggle-pro-feature-list-wrapper,
+.toplevel_page_open-user-map #tab-pro-trial .toggle-pro-feature-list-wrapper {
+  text-align: center;
+}
+.oum-location_page_open-user-map-settings #tab-pro-trial .toggle-pro-feature-list-wrapper #toggle-pro-feature-list,
+.toplevel_page_open-user-map #tab-pro-trial .toggle-pro-feature-list-wrapper #toggle-pro-feature-list {
+  display: inline-block;
+  font-size: 16px;
+  color: #0073aa;
+  text-decoration: none;
+  font-weight: 500;
+  margin-top: 20px;
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+.oum-location_page_open-user-map-settings #tab-pro-trial .toggle-pro-feature-list-wrapper #toggle-pro-feature-list:hover, .oum-location_page_open-user-map-settings #tab-pro-trial .toggle-pro-feature-list-wrapper #toggle-pro-feature-list:active,
+.toplevel_page_open-user-map #tab-pro-trial .toggle-pro-feature-list-wrapper #toggle-pro-feature-list:hover,
+.toplevel_page_open-user-map #tab-pro-trial .toggle-pro-feature-list-wrapper #toggle-pro-feature-list:active {
+  color: #005177;
+}
+.oum-location_page_open-user-map-settings .oum-section,
+.toplevel_page_open-user-map .oum-section {
+  margin: 20px 0;
+  padding: 20px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.oum-location_page_open-user-map-settings .oum-section h3,
+.toplevel_page_open-user-map .oum-section h3 {
+  margin-top: 0;
+  color: #333;
+}
+.oum-location_page_open-user-map-settings .oum-filter-section,
+.toplevel_page_open-user-map .oum-filter-section {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  padding: 15px;
+}
+.oum-location_page_open-user-map-settings .oum-filter-section .oum-section-header,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+.oum-location_page_open-user-map-settings .oum-filter-section .oum-section-header h4,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-header h4 {
+  margin: 0;
+  color: #333;
+}
+.oum-location_page_open-user-map-settings .oum-filter-section .oum-section-header .oum-section-controls,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-header .oum-section-controls {
+  display: flex;
+  gap: 5px;
+}
+.oum-location_page_open-user-map-settings .oum-filter-section .oum-section-header .oum-section-controls .button,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-header .oum-section-controls .button {
+  padding: 4px 8px;
+  font-size: 12px;
+  line-height: 1;
+  min-height: auto;
+  height: auto;
+}
+.oum-location_page_open-user-map-settings .oum-filter-section .oum-section-header .oum-section-controls .button.oum-move-up, .oum-location_page_open-user-map-settings .oum-filter-section .oum-section-header .oum-section-controls .button.oum-move-down,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-header .oum-section-controls .button.oum-move-up,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-header .oum-section-controls .button.oum-move-down {
+  background: #f0f0f0;
+  border-color: #ccc;
+  color: #666;
+}
+.oum-location_page_open-user-map-settings .oum-filter-section .oum-section-header .oum-section-controls .button.oum-move-up:hover, .oum-location_page_open-user-map-settings .oum-filter-section .oum-section-header .oum-section-controls .button.oum-move-down:hover,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-header .oum-section-controls .button.oum-move-up:hover,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-header .oum-section-controls .button.oum-move-down:hover {
+  background: #e0e0e0;
+  border-color: #999;
+}
+.oum-location_page_open-user-map-settings .oum-filter-section .oum-section-header .oum-section-controls .button.oum-remove-section,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-header .oum-section-controls .button.oum-remove-section {
+  background: #ff6b6b;
+  border-color: #ff5252;
+  color: #fff;
+}
+.oum-location_page_open-user-map-settings .oum-filter-section .oum-section-header .oum-section-controls .button.oum-remove-section:hover,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-header .oum-section-controls .button.oum-remove-section:hover {
+  background: #ff5252;
+  border-color: #ff1744;
+}
+.oum-location_page_open-user-map-settings .oum-filter-section .oum-section-content .form-table,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-content .form-table {
+  margin: 0;
+}
+.oum-location_page_open-user-map-settings .oum-filter-section .oum-section-content .form-table th,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-content .form-table th {
+  width: 150px;
+  padding: 10px 0;
+  font-weight: 600;
+}
+.oum-location_page_open-user-map-settings .oum-filter-section .oum-section-content .form-table td,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-content .form-table td {
+  padding: 10px 0;
+}
+.oum-location_page_open-user-map-settings .oum-filter-section .oum-section-content .form-table .description,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-content .form-table .description {
+  font-style: italic;
+  color: #666;
+  margin-top: 5px;
+  font-size: 13px;
+}
+.oum-location_page_open-user-map-settings .oum-filter-section .oum-section-content .form-table .oum-custom-field-options,
+.oum-location_page_open-user-map-settings .oum-filter-section .oum-section-content .form-table .oum-html-options,
+.oum-location_page_open-user-map-settings .oum-filter-section .oum-section-content .form-table .oum-marker-categories-options,
+.oum-location_page_open-user-map-settings .oum-filter-section .oum-section-content .form-table .oum-searchbar-options,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-content .form-table .oum-custom-field-options,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-content .form-table .oum-html-options,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-content .form-table .oum-marker-categories-options,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-content .form-table .oum-searchbar-options {
+  display: none;
+}
+.oum-location_page_open-user-map-settings .oum-filter-section .oum-section-content .form-table .oum-custom-field-options.active,
+.oum-location_page_open-user-map-settings .oum-filter-section .oum-section-content .form-table .oum-html-options.active,
+.oum-location_page_open-user-map-settings .oum-filter-section .oum-section-content .form-table .oum-marker-categories-options.active,
+.oum-location_page_open-user-map-settings .oum-filter-section .oum-section-content .form-table .oum-searchbar-options.active,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-content .form-table .oum-custom-field-options.active,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-content .form-table .oum-html-options.active,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-content .form-table .oum-marker-categories-options.active,
+.toplevel_page_open-user-map .oum-filter-section .oum-section-content .form-table .oum-searchbar-options.active {
+  display: table-row;
+}
+.oum-location_page_open-user-map-settings .oum-filter-sections-container,
+.toplevel_page_open-user-map .oum-filter-sections-container {
+  border: 2px dashed #c3c4c7;
+  border-radius: 8px;
+  padding: 20px;
+  background: #fafafa;
+  margin: 15px 0;
+  max-width: 800px;
+  transition: all 0.2s ease;
+}
+.oum-location_page_open-user-map-settings .oum-filter-sections-container:hover,
+.toplevel_page_open-user-map .oum-filter-sections-container:hover {
+  border-color: #8c8f94;
+  background: #f6f7f7;
+}
+.oum-location_page_open-user-map-settings .oum-filter-sections-container .oum-af-feature-required-notice,
+.toplevel_page_open-user-map .oum-filter-sections-container .oum-af-feature-required-notice {
+  font-style: italic;
+}
+.oum-location_page_open-user-map-settings .oum-filter-sections-container .oum-filter-sections-header,
+.toplevel_page_open-user-map .oum-filter-sections-container .oum-filter-sections-header {
+  margin-bottom: 20px;
+}
+.oum-location_page_open-user-map-settings .oum-filter-sections-container .oum-filter-sections-header strong,
+.toplevel_page_open-user-map .oum-filter-sections-container .oum-filter-sections-header strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 16px;
+  color: #1d2327;
+}
+.oum-location_page_open-user-map-settings .oum-filter-sections-container .oum-filter-sections-header .description,
+.toplevel_page_open-user-map .oum-filter-sections-container .oum-filter-sections-header .description {
+  margin: 0;
+  font-size: 14px;
+  color: #646970;
+}
+.oum-location_page_open-user-map-settings .oum-filter-sections-container .oum-filter-sections-header .description + .description,
+.toplevel_page_open-user-map .oum-filter-sections-container .oum-filter-sections-header .description + .description {
+  margin-top: 8px;
+}
+.oum-location_page_open-user-map-settings .oum-filter-sections-container .oum-filter-sections-footer,
+.toplevel_page_open-user-map .oum-filter-sections-container .oum-filter-sections-footer {
+  margin-top: 20px;
+  text-align: left;
+}
+.oum-location_page_open-user-map-settings #oum-advanced-filter-sections,
+.toplevel_page_open-user-map #oum-advanced-filter-sections {
+  margin-bottom: 20px;
+}
+.oum-location_page_open-user-map-settings #oum-advanced-filter-sections .oum-filter-section,
+.toplevel_page_open-user-map #oum-advanced-filter-sections .oum-filter-section {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.oum-location_page_open-user-map-settings #oum-advanced-filter-sections .oum-filter-section .oum-section-header,
+.toplevel_page_open-user-map #oum-advanced-filter-sections .oum-filter-section .oum-section-header {
+  background: #f8f9fa;
+  padding: 12px 15px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 6px 6px 0 0;
+}
+.oum-location_page_open-user-map-settings #oum-advanced-filter-sections .oum-filter-section .oum-section-header h4,
+.toplevel_page_open-user-map #oum-advanced-filter-sections .oum-filter-section .oum-section-header h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1d2327;
+}
+.oum-location_page_open-user-map-settings #oum-advanced-filter-sections .oum-filter-section .oum-section-header .oum-section-controls,
+.toplevel_page_open-user-map #oum-advanced-filter-sections .oum-filter-section .oum-section-header .oum-section-controls {
+  display: flex;
+  gap: 5px;
+}
+.oum-location_page_open-user-map-settings #oum-advanced-filter-sections .oum-filter-section .oum-section-header .oum-section-controls .button,
+.toplevel_page_open-user-map #oum-advanced-filter-sections .oum-filter-section .oum-section-header .oum-section-controls .button {
+  padding: 4px 8px;
+  font-size: 12px;
+  line-height: 1;
+  min-height: auto;
+  border-radius: 3px;
+}
+.oum-location_page_open-user-map-settings #oum-add-filter-section,
+.toplevel_page_open-user-map #oum-add-filter-section {
+  margin-top: 10px;
+}
+
+.open-user-map .box-wrap .map-wrap .leaflet-map.oum-custom-image-click-through .leaflet-image-layer,
+.open-user-map .box-wrap .map-wrap .leaflet-map.oum-custom-image-click-through .leaflet-image-layer *,
+.leaflet-map.oum-custom-image-click-through .leaflet-image-layer,
+.leaflet-map.oum-custom-image-click-through .leaflet-image-layer * {
+  pointer-events: none;
+}
+
+.wp-block.wp-block-open-user-map-map,
+.elementor-editor-active .elementor-widget-open_user_map_widget,
+.elementor-editor-preview .elementor-widget-open_user_map_widget {
+  background: url(images/block-bg.jpg) top center no-repeat;
+  background-size: cover;
+}
+.wp-block.wp-block-open-user-map-map .hint,
+.elementor-editor-active .elementor-widget-open_user_map_widget .hint,
+.elementor-editor-preview .elementor-widget-open_user_map_widget .hint {
+  overflow: hidden;
+  backdrop-filter: blur(2px);
+  position: relative;
+  padding: 50px 40px;
+  text-align: left;
+  color: white;
+  border: 6px solid #fff;
+  box-shadow: 0 0 1px 0px #008fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.wp-block.wp-block-open-user-map-map .hint h5,
+.elementor-editor-active .elementor-widget-open_user_map_widget .hint h5,
+.elementor-editor-preview .elementor-widget-open_user_map_widget .hint h5 {
+  font-size: 36px;
+  font-weight: 900;
+  margin: 0;
+  padding: 0;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.wp-block.wp-block-open-user-map-map .hint h5::before,
+.elementor-editor-active .elementor-widget-open_user_map_widget .hint h5::before,
+.elementor-editor-preview .elementor-widget-open_user_map_widget .hint h5::before {
+  content: "";
+  display: block;
+  width: 80px;
+  height: 80px;
+  background: url(images/icon-256x256.png) center center no-repeat;
+  background-size: cover;
+  border: 5px solid #fff;
+  opacity: 0.8;
+}
+.wp-block.wp-block-open-user-map-map .hint p,
+.elementor-editor-active .elementor-widget-open_user_map_widget .hint p,
+.elementor-editor-preview .elementor-widget-open_user_map_widget .hint p {
+  font-size: 17px;
+}
+.wp-block.wp-block-open-user-map-map .hint .components-button,
+.elementor-editor-active .elementor-widget-open_user_map_widget .hint .components-button,
+.elementor-editor-preview .elementor-widget-open_user_map_widget .hint .components-button {
+  margin: 5px;
+}
+.wp-block.wp-block-open-user-map-map .hint .components-button.is-primary,
+.elementor-editor-active .elementor-widget-open_user_map_widget .hint .components-button.is-primary,
+.elementor-editor-preview .elementor-widget-open_user_map_widget .hint .components-button.is-primary {
+  color: #fff;
+  border: 1px solid;
+}
+.wp-block.wp-block-open-user-map-map .hint .components-button.is-secondary,
+.elementor-editor-active .elementor-widget-open_user_map_widget .hint .components-button.is-secondary,
+.elementor-editor-preview .elementor-widget-open_user_map_widget .hint .components-button.is-secondary {
+  color: #fff;
+  box-shadow: none;
+  border: 1px solid;
+}
+
+.oum-image-upload-wrap {
+  margin-bottom: 20px;
+}
+.oum-image-upload-wrap .oum-image-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+  min-height: 50px;
+  padding: 10px;
+  border: 2px dashed #ddd;
+  border-radius: 4px;
+}
+.oum-image-upload-wrap .oum-image-preview-grid.dragover {
+  background: #f5f5f5;
+  border-color: #999;
+}
+.oum-image-upload-wrap .oum-image-preview-grid .image-preview-item {
+  position: relative;
+  aspect-ratio: 1;
+  background-size: cover;
+  background-position: center;
+  border-radius: 4px;
+  cursor: grab;
+}
+.oum-image-upload-wrap .oum-image-preview-grid .image-preview-item.dragging {
+  opacity: 0.5;
+}
+.oum-image-upload-wrap .oum-image-preview-grid .image-preview-item .remove-image {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  color: #666;
+}
+.oum-image-upload-wrap .oum-image-preview-grid .image-preview-item .remove-image:hover {
+  background: #fff;
+  color: #000;
+}
+.oum-image-upload-wrap input[type=file] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 5px;
+}
+.oum-image-upload-wrap .oum-image-upload-description {
+  font-size: 12px;
+  color: #666;
+}/*# sourceMappingURL=style.css.map */
