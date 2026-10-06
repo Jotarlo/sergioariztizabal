@@ -1,0 +1,6 @@
+/* Reencuadra la foto horizontal cuando se recorta para pantallas verticales. */
+@media (max-width: 580px) {
+	.sa-concert-agenda {
+		background-position: 30% center;
+	}
+}
