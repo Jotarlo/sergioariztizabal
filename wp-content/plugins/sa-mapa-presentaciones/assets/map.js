@@ -1,7 +1,5 @@
 (function () {
-  /* ====== AGREGA AQUÍ CADA PRESENTACIÓN NUEVA ======
-     m: municipio | d: departamento | fotos: URLs de imágenes (opcional) | g: enlace a la galería (opcional)
-     Si el mismo municipio se repite, sus fotos se juntan. */
+  /* Las presentaciones se administran desde el menú «Mapa presentaciones» de WordPress. */
   var CFG = window.SA_MAPA || { items: [] };
   var PRESENTACIONES = CFG.items;
   var DATA_URL = CFG.dataUrl;
@@ -12,8 +10,9 @@
   var byMuni = {}, deptos = {};
   zoomable(svg); zoomable(dsvg);
   PRESENTACIONES.forEach(function (p) {
-    var o = byMuni[n(p.d) + '|' + n(p.k || p.m)] = byMuni[n(p.d) + '|' + n(p.k || p.m)] || { m: p.m, fotos: [], g: p.g };
-    o.fotos = o.fotos.concat(p.fotos || []);
+    var o = byMuni[n(p.d) + '|' + n(p.k || p.m)] = byMuni[n(p.d) + '|' + n(p.k || p.m)] || { m: p.m, gals: [], links: [] };
+    (p.gals || []).forEach(function (x) { if (o.gals.indexOf(x) < 0) o.gals.push(x); });
+    o.links = o.links.concat(p.links || []);
     deptos[n(p.d)] = 1;
   });
 
@@ -131,21 +130,58 @@
   }
   function show(box, titulo) { box.querySelector('h3').textContent = titulo; box.classList.add('open'); }
   [modal, photos].forEach(function (m) { m.addEventListener('click', function (e) {
-    if (e.target === m || e.target.className === 'x') m.classList.remove('open');
+    if (e.target === m || e.target.className === 'x' || (m === photos && /^(vw|vm)$/.test(e.target.className))) m.classList.remove('open');
   }); });
 
-  function openPhotos(o) {
-    var g = photos.querySelector('.g');
-    g.innerHTML = '';
-    o.fotos.forEach(function (u) {
-      var a = document.createElement('a'), i = document.createElement('img');
-      a.href = u; a.target = '_blank'; i.src = u; i.loading = 'lazy'; i.alt = o.m;
-      a.appendChild(i); g.appendChild(a);
-    });
-    if (!o.fotos.length) g.innerHTML = '<p>Fotos próximamente.</p>';
-    photos.querySelector('.al').innerHTML = (o.g && CFG.showAlbum !== false) ? '<a class="gl" href="' + o.g + '">Ver álbum completo →</a>' : '';
-    show(photos, o.m);
+  /* ---------- Visor de fotos: todas las del álbum, grandes, con flechas ---------- */
+  var vImg = photos.querySelector('.vm img'), vLoad = photos.querySelector('.vl'), vT = photos.querySelector('.vt'),
+      vC = photos.querySelector('.vc'), vA = photos.querySelector('.al');
+  var V = { o: null, list: [], i: 0 };
+  function vShow(i) {
+    var L = V.list; if (!L.length) return;
+    V.i = (i + L.length) % L.length;
+    vLoad.textContent = 'Cargando foto…'; vLoad.style.display = 'block'; vImg.style.opacity = .25;
+    vImg.onload = function () { vLoad.style.display = 'none'; vImg.style.opacity = 1; };
+    vImg.onerror = function () { vLoad.textContent = 'No se pudo cargar esta foto'; };
+    vImg.src = L[V.i]; vImg.alt = V.o.m;
+    vC.textContent = (V.i + 1) + ' / ' + L.length;
+    [1, -1].forEach(function (d) { new Image().src = L[(V.i + d + L.length) % L.length]; });
   }
+  function vMsg(t) { vLoad.textContent = t; vLoad.style.display = 'block'; vImg.removeAttribute('src'); }
+  function openPhotos(o) {
+    V.o = o; V.list = []; V.i = 0;
+    vT.textContent = o.m; vC.textContent = '';
+    vA.innerHTML = '';
+    if (CFG.showAlbum !== false) o.links.forEach(function (l, k) {
+      if (k) vA.appendChild(document.createTextNode(' · '));
+      var a = document.createElement('a'); a.className = 'gl'; a.href = l.u;
+      a.textContent = (o.links.length > 1 && l.t ? 'Álbum: ' + l.t : 'Ver álbum completo') + ' →';
+      vA.appendChild(a);
+    });
+    photos.classList.add('open');
+    if (o.list) { V.list = o.list; return vShow(0); }
+    if (!o.gals.length) return vMsg('Fotos próximamente.');
+    vMsg('Cargando fotos…');
+    fetch(CFG.ajax + '?action=sa_mapa_fotos&gal=' + o.gals.join(',')).then(function (r) { return r.json(); }).then(function (L) {
+      if (!L || !L.length) return vMsg('Fotos próximamente.');
+      o.list = V.list = L; vShow(0);
+    }).catch(function () { vMsg('No se pudieron cargar las fotos.'); });
+  }
+  photos.querySelector('.vp').addEventListener('click', function () { vShow(V.i - 1); });
+  photos.querySelector('.vs').addEventListener('click', function () { vShow(V.i + 1); });
+  document.addEventListener('keydown', function (e) {
+    if (!photos.classList.contains('open')) return;
+    if (e.key === 'Escape') photos.classList.remove('open');
+    else if (e.key === 'ArrowLeft') vShow(V.i - 1);
+    else if (e.key === 'ArrowRight') vShow(V.i + 1);
+  });
+  var vx0 = null;
+  photos.addEventListener('pointerdown', function (e) { vx0 = e.clientX; });
+  photos.addEventListener('pointerup', function (e) {
+    if (vx0 === null) return;
+    var dx = e.clientX - vx0; vx0 = null;
+    if (dx > 60) vShow(V.i - 1); else if (dx < -60) vShow(V.i + 1);
+  });
 
   fetch(DATA_URL).then(function (r) { return r.json(); }).then(function (topo) {
     var depts = topojson.feature(topo, topo.objects.depts).features;
