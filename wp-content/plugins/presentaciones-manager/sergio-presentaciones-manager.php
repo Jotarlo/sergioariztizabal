@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Sergio Aristizábal – Presentaciones
  * Description: Administra videos de YouTube para la sección Presentaciones y los muestra con un shortcode responsive.
- * Version: 1.0.2
+ * Version: 1.1.1
  * Author: Sergio Aristizábal
  * License: GPL-2.0-or-later
  */
@@ -15,9 +15,11 @@ final class SA_Presentaciones_Manager {
 	// Identificador exclusivo para no interferir con el CPT del plugin del mapa.
 	const POST_TYPE = 'sa_videos_pres';
 	const NONCE      = 'sa_presentacion_meta';
+	const ORDER_META = '_sa_order_number';
 
 	public function __construct() {
 		add_action( 'init', array( $this, 'register_post_type' ) );
+		add_action( 'init', array( $this, 'maybe_migrate_order_numbers' ), 15 );
 		add_action( 'init', array( $this, 'maybe_seed_videos' ), 20 );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
 		add_action( 'save_post_' . self::POST_TYPE, array( $this, 'save_meta' ), 10, 2 );
@@ -67,10 +69,47 @@ final class SA_Presentaciones_Manager {
 				if ( ! is_wp_error( $id ) ) {
 					update_post_meta( $id, '_sa_youtube_url', $video[1] );
 					update_post_meta( $id, '_sa_active', '1' );
+					// Preserve the seed list's original display order while using
+					// larger numbers for more recent videos.
+					update_post_meta( $id, self::ORDER_META, count( $videos ) - $position );
 				}
 			}
 		}
 		update_option( 'sa_pm_initial_seeded', '1', false );
+	}
+
+	public function maybe_migrate_order_numbers() {
+		if ( get_option( 'sa_pm_order_numbers_v2_migrated' ) ) {
+			return;
+		}
+
+		$posts = get_posts(
+			array(
+				'post_type'      => self::POST_TYPE,
+				'post_status'    => 'any',
+				'posts_per_page' => -1,
+				'orderby'        => array( 'menu_order' => 'ASC', 'date' => 'ASC', 'ID' => 'ASC' ),
+				'order'          => 'ASC',
+				'suppress_filters' => true,
+			)
+		);
+
+		// Use the existing custom number when available. Otherwise, assign
+		// descending numbers so an update does not unexpectedly reverse the list.
+		$next_number = count( $posts );
+		foreach ( $posts as $post ) {
+			$order = absint( get_post_meta( $post->ID, self::ORDER_META, true ) );
+			if ( $order < 1 ) {
+				$order = max( 1, $next_number );
+				update_post_meta( $post->ID, self::ORDER_META, $order );
+			}
+			if ( (int) $post->menu_order !== $order ) {
+				wp_update_post( array( 'ID' => $post->ID, 'menu_order' => $order ) );
+			}
+			$next_number--;
+		}
+
+		update_option( 'sa_pm_order_numbers_v2_migrated', '1', false );
 	}
 
 	public function register_post_type() {
@@ -88,7 +127,7 @@ final class SA_Presentaciones_Manager {
 				'show_ui'      => true,
 				'show_in_menu' => true,
 				'menu_icon'    => 'dashicons-video-alt3',
-				'supports'     => array( 'title', 'page-attributes' ),
+				'supports'     => array( 'title' ),
 			)
 		);
 	}
@@ -102,14 +141,39 @@ final class SA_Presentaciones_Manager {
 		$url      = get_post_meta( $post->ID, '_sa_youtube_url', true );
 		$active   = get_post_meta( $post->ID, '_sa_active', true );
 		$category = get_post_meta( $post->ID, '_sa_category', true );
+		$order    = (int) $post->menu_order;
+		if ( $order < 1 ) {
+			$order = absint( get_post_meta( $post->ID, self::ORDER_META, true ) );
+		}
+		if ( $order < 1 ) {
+			$order = 1;
+		}
 		?>
 		<p><label for="sa_youtube_url"><strong>Enlace de YouTube</strong></label><br>
 		<input class="widefat" type="url" id="sa_youtube_url" name="sa_youtube_url" value="<?php echo esc_attr( $url ); ?>" placeholder="https://www.youtube.com/watch?v=..."></p>
+		<p><label for="sa_order_number"><strong>Número de orden</strong></label><br>
+		<input class="small-text" type="number" id="sa_order_number" name="sa_order_number" value="<?php echo esc_attr( $order ); ?>" min="1" step="1">
+		<span class="description">El número más alto se muestra primero. Usa un número mayor para un video más reciente. Este es el único campo de orden que utiliza el frontend.</span></p>
 		<p><label for="sa_category"><strong>Categoría (opcional)</strong></label><br>
 		<input class="regular-text" type="text" id="sa_category" name="sa_category" value="<?php echo esc_attr( $category ); ?>" placeholder="Presentaciones, Videoclips..."></p>
 		<p><label><input type="checkbox" name="sa_active" value="1" <?php checked( '1', $active ?: '1' ); ?>> Video activo y visible en la página</label></p>
-		<p class="description">El orden se controla con el campo <em>Orden</em> del panel Publicar. Menor número aparece primero.</p>
 		<?php
+	}
+
+	private function next_order_number( $exclude_id = 0 ) {
+		$latest = get_posts(
+			array(
+				'post_type'      => self::POST_TYPE,
+				'post_status'    => 'any',
+				'posts_per_page' => 1,
+				'orderby'        => 'menu_order',
+				'order'          => 'DESC',
+				'exclude'        => $exclude_id ? array( $exclude_id ) : array(),
+				'suppress_filters' => true,
+			)
+		);
+
+		return $latest ? max( 1, (int) $latest[0]->menu_order + 1 ) : 1;
 	}
 
 	public function save_meta( $post_id, $post ) {
@@ -123,12 +187,21 @@ final class SA_Presentaciones_Manager {
 			return;
 		}
 		$url = isset( $_POST['sa_youtube_url'] ) ? esc_url_raw( wp_unslash( $_POST['sa_youtube_url'] ) ) : '';
+		$order = isset( $_POST['sa_order_number'] ) ? absint( wp_unslash( $_POST['sa_order_number'] ) ) : 0;
+		if ( $order < 1 ) {
+			$order = $this->next_order_number( $post_id );
+		}
 		update_post_meta( $post_id, '_sa_youtube_url', $url );
+		update_post_meta( $post_id, self::ORDER_META, $order );
+		if ( (int) $post->menu_order !== $order ) {
+			wp_update_post( array( 'ID' => $post_id, 'menu_order' => $order ) );
+		}
 		update_post_meta( $post_id, '_sa_active', isset( $_POST['sa_active'] ) ? '1' : '0' );
 		update_post_meta( $post_id, '_sa_category', isset( $_POST['sa_category'] ) ? sanitize_text_field( wp_unslash( $_POST['sa_category'] ) ) : '' );
 	}
 
 	public function columns( $columns ) {
+		$columns['sa_order']    = 'Orden';
 		$columns['sa_status']   = 'Estado';
 		$columns['sa_category'] = 'Categoría';
 		$columns['sa_url']      = 'YouTube';
@@ -136,7 +209,10 @@ final class SA_Presentaciones_Manager {
 	}
 
 	public function column_content( $column, $post_id ) {
-		if ( 'sa_status' === $column ) {
+		if ( 'sa_order' === $column ) {
+			$order = (int) get_post_field( 'menu_order', $post_id );
+			echo esc_html( $order > 0 ? $order : '—' );
+		} elseif ( 'sa_status' === $column ) {
 			echo get_post_meta( $post_id, '_sa_active', true ) === '1' ? '<span style="color:#16803c">Activo</span>' : '<span style="color:#777">Inactivo</span>';
 		} elseif ( 'sa_category' === $column ) {
 			echo esc_html( get_post_meta( $post_id, '_sa_category', true ) ?: '—' );
@@ -149,7 +225,7 @@ final class SA_Presentaciones_Manager {
 		if ( ! is_singular() ) {
 			return;
 		}
-		wp_register_style( 'sa-presentaciones-manager', plugins_url( 'assets/presentaciones.css', __FILE__ ), array(), '1.0.2' );
+		wp_register_style( 'sa-presentaciones-manager', plugins_url( 'assets/presentaciones.css', __FILE__ ), array(), '1.1.1' );
 		wp_enqueue_style( 'sa-presentaciones-manager' );
 	}
 
@@ -182,7 +258,7 @@ final class SA_Presentaciones_Manager {
 			'post_type'      => self::POST_TYPE,
 			'post_status'    => 'publish',
 			'posts_per_page' => intval( $atts['limit'] ),
-			'orderby'        => array( 'menu_order' => 'ASC', 'date' => 'DESC' ),
+			'orderby'        => array( 'menu_order' => 'DESC', 'date' => 'DESC', 'ID' => 'DESC' ),
 		);
 		if ( '' !== trim( $atts['category'] ) ) {
 			$args['meta_query'] = array( array( 'key' => '_sa_category', 'value' => sanitize_text_field( $atts['category'] ), 'compare' => 'LIKE' ) );
