@@ -16,9 +16,9 @@ msgstr ""
 #: astra-sites.php:133
 #: inc/classes/class-astra-sites-nps-notice.php:121
 #: inc/classes/class-astra-sites-utils.php:87
-#: inc/classes/class-astra-sites.php:3131
+#: inc/classes/class-astra-sites.php:3144
 #: inc/lib/onboarding/class-onboarding-loader.php:111
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:123
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:126
 msgid "Starter Templates"
@@ -56,8 +56,8 @@ msgstr "Obtener el kit de herramientas esencial"
 
 #: inc/classes/class-astra-sites-error-handler.php:109
 #: inc/classes/class-astra-sites-error-handler.php:153
-#: inc/lib/ai-builder/inc/classes/importer/class-ai-builder-error-handler.php:110
-#: inc/lib/ai-builder/inc/classes/importer/class-ai-builder-error-handler.php:164
+#: inc/lib/ai-builder/inc/classes/importer/class-ai-builder-error-handler.php:112
+#: inc/lib/ai-builder/inc/classes/importer/class-ai-builder-error-handler.php:167
 #: inc/lib/starter-templates-importer/resetter/st-resetter.php:506
 #: inc/lib/starter-templates-importer/resetter/st-resetter.php:537
 msgid "There was an error on your website."
@@ -77,25 +77,25 @@ msgstr "Esto suele deberse a permisos de archivo inconsistentes."
 msgid "You can easily update permissions by adding the following code into the wp-config.php file."
 msgstr "Puedes actualizar fácilmente los permisos añadiendo el siguiente código en el archivo wp-config.php."
 
-#: inc/lib/starter-templates-importer/importer/st-importer-log.php:570
+#: inc/lib/starter-templates-importer/importer/st-importer-log.php:572
 msgid "Enabled"
 msgstr "Habilitado"
 
-#: inc/lib/starter-templates-importer/importer/st-importer-log.php:573
+#: inc/lib/starter-templates-importer/importer/st-importer-log.php:575
 msgid "Disabled"
 msgstr "Desactivado"
 
-#: inc/lib/starter-templates-importer/importer/st-importer-log.php:657
-#: inc/lib/starter-templates-importer/importer/st-importer-log.php:714
+#: inc/lib/starter-templates-importer/importer/st-importer-log.php:659
+#: inc/lib/starter-templates-importer/importer/st-importer-log.php:716
 msgid "Yes"
 msgstr "Sí"
 
-#: inc/lib/starter-templates-importer/importer/st-importer-log.php:660
-#: inc/lib/starter-templates-importer/importer/st-importer-log.php:717
+#: inc/lib/starter-templates-importer/importer/st-importer-log.php:662
+#: inc/lib/starter-templates-importer/importer/st-importer-log.php:719
 msgid "No"
 msgstr "No"
 
-#: inc/lib/starter-templates-importer/importer/st-importer-log.php:732
+#: inc/lib/starter-templates-importer/importer/st-importer-log.php:734
 msgid "You currently have no scheduled cron events."
 msgstr "Actualmente no tienes eventos cron programados."
 
@@ -104,18 +104,18 @@ msgstr "Actualmente no tienes eventos cron programados."
 #: inc/classes/class-astra-sites.php:291
 #: inc/classes/class-astra-sites.php:837
 #: inc/classes/class-astra-sites.php:887
-#: inc/classes/class-astra-sites.php:1346
-#: inc/classes/class-astra-sites.php:1441
-#: inc/classes/class-astra-sites.php:1499
-#: inc/classes/class-astra-sites.php:1719
+#: inc/classes/class-astra-sites.php:1359
+#: inc/classes/class-astra-sites.php:1454
+#: inc/classes/class-astra-sites.php:1512
+#: inc/classes/class-astra-sites.php:1732
 #: inc/importers/batch-processing/class-astra-sites-batch-processing.php:1033
 #: inc/importers/batch-processing/class-astra-sites-batch-processing.php:1053
 #: inc/importers/batch-processing/class-astra-sites-batch-processing.php:1071
 #: inc/lib/ai-builder/inc/ajax/plugin.php:119
-#: inc/lib/ai-builder/inc/ajax/plugin.php:335
-#: inc/lib/ai-builder/inc/ajax/plugin.php:372
-#: inc/lib/ai-builder/inc/ajax/plugin.php:377
-#: inc/lib/ai-builder/inc/traits/helper.php:965
+#: inc/lib/ai-builder/inc/ajax/plugin.php:336
+#: inc/lib/ai-builder/inc/ajax/plugin.php:373
+#: inc/lib/ai-builder/inc/ajax/plugin.php:378
+#: inc/lib/ai-builder/inc/traits/helper.php:1136
 #: inc/lib/gutenberg-templates/inc/importer/plugin.php:252
 #: inc/lib/gutenberg-templates/inc/importer/plugin.php:319
 #: inc/lib/gutenberg-templates/inc/importer/plugin.php:363
@@ -127,8 +127,8 @@ msgstr "Actualmente no tienes eventos cron programados."
 #: inc/lib/gutenberg-templates/inc/importer/sync-library.php:488
 #: inc/lib/gutenberg-templates/inc/importer/sync-library.php:513
 #: inc/lib/gutenberg-templates/inc/importer/sync-library.php:556
-#: inc/lib/gutenberg-templates/inc/importer/sync-library.php:852
-#: inc/lib/gutenberg-templates/inc/importer/sync-library.php:887
+#: inc/lib/gutenberg-templates/inc/importer/sync-library.php:868
+#: inc/lib/gutenberg-templates/inc/importer/sync-library.php:903
 #: inc/lib/gutenberg-templates/inc/importer/template-kit-importer.php:47
 #: inc/lib/gutenberg-templates/inc/importer/template-kit-importer.php:113
 #: inc/lib/gutenberg-templates/inc/traits/upgrade.php:39
@@ -180,7 +180,7 @@ msgstr "Gratis"
 #: inc/includes/templates.php:200
 #: inc/includes/templates.php:327
 #: inc/includes/templates.php:419
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:73
 msgid "Premium"
 msgstr "Premium"
@@ -200,8 +200,8 @@ msgstr "El editor predeterminado de WordPress"
 
 #: inc/classes/class-astra-sites-page.php:473
 #: inc/classes/class-astra-sites-utils.php:130
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:123
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:149
 msgid "Elementor"
@@ -209,7 +209,7 @@ msgstr "Elementor"
 
 #: inc/classes/class-astra-sites-page.php:478
 #: inc/classes/class-astra-sites-utils.php:121
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:123
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:149
 msgid "Beaver Builder"
@@ -447,7 +447,7 @@ msgid "%s: XMLReader extension is missing! To import templates, please get in to
 msgstr "%s: ¡Falta la extensión XMLReader! Para importar plantillas, por favor contacte a su proveedor de alojamiento para habilitar esta extensión."
 
 #: inc/classes/class-astra-sites.php:902
-#: inc/classes/class-astra-sites.php:1367
+#: inc/classes/class-astra-sites.php:1380
 msgid "Invalid API URL."
 msgstr "URL de API no válida."
 
@@ -467,43 +467,43 @@ msgstr "URL de solicitud de API no válida - %s"
 
 #. translators: %s Error Message
 #: inc/classes/class-astra-sites.php:1020
-#: inc/classes/class-astra-sites.php:1168
+#: inc/classes/class-astra-sites.php:1181
 #, php-format
 msgid "API Request could not be performed - %s"
 msgstr "No se pudo realizar la solicitud de API - %s"
 
 #. translators: %s Error Message
 #: inc/classes/class-astra-sites.php:1025
-#: inc/classes/class-astra-sites.php:1173
+#: inc/classes/class-astra-sites.php:1186
 #, php-format
 msgid "API Request has failed - %s"
 msgstr "La solicitud de API ha fallado - %s"
 
-#: inc/classes/class-astra-sites.php:1087
-#: inc/classes/class-astra-sites.php:1202
+#: inc/classes/class-astra-sites.php:1100
+#: inc/classes/class-astra-sites.php:1215
 msgid "Internal Server Error."
 msgstr "Error interno del servidor."
 
 #. translators: %s IP address.
-#: inc/classes/class-astra-sites.php:1093
-#: inc/classes/class-astra-sites.php:1208
+#: inc/classes/class-astra-sites.php:1106
+#: inc/classes/class-astra-sites.php:1221
 #, php-format
 msgid "Client IP: %1$s </br> Error code: %2$s"
 msgstr "IP del cliente: %1$s </br> Código de error: %2$s"
 
-#: inc/classes/class-astra-sites.php:1126
+#: inc/classes/class-astra-sites.php:1139
 msgid "Provided API details are empty! Please try again!"
 msgstr "¡Los detalles de la API proporcionados están vacíos! ¡Por favor, inténtalo de nuevo!"
 
 #. Translators: %s is Request URL.
 #. Translators: %s is API URL.
-#: inc/classes/class-astra-sites.php:1145
+#: inc/classes/class-astra-sites.php:1158
 #: inc/lib/gutenberg-templates/inc/importer/template-kit-importer.php:60
 #, php-format
 msgid "Invalid Request URL - %s"
 msgstr "URL de solicitud no válida - %s"
 
-#: inc/classes/class-astra-sites.php:1507
+#: inc/classes/class-astra-sites.php:1520
 #: inc/lib/zipwp-images/classes/zipwp-images-api.php:282
 msgid "Need to send URL of the image to be downloaded"
 msgstr "Necesito enviar la URL de la imagen que se va a descargar"
@@ -513,237 +513,237 @@ msgstr "Necesito enviar la URL de la imagen que se va a descargar"
 msgid "Could not download the image."
 msgstr "No se pudo descargar la imagen."
 
-#: inc/classes/class-astra-sites.php:1809
+#: inc/classes/class-astra-sites.php:1822
 msgid "Get Started"
 msgstr "Comenzar"
 
-#: inc/classes/class-astra-sites.php:2022
-#: inc/classes/class-astra-sites.php:2666
+#: inc/classes/class-astra-sites.php:2035
+#: inc/classes/class-astra-sites.php:2679
 #: inc/includes/templates.php:321
 msgid "Get Access!"
 msgstr "¡Obtén acceso!"
 
-#: inc/classes/class-astra-sites.php:2024
+#: inc/classes/class-astra-sites.php:2037
 #: inc/lib/one-onboarding/build/main.js:25
 msgid "Upgrade"
 msgstr "Actualizar"
 
-#: inc/classes/class-astra-sites.php:2028
+#: inc/classes/class-astra-sites.php:2041
 msgid "Syncing template library in the background. The process can take anywhere between 2 to 3 minutes. We will notify you once done."
 msgstr "Sincronizando la biblioteca de plantillas en segundo plano. El proceso puede tardar entre 2 y 3 minutos. Te notificaremos una vez que esté listo."
 
-#: inc/classes/class-astra-sites.php:2029
+#: inc/classes/class-astra-sites.php:2042
 msgid "Some of the files required during the import process are missing.<br/><br/>Please try again after some time."
 msgstr "Algunos de los archivos necesarios durante el proceso de importación están ausentes.<br/><br/>Por favor, inténtelo de nuevo después de un tiempo."
 
-#: inc/classes/class-astra-sites.php:2039
+#: inc/classes/class-astra-sites.php:2052
 msgid "Done! View Site"
 msgstr "¡Hecho! Ver sitio"
 
 #. translators: %s is a template name
-#: inc/classes/class-astra-sites.php:2042
+#: inc/classes/class-astra-sites.php:2055
 #, php-format
 msgid "Import \"%s\" Template"
 msgstr "Importar plantilla \"%s\""
 
-#: inc/classes/class-astra-sites.php:2045
+#: inc/classes/class-astra-sites.php:2058
 msgid "Installing Required Plugins.."
 msgstr "Instalando los plugins requeridos.."
 
 #. translators: %s are white label strings.
-#: inc/classes/class-astra-sites.php:2047
+#: inc/classes/class-astra-sites.php:2060
 #, php-format
 msgid "Installing %1$s Theme.."
 msgstr "Instalando el tema %1$s.."
 
-#: inc/classes/class-astra-sites.php:2070
+#: inc/classes/class-astra-sites.php:2083
 msgid "Dismiss this notice."
 msgstr "Descartar este aviso."
 
-#: inc/classes/class-astra-sites.php:2072
+#: inc/classes/class-astra-sites.php:2085
 msgid "One Last Step.."
 msgstr "Un último paso.."
 
-#: inc/classes/class-astra-sites.php:2073
+#: inc/classes/class-astra-sites.php:2086
 msgid "Your Selected Website is Being Imported."
 msgstr "Su sitio web seleccionado está siendo importado."
 
-#: inc/classes/class-astra-sites.php:2074
+#: inc/classes/class-astra-sites.php:2087
 msgid "Your Selected Template is Being Imported."
 msgstr "Su plantilla seleccionada está siendo importada."
 
-#: inc/classes/class-astra-sites.php:2076
+#: inc/classes/class-astra-sites.php:2089
 msgid "We have sent you a surprise gift on your email address! Please check your inbox!"
 msgstr "¡Te hemos enviado un regalo sorpresa a tu dirección de correo electrónico! ¡Por favor, revisa tu bandeja de entrada!"
 
-#: inc/classes/class-astra-sites.php:2078
+#: inc/classes/class-astra-sites.php:2091
 msgid "Looks like the template you are importing is temporarily not available."
 msgstr "Parece que la plantilla que estás importando no está disponible temporalmente."
 
-#: inc/classes/class-astra-sites.php:2080
+#: inc/classes/class-astra-sites.php:2093
 msgid "There was an error connecting to the Starter Templates API."
 msgstr "Hubo un error al conectar con la API de Plantillas de Inicio."
 
-#: inc/classes/class-astra-sites.php:2081
+#: inc/classes/class-astra-sites.php:2094
 msgid "There was an error while importing the content."
 msgstr "Hubo un error al importar el contenido."
 
-#: inc/classes/class-astra-sites.php:2082
+#: inc/classes/class-astra-sites.php:2095
 msgid "To import content, WordPress needs to store XML file in /wp-content/ folder. Please get in touch with your hosting provider."
 msgstr "Para importar contenido, WordPress necesita almacenar el archivo XML en la carpeta /wp-content/. Por favor, póngase en contacto con su proveedor de alojamiento."
 
-#: inc/classes/class-astra-sites.php:2083
+#: inc/classes/class-astra-sites.php:2096
 msgid "Looks like your host probably could not store XML file in /wp-content/ folder."
 msgstr "Parece que su anfitrión probablemente no pudo almacenar el archivo XML en la carpeta /wp-content/."
 
 #. translators: %s URL to document.
-#: inc/classes/class-astra-sites.php:2087
+#: inc/classes/class-astra-sites.php:2100
 #, php-format
 msgid "%1$sRead&nbsp;<a href=\"%2$s\" target=\"_blank\">article</a>&nbsp;to resolve the issue and continue importing template.%3$s"
 msgstr "%1$sLea&nbsp;<a href=\"%2$s\" target=\"_blank\">el artículo</a>&nbsp;para resolver el problema y continuar importando la plantilla.%3$s"
 
 #. translators: %s URL to document.
-#: inc/classes/class-astra-sites.php:2098
+#: inc/classes/class-astra-sites.php:2111
 #, php-format
 msgid "%1$sPlease report this <a href=\"%2$s\" target=\"_blank\">here</a>.%3$s"
 msgstr "%1$sPor favor, informe esto <a href=\"%2$s\" target=\"_blank\">aquí</a>.%3$s"
 
-#: inc/classes/class-astra-sites.php:2388
+#: inc/classes/class-astra-sites.php:2401
 msgid "XMLReader Support Missing"
 msgstr "Falta soporte de XMLReader"
 
 #. translators: %s doc link.
-#: inc/classes/class-astra-sites.php:2390
+#: inc/classes/class-astra-sites.php:2403
 msgid "You're close to importing the template. To complete the process, enable XMLReader support on your website.."
 msgstr "Estás cerca de importar la plantilla. Para completar el proceso, habilita el soporte de XMLReader en tu sitio web."
 
 #. translators: %s doc link.
-#: inc/classes/class-astra-sites.php:2390
-#: inc/classes/class-astra-sites.php:2395
-#: inc/classes/class-astra-sites.php:2400
-#: inc/classes/class-astra-sites.php:2418
+#: inc/classes/class-astra-sites.php:2403
+#: inc/classes/class-astra-sites.php:2408
+#: inc/classes/class-astra-sites.php:2413
+#: inc/classes/class-astra-sites.php:2431
 #, php-format
 msgid "Read an article <a href=\"%s\" target=\"_blank\">here</a> to resolve the issue."
 msgstr "Lee un artículo <a href=\"%s\" target=\"_blank\">aquí</a> para resolver el problema."
 
-#: inc/classes/class-astra-sites.php:2393
+#: inc/classes/class-astra-sites.php:2406
 msgid "cURL Support Missing"
 msgstr "Falta soporte para cURL"
 
 #. translators: %s doc link.
-#: inc/classes/class-astra-sites.php:2395
+#: inc/classes/class-astra-sites.php:2408
 msgid "To run a smooth import, kindly enable cURL support on your website."
 msgstr "Para ejecutar una importación sin problemas, por favor habilite el soporte cURL en su sitio web."
 
-#: inc/classes/class-astra-sites.php:2398
+#: inc/classes/class-astra-sites.php:2411
 msgid "Disable Debug Mode"
 msgstr "Desactivar el modo de depuración"
 
 #. translators: %s doc link.
-#: inc/classes/class-astra-sites.php:2400
+#: inc/classes/class-astra-sites.php:2413
 msgid "WordPress debug mode is currently enabled on your website. With this, any errors from third-party plugins might affect the import process."
 msgstr "El modo de depuración de WordPress está actualmente habilitado en tu sitio web. Con esto, cualquier error de plugins de terceros podría afectar el proceso de importación."
 
 #. translators: %s doc link.
-#: inc/classes/class-astra-sites.php:2400
+#: inc/classes/class-astra-sites.php:2413
 msgid "Kindly disable it to continue importing the Starter Template. To do so, you can add the following code into the wp-config.php file."
 msgstr "Por favor, desactívelo para continuar importando la Plantilla de Inicio. Para hacerlo, puede agregar el siguiente código en el archivo wp-config.php."
 
-#: inc/classes/class-astra-sites.php:2403
+#: inc/classes/class-astra-sites.php:2416
 msgid "Update Plugin"
 msgstr "Actualizar complemento"
 
 #. translators: %s update page link.
-#: inc/classes/class-astra-sites.php:2405
+#: inc/classes/class-astra-sites.php:2418
 #, php-format
 msgid "Kindly <a href=\"%s\" target=\"_blank\">update</a> them for a successful import. Skipping this step might break the template design/feature."
 msgstr "Por favor, <a href=\"%s\" target=\"_blank\">actualícelos</a> para una importación exitosa. Omitir este paso podría romper el diseño/la función de la plantilla."
 
-#: inc/classes/class-astra-sites.php:2408
+#: inc/classes/class-astra-sites.php:2421
 #: inc/includes/templates.php:468
 msgid "Required Plugins Missing"
 msgstr "Faltan complementos requeridos"
 
-#: inc/classes/class-astra-sites.php:2409
+#: inc/classes/class-astra-sites.php:2422
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:153
 msgid "This starter template requires premium plugins. As these are third party premium plugins, you'll need to purchase, install and activate them first."
 msgstr "Esta plantilla inicial requiere complementos premium. Como se trata de complementos premium de terceros, primero deberá comprarlos, instalarlos y activarlos."
 
-#: inc/classes/class-astra-sites.php:2412
+#: inc/classes/class-astra-sites.php:2425
 msgid "Dynamic Page"
 msgstr "Página Dinámica"
 
-#: inc/classes/class-astra-sites.php:2413
+#: inc/classes/class-astra-sites.php:2426
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "The page template you are about to import contains a dynamic widget/module. Please note this dynamic data will not be available with the imported page."
 msgstr "La plantilla de página que está a punto de importar contiene un widget/módulo dinámico. Tenga en cuenta que estos datos dinámicos no estarán disponibles con la página importada."
 
-#: inc/classes/class-astra-sites.php:2413
+#: inc/classes/class-astra-sites.php:2426
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "You will need to add it manually on the page."
 msgstr "Necesitarás añadirlo manualmente en la página."
 
-#: inc/classes/class-astra-sites.php:2413
+#: inc/classes/class-astra-sites.php:2426
 msgid "This dynamic content will be available when you import the entire site."
 msgstr "Este contenido dinámico estará disponible cuando importes todo el sitio."
 
-#: inc/classes/class-astra-sites.php:2416
+#: inc/classes/class-astra-sites.php:2429
 msgid "Enable Flexbox Container from Elementor"
 msgstr "Habilitar contenedor Flexbox desde Elementor"
 
 #. translators: %s doc link.
-#: inc/classes/class-astra-sites.php:2418
+#: inc/classes/class-astra-sites.php:2431
 msgid "The Flexbox Container widget is disabled on your website. With this disabled, the import process will be affected. Kindly enable it to continue importing the Starter Template."
 msgstr "El widget del contenedor Flexbox está deshabilitado en su sitio web. Con esto deshabilitado, el proceso de importación se verá afectado. Por favor, habilítelo para continuar importando la plantilla de inicio."
 
-#: inc/classes/class-astra-sites.php:2670
+#: inc/classes/class-astra-sites.php:2683
 msgid "Template"
 msgstr "Plantilla"
 
-#: inc/classes/class-astra-sites.php:2671
+#: inc/classes/class-astra-sites.php:2684
 msgid "Block"
 msgstr "Bloque"
 
-#: inc/classes/class-astra-sites.php:2672
+#: inc/classes/class-astra-sites.php:2685
 #: inc/includes/templates.php:78
 #: inc/lib/zip-ai/sidebar/build/sidebar-app.js:14
 msgid "Dismiss"
 msgstr "Descartar"
 
-#: inc/classes/class-astra-sites.php:2673
+#: inc/classes/class-astra-sites.php:2686
 msgid "Install Required Plugins"
 msgstr "Instalar complementos requeridos"
 
-#: inc/classes/class-astra-sites.php:2677
+#: inc/classes/class-astra-sites.php:2690
 msgid "You can locate <strong>Starter Templates Settings</strong> under the <strong>Page Settings</strong> of the Style Tab."
 msgstr "Puede encontrar <strong>Configuración de Plantillas de Inicio</strong> bajo la <strong>Configuración de Página</strong> de la pestaña de Estilo."
 
-#: inc/classes/class-astra-sites.php:2679
+#: inc/classes/class-astra-sites.php:2692
 msgid "Read More →"
 msgstr "Leer más →"
 
-#: inc/classes/class-astra-sites.php:3053
+#: inc/classes/class-astra-sites.php:3066
 msgid "Template library refreshed!"
 msgstr "¡Biblioteca de plantillas actualizada!"
 
-#: inc/classes/class-astra-sites.php:3133
+#: inc/classes/class-astra-sites.php:3146
 msgid "Build Your Dream Site in Minutes With AI"
 msgstr "Construye tu sitio de ensueño en minutos con IA"
 
-#: inc/classes/class-astra-sites.php:3134
+#: inc/classes/class-astra-sites.php:3147
 msgid "Say goodbye to the days of spending weeks designing and building your website.<br/> You can now create professional-grade websites in minutes."
 msgstr "Despídete de los días de pasar semanas diseñando y construyendo tu sitio web.<br/> Ahora puedes crear sitios web de calidad profesional en minutos."
 
-#: inc/classes/class-astra-sites.php:3136
+#: inc/classes/class-astra-sites.php:3149
 #: inc/lib/one-onboarding/build/main.js:16
 msgid "Let’s Get Started"
 msgstr "Comencemos"
 
-#: inc/classes/class-astra-sites.php:3137
+#: inc/classes/class-astra-sites.php:3150
 msgid "I want to build this website from scratch"
 msgstr "Quiero construir este sitio web desde cero"
 
-#: inc/classes/class-astra-sites.php:3172
+#: inc/classes/class-astra-sites.php:3185
 msgid "Required WP_Filesystem Permissions to import the templates from Starter Templates are missing."
 msgstr "Faltan los permisos de WP_Filesystem necesarios para importar las plantillas de Starter Templates."
 
@@ -856,8 +856,8 @@ msgstr "Bloques"
 
 #: inc/includes/templates.php:144
 #: inc/includes/templates.php:145
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
-#: inc/lib/ai-builder/inc/assets/build/main.js:244
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
+#: inc/lib/ai-builder/inc/assets/build/main.js:259
 #: inc/lib/zip-ai/sidebar/build/sidebar-app.js:14
 msgid "Close"
 msgstr "Cerrar"
@@ -913,8 +913,8 @@ msgid "Skip & Import"
 msgstr "Omitir e Importar"
 
 #: inc/includes/templates.php:481
-#: inc/lib/ai-builder/inc/assets/build/main.js:183
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:198
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/gutenberg-templates/dist/main.js:2
 #: inc/lib/zip-ai/admin/dashboard-app/build/dashboard-app.js:3
 #: inc/lib/zip-ai/sidebar/build/sidebar-app.js:3
@@ -977,16 +977,16 @@ msgid "Unlock Full Power"
 msgstr "Desbloquear todo el poder"
 
 #: inc/lib/ai-builder/ai-builder-plugin-loader.php:491
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Contact Support"
 msgstr "Contactar con el soporte"
 
-#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:223
+#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:360
 #: inc/lib/ai-builder/inc/ajax/ajax-errors.php:40
 msgid "Sorry, you are not allowed to do this operation."
 msgstr "Lo siento, no tienes permiso para realizar esta operación."
 
-#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:236
+#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:373
 #: inc/lib/ai-builder/inc/ajax/ajax-errors.php:41
 msgid "Nonce validation failed"
 msgstr "La validación del nonce falló"
@@ -1000,18 +1000,18 @@ msgstr "Lo siento, algo salió mal."
 msgid "Permission Denied!"
 msgstr "¡Permiso denegado!"
 
-#: inc/lib/ai-builder/inc/ajax/importer.php:518
-#: inc/lib/ai-builder/inc/ajax/importer.php:559
+#: inc/lib/ai-builder/inc/ajax/importer.php:524
+#: inc/lib/ai-builder/inc/ajax/importer.php:570
 #: inc/lib/ai-builder/inc/ajax/plugin.php:129
 msgid "Required function not found"
 msgstr "Función requerida no encontrada"
 
-#: inc/lib/ai-builder/inc/ajax/importer.php:671
+#: inc/lib/ai-builder/inc/ajax/importer.php:682
 #: inc/lib/ai-builder/inc/classes/importer/class-ai-builder-fse-importer.php:43
 msgid "You are not authorized to perform this action."
 msgstr "No estás autorizado para realizar esta acción."
 
-#: inc/lib/ai-builder/inc/ajax/importer.php:678
+#: inc/lib/ai-builder/inc/ajax/importer.php:689
 #: inc/lib/ai-builder/inc/classes/importer/class-ai-builder-fse-importer.php:53
 msgid "Received empty parameters."
 msgstr "Se recibieron parámetros vacíos."
@@ -1022,11 +1022,11 @@ msgstr "Se recibieron parámetros vacíos."
 msgid "Invalid URL - %s"
 msgstr "URL no válida - %s"
 
-#: inc/lib/ai-builder/inc/ajax/plugin.php:355
+#: inc/lib/ai-builder/inc/ajax/plugin.php:356
 msgid "Theme Activated"
 msgstr "Tema activado"
 
-#: inc/lib/ai-builder/inc/ajax/plugin.php:384
+#: inc/lib/ai-builder/inc/ajax/plugin.php:385
 msgid "Failed to set the site language."
 msgstr "Error al establecer el idioma del sitio."
 
@@ -1046,7 +1046,7 @@ msgstr "Error al establecer el idioma del sitio."
 #: inc/lib/gutenberg-templates/inc/api/settings.php:92
 #: inc/lib/gutenberg-templates/inc/api/sites.php:70
 #: inc/lib/gutenberg-templates/inc/classes/ast-block-templates-zipwp-api.php:81
-#: inc/lib/nps-survey/classes/nps-survey-script.php:313
+#: inc/lib/nps-survey/classes/nps-survey-script.php:323
 #: inc/lib/onboarding/classes/class-astra-sites-zipwp-api.php:80
 #: inc/lib/onboarding/classes/class-astra-sites-zipwp-integration.php:49
 #: inc/lib/zipwp-images/classes/zipwp-images-api.php:95
@@ -1054,26 +1054,26 @@ msgid "Sorry, you are not allowed to do that."
 msgstr "Lo siento, no tienes permiso para hacer eso."
 
 #: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:708
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:750
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:876
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:969
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1077
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1181
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1273
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1352
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1423
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1499
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1579
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1678
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1774
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1850
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1915
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1980
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:2051
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:2132
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:2199
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:2226
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:2318
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:770
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:896
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:993
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1101
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1214
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1306
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1385
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1456
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1532
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1612
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1711
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1807
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1883
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1948
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:2013
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:2084
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:2165
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:2232
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:2259
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:2385
 #: inc/lib/getting-started/classes/class-gs-api.php:158
 #: inc/lib/getting-started/classes/class-gs-api.php:377
 #: inc/lib/gutenberg-templates/inc/api/blocks.php:93
@@ -1088,28 +1088,28 @@ msgstr "Lo siento, no tienes permiso para hacer eso."
 #: inc/lib/gutenberg-templates/inc/api/sites.php:93
 #: inc/lib/gutenberg-templates/inc/classes/ast-block-templates-zipwp-api.php:142
 #: inc/lib/gutenberg-templates/inc/classes/ast-block-templates-zipwp-api.php:193
-#: inc/lib/nps-survey/classes/nps-survey-script.php:366
-#: inc/lib/nps-survey/classes/nps-survey-script.php:486
+#: inc/lib/nps-survey/classes/nps-survey-script.php:440
+#: inc/lib/nps-survey/classes/nps-survey-script.php:560
 #: inc/lib/onboarding/classes/class-astra-sites-zipwp-api.php:163
 #: inc/lib/onboarding/classes/class-astra-sites-zipwp-api.php:236
 #: inc/lib/zipwp-images/classes/zipwp-images-api.php:174
 msgid "Nonce verification failed."
 msgstr "La verificación del nonce falló."
 
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1029
-#: inc/lib/starter-templates-importer/importer/st-importer.php:614
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1053
+#: inc/lib/starter-templates-importer/importer/st-importer.php:621
 msgid "There was an error downloading the XML file."
 msgstr "Hubo un error al descargar el archivo XML."
 
-#: inc/lib/ai-builder/inc/ajax/importer.php:572
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1041
-#: inc/lib/ai-builder/inc/traits/helper.php:669
-#: inc/lib/ai-builder/inc/traits/helper.php:703
-#: inc/lib/ai-builder/inc/traits/helper.php:741
-#: inc/lib/ai-builder/inc/traits/helper.php:824
-#: inc/lib/ai-builder/inc/traits/helper.php:848
-#: inc/lib/ai-builder/inc/traits/helper.php:873
-#: inc/lib/ai-builder/inc/traits/helper.php:910
+#: inc/lib/ai-builder/inc/ajax/importer.php:583
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1065
+#: inc/lib/ai-builder/inc/traits/helper.php:803
+#: inc/lib/ai-builder/inc/traits/helper.php:837
+#: inc/lib/ai-builder/inc/traits/helper.php:889
+#: inc/lib/ai-builder/inc/traits/helper.php:995
+#: inc/lib/ai-builder/inc/traits/helper.php:1019
+#: inc/lib/ai-builder/inc/traits/helper.php:1044
+#: inc/lib/ai-builder/inc/traits/helper.php:1081
 msgid "Required class not found."
 msgstr "Clase requerida no encontrada."
 
@@ -1124,27 +1124,27 @@ msgstr "No tienes permiso para realizar esta acción."
 msgid "Please contact the hosting service provider to help you update the permissions so that you can successfully import a complete template."
 msgstr "Por favor, contacta al proveedor del servicio de alojamiento para que te ayude a actualizar los permisos y así puedas importar con éxito una plantilla completa."
 
-#: inc/lib/ai-builder/inc/traits/helper.php:498
+#: inc/lib/ai-builder/inc/traits/helper.php:524
 msgid "Insufficient Permission. Please contact your Super Admin to allow the install required plugin permissions."
 msgstr "Permiso insuficiente. Por favor, contacta a tu Super Admin para permitir los permisos necesarios para instalar el plugin."
 
-#: inc/lib/ai-builder/inc/traits/helper.php:650
+#: inc/lib/ai-builder/inc/traits/helper.php:784
 msgid "Plugin Activated"
 msgstr "Complemento activado"
 
-#: inc/lib/ai-builder/inc/traits/helper.php:666
+#: inc/lib/ai-builder/inc/traits/helper.php:800
 msgid "User does not have permission!"
 msgstr "¡El usuario no tiene permiso!"
 
-#: inc/lib/ai-builder/inc/traits/helper.php:714
+#: inc/lib/ai-builder/inc/traits/helper.php:862
 msgid "Site options Imported!"
 msgstr "¡Opciones del sitio importadas!"
 
-#: inc/lib/ai-builder/inc/traits/helper.php:879
+#: inc/lib/ai-builder/inc/traits/helper.php:1050
 msgid "Deleted Widgets!"
 msgstr "¡Widgets eliminados!"
 
-#: inc/lib/ai-builder/inc/traits/helper.php:905
+#: inc/lib/ai-builder/inc/traits/helper.php:1076
 msgid "Customizer data is empty!"
 msgstr "¡Los datos del personalizador están vacíos!"
 
@@ -1180,7 +1180,7 @@ msgstr "Resolver el problema de permisos de archivo"
 #: inc/lib/gutenberg-templates/inc/importer/plugin.php:295
 #: inc/lib/gutenberg-templates/inc/importer/plugin.php:471
 #: inc/lib/zip-ai/classes/sidebar-configurations.php:296
-#: inc/lib/ai-builder/inc/assets/build/main.js:184
+#: inc/lib/ai-builder/inc/assets/build/main.js:199
 #: inc/lib/zip-ai/sidebar/build/sidebar-app.js:6
 msgid "Something went wrong"
 msgstr "Algo salió mal"
@@ -1212,11 +1212,11 @@ msgstr "El middleware de Zip AI no está respondiendo."
 msgid "The Zip AI Middleware encountered an error."
 msgstr "El middleware Zip AI encontró un error."
 
-#: inc/lib/onboarding/class-onboarding-loader.php:419
+#: inc/lib/onboarding/class-onboarding-loader.php:420
 msgid "Disable Elementor Page Builder Templates in Starter Templates"
 msgstr "Desactivar las plantillas de Elementor Page Builder en las plantillas de inicio"
 
-#: inc/lib/onboarding/class-onboarding-loader.php:426
+#: inc/lib/onboarding/class-onboarding-loader.php:427
 msgid "Disable Beaver Builder Page Builder Templates in Starter Templates"
 msgstr "Desactivar las plantillas de Beaver Builder Page Builder en las plantillas de inicio"
 
@@ -1233,7 +1233,7 @@ msgstr "Lote de Gutenberg completado."
 msgid "Template Type is not a AI."
 msgstr "El tipo de plantilla no es una IA."
 
-#: inc/lib/ai-builder/inc/ajax/importer.php:582
+#: inc/lib/ai-builder/inc/ajax/importer.php:593
 #: inc/lib/starter-templates-importer/importer/batch/st-batch-processing-misc.php:90
 msgid "Required flags are not set."
 msgstr "No se han establecido las banderas requeridas."
@@ -1284,7 +1284,7 @@ msgstr "El proceso de importación se ha iniciado correctamente."
 msgid "Spectra settings are empty."
 msgstr "La configuración de espectros está vacía."
 
-#: inc/lib/ai-builder/inc/ajax/importer.php:399
+#: inc/lib/ai-builder/inc/ajax/importer.php:405
 #: inc/lib/starter-templates-importer/importer/st-importer.php:156
 msgid "Spectra settings imported successfully."
 msgstr "Configuración de espectros importada con éxito."
@@ -1310,24 +1310,24 @@ msgid "Customizer data imported successfully."
 msgstr "Datos del personalizador importados con éxito."
 
 #. Translators: %s is WXR URL.
-#: inc/lib/starter-templates-importer/importer/st-importer.php:573
+#: inc/lib/starter-templates-importer/importer/st-importer.php:580
 #, php-format
 msgid "Invalid WXR Request URL - %s"
 msgstr "URL de solicitud WXR no válida - %s"
 
-#: inc/lib/starter-templates-importer/importer/st-importer.php:716
+#: inc/lib/starter-templates-importer/importer/st-importer.php:723
 msgid "Site options are empty!"
 msgstr "¡Las opciones del sitio están vacías!"
 
-#: inc/lib/starter-templates-importer/importer/st-importer.php:816
+#: inc/lib/starter-templates-importer/importer/st-importer.php:823
 msgid "Options imported successfully."
 msgstr "Opciones importadas con éxito."
 
-#: inc/lib/starter-templates-importer/importer/st-importer.php:865
+#: inc/lib/starter-templates-importer/importer/st-importer.php:872
 msgid "Widget data is empty!"
 msgstr "¡Los datos del widget están vacíos!"
 
-#: inc/lib/starter-templates-importer/importer/st-importer.php:883
+#: inc/lib/starter-templates-importer/importer/st-importer.php:890
 msgid "Widgets imported successfully."
 msgstr "Widgets importados con éxito."
 
@@ -1531,7 +1531,7 @@ msgstr "El comentario %1$d fue importado con el autor %2$d, pero no se pudo enco
 msgid "Could not update comment #%d with mapped data"
 msgstr "No se pudo actualizar el comentario #%d con los datos mapeados"
 
-#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:1932
+#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:1969
 msgid "Import complete!"
 msgstr "¡Importación completa!"
 
@@ -1682,7 +1682,7 @@ msgid "Original %1$s"
 msgstr "Original %1$s"
 
 #: inc/lib/ai-builder/inc/assets/build/main.js:2
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:73
 msgid "Original"
 msgstr "Original"
@@ -1731,20 +1731,20 @@ msgstr "Mostrar título del sitio"
 msgid "Logo width"
 msgstr "Ancho del logotipo"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:183
+#: inc/lib/ai-builder/inc/assets/build/main.js:198
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "Are you sure?"
 msgstr "¿Estás seguro?"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:183
+#: inc/lib/ai-builder/inc/assets/build/main.js:198
 msgid "This will redirect you to the first screen and discard the progress you have made."
 msgstr "Esto te redirigirá a la primera pantalla y descartará el progreso que has hecho."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:183
+#: inc/lib/ai-builder/inc/assets/build/main.js:198
 msgid "If you prefer to continue, click 'Cancel'."
 msgstr "Si prefieres continuar, haz clic en 'Cancelar'."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:183
+#: inc/lib/ai-builder/inc/assets/build/main.js:198
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "Exit"
 msgstr "Salir"
@@ -1819,12 +1819,14 @@ msgstr "Habilitar esta opción mantendrá los datos de tus antiguas Plantillas d
 #: inc/lib/ai-builder/inc/assets/build/main.js:173
 #: inc/lib/ai-builder/inc/assets/build/main.js:180
 #: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Start Building"
 msgstr "Comienza a construir"
 
 #: inc/lib/ai-builder/inc/assets/build/main.js:173
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
 #: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/nps-survey/dist/main.js:1
 #: inc/lib/nps-survey/dist/main.js:4
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:133
@@ -1865,7 +1867,7 @@ msgid "We encountered the following errors while creating your previous site:"
 msgstr "Encontramos los siguientes errores al crear su sitio anterior:"
 
 #: inc/lib/ai-builder/inc/assets/build/main.js:174
-#: inc/lib/ai-builder/inc/assets/build/main.js:182
+#: inc/lib/ai-builder/inc/assets/build/main.js:197
 msgid "Not enough information to display."
 msgstr "No hay suficiente información para mostrar."
 
@@ -1886,7 +1888,7 @@ msgid "Created On: "
 msgstr "Creado el:"
 
 #: inc/lib/ai-builder/inc/assets/build/main.js:180
-#: inc/lib/ai-builder/inc/assets/build/main.js:182
+#: inc/lib/ai-builder/inc/assets/build/main.js:197
 msgid "Importing saved sites won’t be exhausting your AI site generation count."
 msgstr "Importar sitios guardados no agotará tu conteo de generación de sitios de IA."
 
@@ -1894,22 +1896,22 @@ msgstr "Importar sitios guardados no agotará tu conteo de generación de sitios
 msgid "Retry Import"
 msgstr "Reintentar importación"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:180
-#: inc/lib/ai-builder/inc/assets/build/main.js:245
+#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:260
 msgid "This is just a sneak peek. The actual website and its content will be created in the next step."
 msgstr "Esto es solo un adelanto. El sitio web real y su contenido se crearán en el siguiente paso."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:180
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:149
 msgid "Build with AI"
 msgstr "Construir con IA"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:180
+#: inc/lib/ai-builder/inc/assets/build/main.js:195
 msgid "Premium Design"
 msgstr "Diseño Premium"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:180
+#: inc/lib/ai-builder/inc/assets/build/main.js:195
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:133
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:144
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:149
@@ -1918,420 +1920,421 @@ msgstr "Diseño Premium"
 msgid "Continue"
 msgstr "Continuar"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:180
+#: inc/lib/ai-builder/inc/assets/build/main.js:195
 msgid "Back to Other Designs"
 msgstr "Volver a otros diseños"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:180
+#: inc/lib/ai-builder/inc/assets/build/main.js:195
 msgid "Responsive Preview"
 msgstr "Vista previa receptiva"
 
 #. translators: %s: daily limit
-#: inc/lib/ai-builder/inc/assets/build/main.js:181
+#: inc/lib/ai-builder/inc/assets/build/main.js:196
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:146
 #, js-format
 msgid "%s AI sites"
 msgstr "Sitios de IA %s"
 
 #. translators: %s: daily limit
-#: inc/lib/ai-builder/inc/assets/build/main.js:182
+#: inc/lib/ai-builder/inc/assets/build/main.js:197
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:147
 #, js-format
 msgid "This plan allows you to generate %s per day, and you have reached this limit."
 msgstr "Este plan te permite generar %s por día, y has alcanzado este límite."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:182
+#: inc/lib/ai-builder/inc/assets/build/main.js:197
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:147
 msgid "To create more AI websites, you will need to either upgrade your plan or wait until the limit resets."
 msgstr "Para crear más sitios web de IA, necesitarás actualizar tu plan o esperar hasta que se restablezca el límite."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:182
+#: inc/lib/ai-builder/inc/assets/build/main.js:197
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:149
 msgid "Limit reached"
 msgstr "Límite alcanzado"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:182
+#: inc/lib/ai-builder/inc/assets/build/main.js:197
 msgid "Resume your last session?"
 msgstr "¿Reanudar tu última sesión?"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:182
+#: inc/lib/ai-builder/inc/assets/build/main.js:197
 msgid "It appears that your previous website building session was interrupted. Would you like to pick up where you left off?"
 msgstr "Parece que tu sesión anterior de creación de sitios web fue interrumpida. ¿Te gustaría continuar donde lo dejaste?"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:182
-#: inc/lib/ai-builder/inc/assets/build/main.js:183
+#: inc/lib/ai-builder/inc/assets/build/main.js:197
+#: inc/lib/ai-builder/inc/assets/build/main.js:198
 msgid "Resume Previous Session"
 msgstr "Reanudar sesión anterior"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:182
-#: inc/lib/ai-builder/inc/assets/build/main.js:183
+#: inc/lib/ai-builder/inc/assets/build/main.js:197
+#: inc/lib/ai-builder/inc/assets/build/main.js:198
 msgid "Start Over"
 msgstr "Empezar de nuevo"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:183
+#: inc/lib/ai-builder/inc/assets/build/main.js:198
 msgid "Oops , Something went wrong!"
 msgstr "¡Ups, algo salió mal!"
 
 #. translators: %1$s: Contact us link
-#: inc/lib/ai-builder/inc/assets/build/main.js:184
+#: inc/lib/ai-builder/inc/assets/build/main.js:199
 #: inc/lib/gutenberg-templates/dist/main.js:2
 #, js-format
 msgid "There was a problem processing the request. Please try again. If this error continues please contact our <a href=\"%1$s\">support team</a>."
 msgstr "Hubo un problema al procesar la solicitud. Por favor, inténtelo de nuevo. Si este error persiste, por favor contacte a nuestro <a href=\"%1$s\">equipo de soporte</a>."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:184
-#: inc/lib/ai-builder/inc/assets/build/main.js:245
+#: inc/lib/ai-builder/inc/assets/build/main.js:199
+#: inc/lib/ai-builder/inc/assets/build/main.js:260
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "Back to Main Screen"
 msgstr "Volver a la pantalla principal"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:184
+#: inc/lib/ai-builder/inc/assets/build/main.js:199
 msgid "Site creation failed due to an unexpected error. Please try again or reach out for assistance if the issue persists."
 msgstr "La creación del sitio falló debido a un error inesperado. Por favor, inténtelo de nuevo o comuníquese para obtener ayuda si el problema persiste."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:184
+#: inc/lib/ai-builder/inc/assets/build/main.js:199
 msgid "Additional technical information:"
 msgstr "Información técnica adicional:"
 
 #. translators: %s: message
-#: inc/lib/ai-builder/inc/assets/build/main.js:185
+#: inc/lib/ai-builder/inc/assets/build/main.js:200
 #, js-format
 msgid "Error Message: %1$s"
 msgstr "Mensaje de error: %1$s"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:185
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:200
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:123
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:149
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:342
 msgid "Exit to Dashboard"
 msgstr "Salir al panel de control"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:185
+#: inc/lib/ai-builder/inc/assets/build/main.js:200
 msgid "This is the total usage quota"
 msgstr "Esta es la cuota total de uso"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:185
+#: inc/lib/ai-builder/inc/assets/build/main.js:200
 msgid "This usage quota will reset monthly"
 msgstr "Esta cuota de uso se restablecerá mensualmente"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:185
+#: inc/lib/ai-builder/inc/assets/build/main.js:200
 msgid "This usage quota will reset daily"
 msgstr "Esta cuota de uso se restablecerá diariamente"
 
 #. translators: Reset Type
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
 #, js-format
 msgid "This usage quota will reset %s"
 msgstr "Esta cuota de uso se restablecerá %s"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
 msgid "Plan Usage & Limit"
 msgstr "Uso del Plan y Límite"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
 msgid "Keep track and monitor how you allocate and use resources in your existing plan."
 msgstr "Realiza un seguimiento y monitorea cómo asignas y utilizas los recursos en tu plan actual."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
 msgid "Plan"
 msgstr "Plan"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
 msgid "Manage Plan"
 msgstr "Gestionar Plan"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
 msgid "Staging Sites"
 msgstr "Sitios de prueba"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
 msgid "AI Website Generations"
 msgstr "Generaciones de sitios web de IA"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
 msgid "Blueprint Sites"
 msgstr "Sitios de planos"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
 msgid "Disk Space Utilized"
 msgstr "Espacio en disco utilizado"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
 msgid "Team members"
 msgstr "Miembros del equipo"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:180
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "Upgrade Now"
 msgstr "Actualiza ahora"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
 msgid "5 AI sites per day"
 msgstr "5 sitios de IA por día"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
 msgid "20,000 AI Credits"
 msgstr "20,000 Créditos de IA"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
 msgid "Premium designs"
 msgstr "Diseños premium"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
 msgid "5 Blueprint Sites"
 msgstr "5 Sitios de Planos"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
 msgid "10 AI sites per day"
 msgstr "10 sitios de IA por día"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
 msgid "100,000 AI Credits"
 msgstr "100,000 Créditos de IA"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
 msgid "10 Blueprint Sites"
 msgstr "10 Sitios de Planos"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
 msgid "Great Start! Congratulations.."
 msgstr "¡Gran comienzo! Felicitaciones."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:123
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:149
 msgid "Block Editor"
 msgstr "Editor de Bloques"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:123
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:149
 msgid "AI Website Builder"
 msgstr "Constructor de sitios web de IA"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Next"
 msgstr "Siguiente"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Skip Step"
 msgstr "Omitir paso"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Search"
 msgstr "Buscar"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Nothing found"
 msgstr "No se encontró nada"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "You've almost reached AI site-building limit."
 msgstr "Casi has alcanzado el límite de construcción de sitios de IA."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Upgrade with add-ons to unlock more."
 msgstr "Mejora con complementos para desbloquear más."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Use this"
 msgstr "Usa esto"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
-#: inc/lib/ai-builder/inc/assets/build/main.js:204
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
+#: inc/lib/ai-builder/inc/assets/build/main.js:219
 msgid "Improve Using AI"
 msgstr "Mejorar usando IA"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Add More Business Details"
 msgstr "Agregar más detalles del negocio"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "The business details provided are not enough to create the website content. Please describe your business with more details, or use AI to write it for you."
 msgstr "Los detalles del negocio proporcionados no son suficientes para crear el contenido del sitio web. Por favor, describa su negocio con más detalles, o use IA para escribirlo por usted."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "A good business description is:"
 msgstr "Una buena descripción de negocio es:"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "I'll Write by Myself"
 msgstr "Escribiré por mi cuenta"
 
 #. translators: %s: social media name
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 #: inc/lib/gutenberg-templates/dist/main.js:2
 #, js-format
 msgid "Enter your %s account URL"
 msgstr "Introduce la URL de tu cuenta de %s"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "Enter your Google Business URL"
 msgstr "Introduce tu URL de Google Business"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "Enter your Yelp business URL"
 msgstr "Introduce la URL de tu negocio en Yelp"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "Enter your account URL"
 msgstr "Introduce la URL de tu cuenta"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 msgid "Facebook"
 msgstr "Facebook"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 msgid "Twitter"
 msgstr "Twitter"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 msgid "Instagram"
 msgstr "Instagram"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 msgid "LinkedIn"
 msgstr "LinkedIn"
 
 #: inc/classes/class-astra-sites-astra-onboarding.php:251
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 #: inc/lib/one-onboarding/build/main.js:1
 msgid "YouTube"
 msgstr "YouTube"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 msgid "Google My Business"
 msgstr "Google Mi Negocio"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 msgid "Yelp"
 msgstr "Yelp"
 
 #: inc/classes/class-astra-sites-astra-onboarding.php:250
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 #: inc/lib/gutenberg-templates/dist/main.js:2
 #: inc/lib/one-onboarding/build/main.js:1
 msgid "Social Media"
 msgstr "Redes Sociales"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "Please enter a full URL. Eg. https://twitter.com/abcd, https://instagram.com/abcd, https://facebook.com/abcd"
 msgstr "Por favor, introduce una URL completa. Ej. https://twitter.com/abcd, https://instagram.com/abcd, https://facebook.com/abcd"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "This might not be a valid URL."
 msgstr "Esta podría no ser una URL válida."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "Upload images"
 msgstr "Subir imágenes"
 
 #. translators: %s: file name
-#: inc/lib/ai-builder/inc/assets/build/main.js:193
 #: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 #: inc/lib/gutenberg-templates/dist/main.js:2
 #, js-format
 msgid "Invalid file name! Please avoid special characters. (%s)"
 msgstr "¡Nombre de archivo no válido! Por favor, evite caracteres especiales. (%s)"
 
 #. translators: %s: Option number
-#: inc/lib/ai-builder/inc/assets/build/main.js:194
+#: inc/lib/ai-builder/inc/assets/build/main.js:209
 #, js-format
 msgid "Option %s"
 msgstr "Opción %s"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:194
+#: inc/lib/ai-builder/inc/assets/build/main.js:209
 msgid "Open Design in New Tab"
 msgstr "Abrir diseño en una nueva pestaña"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:194
+#: inc/lib/ai-builder/inc/assets/build/main.js:209
 msgid "E-Commerce"
 msgstr "Comercio electrónico"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:194
+#: inc/lib/ai-builder/inc/assets/build/main.js:209
 msgid "Pages included:"
 msgstr "Páginas incluidas:"
 
 #. translators: %s: Page count
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #, js-format
 msgid "Page count: %s"
 msgstr "Recuento de páginas: %s"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Generating preview…"
 msgstr "Generando vista previa…"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "All orientations"
 msgstr "Todas las orientaciones"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/zipwp-images/dist/main.js:1
 msgid "Landscape"
 msgstr "Paisaje"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/zipwp-images/dist/main.js:1
 msgid "Portrait"
 msgstr "Retrato"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Search Results"
 msgstr "Resultados de búsqueda"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "Upload Your Images"
 msgstr "Sube tus imágenes"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Selected Images"
 msgstr "Imágenes seleccionadas"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:149
 msgid "Select features"
 msgstr "Seleccionar características"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:149
 msgid "Select the features you want on this website"
 msgstr "Selecciona las características que deseas en este sitio web"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Something went wrong. Please try again later."
 msgstr "Algo salió mal. Por favor, inténtelo de nuevo más tarde."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:153
 msgid "Skip & Start Building"
 msgstr "Omitir y comenzar a construir"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:144
 msgid "Importing Content…"
 msgstr "Importando contenido…"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:123
+#: inc/lib/onboarding/assets/dist/onboarding/main.js:165
 msgid "Fetching related demo failed."
 msgstr "La obtención de la demostración relacionada falló."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:123
 msgid "Astra Theme Installed."
 msgstr "Tema Astra instalado."
@@ -2340,110 +2343,110 @@ msgstr "Tema Astra instalado."
 msgid "Astra theme installation failed."
 msgstr "La instalación del tema Astra falló."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:123
 msgid "Installing Astra Theme…"
 msgstr "Instalando el tema Astra…"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Oops.. Something went wrong"
 msgstr "Ups.. Algo salió mal"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "What happened?"
 msgstr "¿Qué pasó?"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Importing site content has failed. The import process was interrupted."
 msgstr "La importación del contenido del sitio ha fallado. El proceso de importación fue interrumpido."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Additional technical information from console:"
 msgstr "Información técnica adicional de la consola:"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Click here to try again"
 msgstr "Haz clic aquí para intentarlo de nuevo"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Double-checking for grammar and spelling errors…"
 msgstr "Comprobando dos veces los errores de gramática y ortografía…"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Finalizing setup and configurations…"
 msgstr "Finalizando la configuración y los ajustes…"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Crossing the t's and dotting the i's…"
 msgstr "Cruzando las t y poniendo los puntos sobre las íes…"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Reviewing for any last-minute tweaks…"
 msgstr "Revisando para cualquier ajuste de último minuto…"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Almost there! Just a few more finishing touches…"
 msgstr "¡Casi listo! Solo unos pocos toques finales…"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Your website is almost ready."
 msgstr "Tu sitio web está casi listo."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "It's taking longer than usual. Please bear with us!"
 msgstr "Está tardando más de lo habitual. ¡Por favor, tenga paciencia con nosotros!"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Building a website has never been this easy!"
 msgstr "¡Construir un sitio web nunca ha sido tan fácil!"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Here is how the AI Website Builder works:"
 msgstr "Aquí está cómo funciona el Constructor de Sitios Web de IA:"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Create a free account on ZipWP platform."
 msgstr "Crea una cuenta gratuita en la plataforma ZipWP."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Describe your dream website in your own words."
 msgstr "Describe tu sitio web soñado con tus propias palabras."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Watch as AI crafts your WordPress website instantly."
 msgstr "Mira cómo la IA crea tu sitio web de WordPress al instante."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Refine the website with an easy drag & drop builder."
 msgstr "Refina el sitio web con un constructor fácil de arrastrar y soltar."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Launch."
 msgstr "Lanzamiento."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Let's Get Started. It's Free"
 msgstr "Comencemos. Es gratis"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Let's build your website!"
 msgstr "¡Construyamos tu sitio web!"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Please share some basic details of the website to get started."
 msgstr "Por favor, comparte algunos detalles básicos del sitio web para comenzar."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "Name of the website:"
 msgstr "Nombre del sitio web:"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "Enter name or title of the website"
 msgstr "Ingrese el nombre o título del sitio web"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Name is required"
 msgstr "Se requiere el nombre"
 
@@ -2451,177 +2454,177 @@ msgstr "Se requiere el nombre"
 msgid "This website is for:"
 msgstr "Este sitio web es para:"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "Name, language & type"
 msgstr "Nombre, idioma y tipo"
 
 #. translators: %s: business name
-#: inc/lib/ai-builder/inc/assets/build/main.js:196
+#: inc/lib/ai-builder/inc/assets/build/main.js:211
 #, js-format
 msgid "What is %s? Please describe the business."
 msgstr "¿Qué es %s? Por favor, describe el negocio."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:196
+#: inc/lib/ai-builder/inc/assets/build/main.js:211
 msgid "Please be as descriptive as you can. Share details such as services, products, goals, etc."
 msgstr "Por favor, sea lo más descriptivo posible. Comparta detalles como servicios, productos, objetivos, etc."
 
 #. translators: %s: person name
-#: inc/lib/ai-builder/inc/assets/build/main.js:197
+#: inc/lib/ai-builder/inc/assets/build/main.js:212
 #, js-format
 msgid "Who is %s? Tell us more about the person."
 msgstr "¿Quién es %s? Cuéntanos más sobre la persona."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:197
+#: inc/lib/ai-builder/inc/assets/build/main.js:212
 msgid "Please be as descriptive as you can. Share details such as what they do, their expertise, offerings, etc."
 msgstr "Por favor, sea lo más descriptivo posible. Comparta detalles como lo que hacen, su experiencia, ofertas, etc."
 
 #. translators: %s: organisation name
-#: inc/lib/ai-builder/inc/assets/build/main.js:198
+#: inc/lib/ai-builder/inc/assets/build/main.js:213
 #, js-format
 msgid "What is %s? Please describe the organisation."
 msgstr "¿Qué es %s? Por favor describe la organización."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:198
+#: inc/lib/ai-builder/inc/assets/build/main.js:213
 msgid "Please be as descriptive as you can. Share details such as services, programs, mission, vision, etc."
 msgstr "Por favor, sea lo más descriptivo posible. Comparta detalles como servicios, programas, misión, visión, etc."
 
 #. translators: %s: restaurant name
-#: inc/lib/ai-builder/inc/assets/build/main.js:199
+#: inc/lib/ai-builder/inc/assets/build/main.js:214
 #, js-format
 msgid "What is %s? Tell us more about the restaurant."
 msgstr "¿Qué es %s? Cuéntanos más sobre el restaurante."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:199
+#: inc/lib/ai-builder/inc/assets/build/main.js:214
 msgid "Please be as descriptive as you can. Share details such as a brief about the restaurant, specialty, menu, etc."
 msgstr "Por favor, sea lo más descriptivo posible. Comparta detalles como una breve descripción del restaurante, especialidades, menú, etc."
 
 #. translators: %s: product name
-#: inc/lib/ai-builder/inc/assets/build/main.js:200
+#: inc/lib/ai-builder/inc/assets/build/main.js:215
 #, js-format
 msgid "What is %s? Share more details about the product."
 msgstr "¿Qué es %s? Comparte más detalles sobre el producto."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:200
-#: inc/lib/ai-builder/inc/assets/build/main.js:202
+#: inc/lib/ai-builder/inc/assets/build/main.js:215
+#: inc/lib/ai-builder/inc/assets/build/main.js:217
 msgid "Please be as descriptive as you can. Share details such as a brief about the product, features, some USPs, etc."
 msgstr "Por favor, sea lo más descriptivo posible. Comparta detalles como una breve descripción del producto, características, algunas USPs, etc."
 
 #. translators: %s: event name
-#: inc/lib/ai-builder/inc/assets/build/main.js:201
+#: inc/lib/ai-builder/inc/assets/build/main.js:216
 #, js-format
 msgid "Tell us more about %s."
 msgstr "Cuéntanos más sobre %s."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:201
+#: inc/lib/ai-builder/inc/assets/build/main.js:216
 msgid "Please be as descriptive as you can. Share details such as Event information date, venue, some highlights, etc."
 msgstr "Por favor, sea lo más descriptivo posible. Comparta detalles como la información del evento, fecha, lugar, algunos aspectos destacados, etc."
 
 #. translators: %s: landing page name
-#: inc/lib/ai-builder/inc/assets/build/main.js:202
+#: inc/lib/ai-builder/inc/assets/build/main.js:217
 #, js-format
 msgid "Share more details about %s."
 msgstr "Comparte más detalles sobre %s."
 
 #. translators: %s: medical facility name
-#: inc/lib/ai-builder/inc/assets/build/main.js:203
+#: inc/lib/ai-builder/inc/assets/build/main.js:218
 #, js-format
 msgid "Tell us more about the %s."
 msgstr "Cuéntanos más sobre el %s."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:203
+#: inc/lib/ai-builder/inc/assets/build/main.js:218
 msgid "Please be as descriptive as you can. Share details such as treatments, procedures, facilities, etc."
 msgstr "Por favor, sea lo más descriptivo posible. Comparta detalles como tratamientos, procedimientos, instalaciones, etc."
 
 #. translators: %s: entity name
-#: inc/lib/ai-builder/inc/assets/build/main.js:204
+#: inc/lib/ai-builder/inc/assets/build/main.js:219
 #, js-format
 msgid "Please describe %s in a few words."
 msgstr "Por favor describe %s en pocas palabras."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:204
+#: inc/lib/ai-builder/inc/assets/build/main.js:219
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "The best way to describe anything is by answering a few WH questions. Who, What, Where, Why, When, etc."
 msgstr "La mejor manera de describir algo es respondiendo algunas preguntas WH. Quién, Qué, Dónde, Por qué, Cuándo, etc."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:204
+#: inc/lib/ai-builder/inc/assets/build/main.js:219
 msgid "Characters: "
 msgstr "Caracteres:"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:204
+#: inc/lib/ai-builder/inc/assets/build/main.js:219
 msgid "E.g. Mantra Minds is a yoga studio located in Chino Hills, California. The studio offers a variety of classes such as Hatha yoga, Vinyasa flow, and Restorative yoga. The studio is led by Jane, an experienced and certified yoga instructor with over 10 years of teaching expertise. The welcoming atmosphere and personalized Jane make it a favorite among yoga enthusiasts in the area."
 msgstr "Por ejemplo, Mantra Minds es un estudio de yoga ubicado en Chino Hills, California. El estudio ofrece una variedad de clases como yoga Hatha, flujo Vinyasa y yoga Restaurativo. El estudio está dirigido por Jane, una instructora de yoga experimentada y certificada con más de 10 años de experiencia en la enseñanza. La atmósfera acogedora y la atención personalizada de Jane lo convierten en un favorito entre los entusiastas del yoga en la zona."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:204
+#: inc/lib/ai-builder/inc/assets/build/main.js:219
 msgid "Write Using AI"
 msgstr "Escribir usando IA"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:204
+#: inc/lib/ai-builder/inc/assets/build/main.js:219
 msgid "Describe"
 msgstr "Describir"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:204
+#: inc/lib/ai-builder/inc/assets/build/main.js:219
 msgid "Some details please"
 msgstr "Algunos detalles por favor"
 
 #. translators: %s: Business name.
-#: inc/lib/ai-builder/inc/assets/build/main.js:207
+#: inc/lib/ai-builder/inc/assets/build/main.js:222
 #, js-format
 msgid "How can people get in touch with %1$s?"
 msgstr "¿Cómo pueden ponerse en contacto con %1$s?"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:207
+#: inc/lib/ai-builder/inc/assets/build/main.js:222
 msgid "Please provide the contact information below. These will be used on the website."
 msgstr "Por favor, proporcione la información de contacto a continuación. Estos se utilizarán en el sitio web."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:207
+#: inc/lib/ai-builder/inc/assets/build/main.js:222
 #: inc/lib/one-onboarding/build/main.js:1
 msgid "Email"
 msgstr "Correo electrónico"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:207
+#: inc/lib/ai-builder/inc/assets/build/main.js:222
 msgid "Your email"
 msgstr "Tu correo electrónico"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:207
+#: inc/lib/ai-builder/inc/assets/build/main.js:222
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "Please enter a valid email"
 msgstr "Por favor, introduce un correo electrónico válido"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:207
+#: inc/lib/ai-builder/inc/assets/build/main.js:222
 msgid "Phone Number"
 msgstr "Número de teléfono"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:207
+#: inc/lib/ai-builder/inc/assets/build/main.js:222
 msgid "Your phone number"
 msgstr "Tu número de teléfono"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:207
+#: inc/lib/ai-builder/inc/assets/build/main.js:222
 msgid "Address"
 msgstr "Dirección"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:207
+#: inc/lib/ai-builder/inc/assets/build/main.js:222
 msgid "Contact"
 msgstr "Contacto"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:207
+#: inc/lib/ai-builder/inc/assets/build/main.js:222
 msgid "How can people get in touch"
 msgstr "¿Cómo pueden ponerse en contacto?"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "You can only upload 20 images at once"
 msgstr "Solo puedes subir 20 imágenes a la vez"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "Select the Images"
 msgstr "Selecciona las imágenes"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "Add more relevant keywords…"
 msgstr "Agrega más palabras clave relevantes…"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "Suggested Keywords"
 msgstr "Palabras clave sugeridas"
@@ -2635,406 +2638,406 @@ msgstr "Claro"
 msgid "or drop your images here (Max 20)"
 msgstr "o suelta tus imágenes aquí (Máx 20)"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "PNG, JPG, JPEG"
 msgstr "PNG, JPG, JPEG"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "Max size: 5 MB per file"
 msgstr "Tamaño máximo: 5 MB por archivo"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "You have not selected any images yet."
 msgstr "Aún no has seleccionado ninguna imagen."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "We couldn't find anything with your keyword."
 msgstr "No pudimos encontrar nada con tu palabra clave."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 #: inc/lib/gutenberg-templates/dist/main.js:2
 #: inc/lib/zipwp-images/dist/main.js:4
 msgid "Try to refine your search."
 msgstr "Intenta refinar tu búsqueda."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "Find the perfect images for your website by entering a keyword or selecting from the suggested options."
 msgstr "Encuentra las imágenes perfectas para tu sitio web ingresando una palabra clave o seleccionando entre las opciones sugeridas."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "End of the search results"
 msgstr "Fin de los resultados de búsqueda"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "Save & Exit"
 msgstr "Guardar y salir"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "Images"
 msgstr "Imágenes"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "Select relevant images as needed"
 msgstr "Selecciona las imágenes relevantes según sea necesario"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "Choose the Design"
 msgstr "Elige el diseño"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "Add a keyword"
 msgstr "Agregar una palabra clave"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "Error while fetching templates"
 msgstr "Error al obtener las plantillas"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "Load More Designs"
 msgstr "Cargar más diseños"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "Design"
 msgstr "Diseño"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "Choose a structure for your website"
 msgstr "Elige una estructura para tu sitio web"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "Features"
 msgstr "Características"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "Select features as you need"
 msgstr "Selecciona las funciones según necesites"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Resetting posts."
 msgstr "Restableciendo publicaciones."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Resetting posts failed."
 msgstr "Restablecer las publicaciones falló."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Taking settings backup."
 msgstr "Realizando copia de seguridad de la configuración."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Taking settings backup failed."
 msgstr "Error al realizar la copia de seguridad de la configuración."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Resetting customizer."
 msgstr "Restableciendo el personalizador."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Resetting customizer failed."
 msgstr "Restablecer el personalizador falló."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Resetting site options."
 msgstr "Restableciendo las opciones del sitio."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Resetting site options Failed."
 msgstr "Restablecer las opciones del sitio falló."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Resetting widgets."
 msgstr "Restableciendo widgets."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Resetting widgets JSON parse failed."
 msgstr "Restablecer widgets falló al analizar JSON."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Resetting widgets failed."
 msgstr "El restablecimiento de los widgets falló."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Resetting terms and forms."
 msgstr "Restableciendo términos y formularios."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Resetting terms and forms failed."
 msgstr "Restablecer los términos y formularios falló."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Gathering posts for deletions."
 msgstr "Reuniendo publicaciones para eliminaciones."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Resetting posts done."
 msgstr "Restablecimiento de publicaciones completado."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Importing Site Content Failed. - Import Process Interrupted"
 msgstr "La importación del contenido del sitio falló. - Proceso de importación interrumpido"
 
 #. translators: Response importMessage
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:165
 #, js-format
 msgid "Importing - %1$s"
 msgstr "Importando - %1$s"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:133
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:150
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:165
 msgid "Are you sure you want to cancel the site import process?"
 msgstr "¿Está seguro de que desea cancelar el proceso de importación del sitio?"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 msgid "Retrying Import."
 msgstr "Reintentando la importación."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 msgid "Preparing your site for import…"
 msgstr "Preparando su sitio para la importación…"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 msgid "Preparing the site…"
 msgstr "Preparando el sitio…"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 msgid "Please wait a moment…"
 msgstr "Por favor, espera un momento…"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 msgid "Failed to create website"
 msgstr "Error al crear el sitio web"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 msgid "The website is created successfully!"
 msgstr "¡El sitio web se ha creado con éxito!"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:165
 msgid "Starting Import."
 msgstr "Iniciando importación."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 msgid "Resetting site."
 msgstr "Restableciendo el sitio."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:165
 msgid "Reset for old website is done."
 msgstr "El restablecimiento del sitio web antiguo está hecho."
 
 #. translators: %s: Image number.
-#: inc/lib/ai-builder/inc/assets/build/main.js:220
+#: inc/lib/ai-builder/inc/assets/build/main.js:235
 #, js-format
 msgid "Downloading Image %s"
 msgstr "Descargando imagen %s"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:220
+#: inc/lib/ai-builder/inc/assets/build/main.js:235
 msgid "Downloading images failed."
 msgstr "La descarga de imágenes falló."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Importing forms."
 msgstr "Importando formularios."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Importing Customizer failed due to parse JSON error."
 msgstr "La importación del personalizador falló debido a un error al analizar JSON."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Importing Customizer Failed."
 msgstr "Error al importar el personalizador."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Importing Spectra Settings."
 msgstr "Importando configuraciones de espectros."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Importing Spectra Settings failed due to parse JSON error."
 msgstr "La importación de la configuración de Spectra falló debido a un error al analizar JSON."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 msgid "Importing Spectra Settings Failed."
 msgstr "Error al importar la configuración de Spectra."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:220
+#: inc/lib/ai-builder/inc/assets/build/main.js:235
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:165
 msgid "Importing Surecart Settings failed."
 msgstr "La importación de la configuración de Surecart falló."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:220
+#: inc/lib/ai-builder/inc/assets/build/main.js:235
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:165
 msgid "Importing Surecart Settings Failed."
 msgstr "La importación de la configuración de Surecart falló."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:220
+#: inc/lib/ai-builder/inc/assets/build/main.js:235
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:165
 msgid "Importing Site Content."
 msgstr "Importando contenido del sitio."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:220
+#: inc/lib/ai-builder/inc/assets/build/main.js:235
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:156
 msgid "Installing Required Plugins."
 msgstr "Instalando los plugins requeridos."
 
 #. translators: Plugin Name.
-#: inc/lib/ai-builder/inc/assets/build/main.js:223
+#: inc/lib/ai-builder/inc/assets/build/main.js:238
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:156
 #, js-format
 msgid "%1$s plugin installed successfully."
 msgstr "El complemento %1$s se instaló correctamente."
 
 #. translators: Plugin Name.
-#: inc/lib/ai-builder/inc/assets/build/main.js:226
+#: inc/lib/ai-builder/inc/assets/build/main.js:241
 #, js-format
 msgid "Could not install the plugin - %s"
 msgstr "No se pudo instalar el plugin - %s"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:165
 msgid "Importing Site Options."
 msgstr "Importando opciones del sitio."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:165
 msgid "Importing Site Options failed due to parse JSON error."
 msgstr "La importación de las opciones del sitio falló debido a un error al analizar JSON."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:165
 msgid "Importing Site Options Failed."
 msgstr "La importación de opciones del sitio falló."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:165
 msgid "Importing Widgets."
 msgstr "Importando widgets."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:165
 msgid "Importing Widgets failed due to parse JSON error."
 msgstr "La importación de widgets falló debido a un error al analizar JSON."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:165
 msgid "Importing Widgets Failed."
 msgstr "La importación de widgets falló."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:226
+#: inc/lib/ai-builder/inc/assets/build/main.js:241
 msgid "Processing content for pages."
 msgstr "Procesando contenido para páginas."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 msgid "Final finishing."
 msgstr "Acabado final."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 msgid "Final finishing failed due to parse JSON error."
 msgstr "El acabado final falló debido a un error al analizar JSON."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 msgid "Final finishing Failed."
 msgstr "Finalización fallida."
 
 #. translators: Plugin Name.
-#: inc/lib/ai-builder/inc/assets/build/main.js:229
+#: inc/lib/ai-builder/inc/assets/build/main.js:244
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:168
 #, js-format
 msgid "Activating %1$s plugin."
 msgstr "Activando el complemento %1$s."
 
 #. translators: Plugin Name.
-#: inc/lib/ai-builder/inc/assets/build/main.js:232
+#: inc/lib/ai-builder/inc/assets/build/main.js:247
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:172
 #, js-format
 msgid "%1$s activated."
 msgstr "%1$s activado."
 
 #. translators: Plugin name.
-#: inc/lib/ai-builder/inc/assets/build/main.js:235
+#: inc/lib/ai-builder/inc/assets/build/main.js:250
 #, js-format
 msgid "JSON_Error: Could not activate the required plugin - %1$s."
 msgstr "Error_JSON: No se pudo activar el plugin requerido - %1$s."
 
 #. translators: Plugin name.
-#: inc/lib/ai-builder/inc/assets/build/main.js:241
+#: inc/lib/ai-builder/inc/assets/build/main.js:256
 #, js-format
 msgid "Could not activate the required plugin - %1$s."
 msgstr "No se pudo activar el complemento requerido - %1$s."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
-#: inc/lib/ai-builder/inc/assets/build/main.js:244
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
+#: inc/lib/ai-builder/inc/assets/build/main.js:259
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:172
 msgid "We are building your website…"
 msgstr "Estamos construyendo tu sitio web…"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:244
-#: inc/lib/ai-builder/inc/assets/build/main.js:245
+#: inc/lib/ai-builder/inc/assets/build/main.js:259
+#: inc/lib/ai-builder/inc/assets/build/main.js:260
 #: inc/lib/one-onboarding/build/main.js:43
 msgid "Done"
 msgstr "Hecho"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:244
+#: inc/lib/ai-builder/inc/assets/build/main.js:259
 msgid "Your website is ready!"
 msgstr "¡Tu sitio web está listo!"
 
 #. translators: %s: line break
-#: inc/lib/ai-builder/inc/assets/build/main.js:245
+#: inc/lib/ai-builder/inc/assets/build/main.js:260
 #, js-format
 msgid "Woohoo, your website %1$s is ready!"
 msgstr "¡Woohoo, tu sitio web %1$s está listo!"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:245
+#: inc/lib/ai-builder/inc/assets/build/main.js:260
 msgid "You did it! Your brand new website is all set to shine online."
 msgstr "¡Lo lograste! Tu nuevo sitio web está listo para brillar en línea."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:245
+#: inc/lib/ai-builder/inc/assets/build/main.js:260
 msgid "See Your Website"
 msgstr "Ver tu sitio web"
 
 #: inc/classes/class-astra-sites-astra-onboarding.php:286
 #: inc/classes/class-astra-sites-astra-onboarding.php:295
-#: inc/lib/ai-builder/inc/assets/build/main.js:245
+#: inc/lib/ai-builder/inc/assets/build/main.js:260
 msgid "Visit Dashboard"
 msgstr "Visitar el panel de control"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:245
+#: inc/lib/ai-builder/inc/assets/build/main.js:260
 msgid "Congratulations! Your website is ready!"
 msgstr "¡Felicidades! ¡Tu sitio web está listo!"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:245
+#: inc/lib/ai-builder/inc/assets/build/main.js:260
 msgid "The requested URL was not found."
 msgstr "La URL solicitada no fue encontrada."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:245
+#: inc/lib/ai-builder/inc/assets/build/main.js:260
 msgid "The URL may have been typed incorrectly. Or it might be a broken or outdated link."
 msgstr "Es posible que la URL se haya escrito incorrectamente. O podría ser un enlace roto o desactualizado."
 
@@ -3342,7 +3345,7 @@ msgstr "Conectar"
 msgid "Connect your account"
 msgstr "Conecta tu cuenta"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/gutenberg-templates/dist/main.js:2
 msgid "Let's Start"
 msgstr "Empecemos"
@@ -4346,77 +4349,77 @@ msgid "Template Kits"
 msgstr "Kits de Plantillas"
 
 #. translators: %s Anchor link to support URL.
-#: inc/classes/class-astra-sites.php:2103
+#: inc/classes/class-astra-sites.php:2116
 #, php-format
 msgid "Please report this error%1$s here %2$s, so we can fix it."
 msgstr "Por favor, informe de este error%1$s aquí %2$s, para que podamos solucionarlo."
 
-#: inc/classes/class-astra-sites.php:2421
+#: inc/classes/class-astra-sites.php:2434
 msgid "Missing plugin installation permission"
 msgstr "Falta permiso para la instalación del complemento"
 
 #. translators: %s doc link.
-#: inc/classes/class-astra-sites.php:2423
+#: inc/classes/class-astra-sites.php:2436
 msgid "You do not have permission to install the required plugin. You must have install permissions to proceed with the required plugin."
 msgstr "No tienes permiso para instalar el complemento requerido. Debes tener permisos de instalación para proceder con el complemento requerido."
 
-#: inc/classes/class-astra-sites.php:2426
+#: inc/classes/class-astra-sites.php:2439
 msgid "Missing plugin activation permission"
 msgstr "Falta permiso para activar el complemento"
 
 #. translators: %s doc link.
-#: inc/classes/class-astra-sites.php:2428
+#: inc/classes/class-astra-sites.php:2441
 msgid "You do not have permission to activate the required plugin. You must have activate permissions to proceed with the required plugin."
 msgstr "No tienes permiso para activar el complemento requerido. Debes tener permisos de activación para proceder con el complemento requerido."
 
-#: inc/classes/class-astra-sites.php:2431
+#: inc/classes/class-astra-sites.php:2444
 msgid "Insufficient Memory Limit"
 msgstr "Límite de memoria insuficiente"
 
 #. translators: %s doc link.
-#: inc/classes/class-astra-sites.php:2433
+#: inc/classes/class-astra-sites.php:2446
 msgid "The memory limit of your site is below the recommended 256MB. While you can proceed, increasing the memory limit is advised for a seamless import experience."
 msgstr "El límite de memoria de su sitio está por debajo del recomendado de 256MB. Aunque puede continuar, se recomienda aumentar el límite de memoria para una experiencia de importación sin problemas."
 
 #. translators: %1$s: Number of AI sites used, %2$s: Current plan name, %3$s: Suggested Plan
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 #, js-format
 msgid "You've successfully generated %1$s AI sites with your %2$s account. Do much more with the %3$s Plan:"
 msgstr "Has generado con éxito %1$s sitios de IA con tu cuenta %2$s. Haz mucho más con el Plan %3$s:"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Required plugins could not be verified."
 msgstr "No se pudieron verificar los plugins requeridos."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Astra theme activation failed."
 msgstr "La activación del tema Astra falló."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:123
 msgid "Theme installation failed."
 msgstr "La instalación del tema falló."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Failed to check File Permissions"
 msgstr "Error al verificar los permisos del archivo"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 msgid "Failed to save Site Logo"
 msgstr "Error al guardar el logotipo del sitio"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 msgid "Failed to save Typography"
 msgstr "Error al guardar la tipografía"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 msgid "Failed to save Site Language"
 msgstr "Error al guardar el idioma del sitio"
 
 #. translators: %1$s is the opening <a> tag with the URL, %2$s is the closing </a> tag.
 #. translators: %1$s is the opening <a> tag, %2$s is the closing </a> tag.
-#: inc/lib/ai-builder/inc/assets/build/main.js:238
-#: inc/lib/ai-builder/inc/assets/build/main.js:244
+#: inc/lib/ai-builder/inc/assets/build/main.js:253
+#: inc/lib/ai-builder/inc/assets/build/main.js:259
 #, js-format
 msgid "%1$sRead article%2$s to resolve the issue and continue importing the template."
 msgstr "%1$sLea el artículo%2$s para resolver el problema y continuar importando la plantilla."
@@ -4592,7 +4595,7 @@ msgstr "Obtener más créditos"
 msgid "Quick Feedback"
 msgstr "Retroalimentación rápida"
 
-#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:307
+#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:444
 #: inc/classes/class-astra-sites-astra-onboarding.php:253
 #: inc/lib/one-onboarding/build/main.js:1
 msgid "Other"
@@ -4674,47 +4677,47 @@ msgstr "Para continuar usando el asistente y acceder a todas sus funciones, por 
 msgid "Buy more credits"
 msgstr "Comprar más créditos"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Sign up for a free ZipWP account to import and customize your website!"
 msgstr "¡Regístrate para obtener una cuenta gratuita de ZipWP para importar y personalizar tu sitio web!"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Customize your website with ease"
 msgstr "Personaliza tu sitio web con facilidad"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Launch faster than ever"
 msgstr "Lanza más rápido que nunca"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Need help? We're a message away"
 msgstr "¿Necesitas ayuda? Estamos a un mensaje de distancia"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Create ZipWP Account"
 msgstr "Crear cuenta ZipWP"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Upload"
 msgstr "Subir"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "Clear all"
 msgstr "Borrar todo"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "or drop your images here"
 msgstr "o suelta tus imágenes aquí"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "(Max 20)"
 msgstr "(Máximo 20)"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:226
+#: inc/lib/ai-builder/inc/assets/build/main.js:241
 msgid "Batch process failed."
 msgstr "El proceso por lotes falló."
 
-#: inc/classes/class-astra-sites.php:1817
+#: inc/classes/class-astra-sites.php:1830
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:150
 msgid "Get Premium Templates"
 msgstr "Obtener plantillas premium"
@@ -4758,48 +4761,48 @@ msgstr "Comienza a Aceptar Pagos"
 msgid "Select Different Design"
 msgstr "Seleccionar diseño diferente"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:182
+#: inc/lib/ai-builder/inc/assets/build/main.js:197
 msgid "contact support"
 msgstr "contactar soporte"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:182
+#: inc/lib/ai-builder/inc/assets/build/main.js:197
 msgid "Start Over?"
 msgstr "¿Empezar de nuevo?"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:182
+#: inc/lib/ai-builder/inc/assets/build/main.js:197
 msgid "Starting over will reset your previous session and consume an additional AI credit."
 msgstr "Empezar de nuevo restablecerá su sesión anterior y consumirá un crédito de IA adicional."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:182
+#: inc/lib/ai-builder/inc/assets/build/main.js:197
 msgid "Would you like to continue, or return to your previous session?"
 msgstr "¿Le gustaría continuar o regresar a su sesión anterior?"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:182
+#: inc/lib/ai-builder/inc/assets/build/main.js:197
 msgid "Previous Session Details"
 msgstr "Detalles de la sesión anterior"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:182
+#: inc/lib/ai-builder/inc/assets/build/main.js:197
 msgid "Copy details to clipboard"
 msgstr "Copiar detalles al portapapeles"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:182
+#: inc/lib/ai-builder/inc/assets/build/main.js:197
 msgid "Error:"
 msgstr "Error:"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:182
+#: inc/lib/ai-builder/inc/assets/build/main.js:197
 msgid "Business Name:"
 msgstr "Nombre del negocio:"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:182
+#: inc/lib/ai-builder/inc/assets/build/main.js:197
 msgid "Description:"
 msgstr "Descripción:"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:182
+#: inc/lib/ai-builder/inc/assets/build/main.js:197
 msgid "UUID:"
 msgstr "UUID:"
 
 #. translators: %1$s: Contact us link
-#: inc/lib/ai-builder/inc/assets/build/main.js:183
+#: inc/lib/ai-builder/inc/assets/build/main.js:198
 #, js-format
 msgid "If the issue persists after multiple attempts, please %1$s for assistance. Copy and share the above details with our support team to help us resolve the issue quickly."
 msgstr "Si el problema persiste después de varios intentos, por favor %1$s para obtener asistencia. Copie y comparta los detalles anteriores con nuestro equipo de soporte para ayudarnos a resolver el problema rápidamente."
@@ -4831,23 +4834,23 @@ msgstr "La importación de datos de Recuperación de Carritos Abandonados falló
 msgid "Importing Cart Abandonment Recovery data Failed."
 msgstr "La importación de datos de Recuperación de Carritos Abandonados falló."
 
-#: inc/lib/ai-builder/inc/traits/helper.php:589
+#: inc/lib/ai-builder/inc/traits/helper.php:723
 msgid "This plugin requires WooCommerce to be installed and activated first."
 msgstr "Este plugin requiere que WooCommerce esté instalado y activado primero."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "This website will be in:"
 msgstr "Este sitio web estará en:"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Type to search your business"
 msgstr "Escribe para buscar tu negocio"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "This website is for"
 msgstr "Este sitio web es para"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:207
+#: inc/lib/ai-builder/inc/assets/build/main.js:222
 msgid "Enter address"
 msgstr "Ingresa la dirección"
 
@@ -4868,7 +4871,7 @@ msgid "🎉 Congratulations on completing the tasks and instructional videos to 
 msgstr "🎉 Felicitaciones por completar las tareas y los videos instructivos para tomar el control total de tu sitio web.\\n 🚀 Ahora, estás bien equipado para hacer que tu sitio web prospere. ¡Buena suerte en tu viaje con el sitio web, y que te traiga grandes logros y oportunidades en el mundo digital!"
 
 #: inc/lib/getting-started/classes/class-gs-admin.php:110
-#: inc/lib/ai-builder/inc/assets/build/main.js:245
+#: inc/lib/ai-builder/inc/assets/build/main.js:260
 #: inc/lib/getting-started/build/main.js:1
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:142
 msgid "Finish Setup"
@@ -4904,24 +4907,24 @@ msgstr "SEO y visibilidad en buscadores"
 msgid "Optimize your website for search engines"
 msgstr "Optimiza tu sitio web para los motores de búsqueda"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Confirm Credit Usage"
 msgstr "Confirmar uso de crédito"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "credit"
 msgstr "crédito"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Confirm and Proceed"
 msgstr "Confirmar y proceder"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:149
 msgid "The following plugins will be installed and activated for the selected features:"
 msgstr "Los siguientes plugins se instalarán y activarán para las características seleccionadas:"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:149
 msgid "Required plugins for the website"
 msgstr "Plugins requeridos para el sitio web"
@@ -5330,16 +5333,16 @@ msgstr "Limpia la caché de tu navegador e inténtalo de nuevo."
 msgid "Check the WordPress error logs for more detailed information about the failure."
 msgstr "Revisa los registros de errores de WordPress para obtener información más detallada sobre la falla."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Great Job! Your Site is Ready! 🎉"
 msgstr "¡Gran trabajo! ¡Tu sitio está listo! 🎉"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 msgid "Already have an account?"
 msgstr "¿Ya tienes una cuenta?"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Click here to login."
 msgstr "Haz clic aquí para iniciar sesión."
 
@@ -5607,7 +5610,7 @@ msgid "Docs & Help Center"
 msgstr "Centro de Documentación y Ayuda"
 
 #: inc/lib/ai-builder/inc/ajax/auth.php:74
-#: inc/lib/ai-builder/inc/ajax/importer.php:251
+#: inc/lib/ai-builder/inc/ajax/importer.php:257
 #: inc/lib/ai-builder/inc/ajax/plugin.php:146
 #: inc/lib/ai-builder/inc/ajax/plugin.php:205
 msgid "You do not have permission to do this action."
@@ -5621,13 +5624,13 @@ msgstr "¡No se seleccionaron imágenes para descargar!"
 msgid "No image to download!"
 msgstr "¡No hay imagen para descargar!"
 
-#: inc/lib/ai-builder/inc/ajax/importer.php:300
+#: inc/lib/ai-builder/inc/ajax/importer.php:306
 #: inc/lib/ai-builder/inc/ajax/plugin.php:186
 msgid "Image downloaded successfully!"
 msgstr "¡Imagen descargada con éxito!"
 
 #. translators: %s is the error message
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:803
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:823
 #, php-format
 msgid "Failed %s"
 msgstr "Falló %s"
@@ -5673,7 +5676,7 @@ msgstr "Plugin activado con éxito"
 msgid "Onboarding state is required"
 msgstr "El estado de incorporación es obligatorio"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Search Language"
 msgstr "Buscar idioma"
 
@@ -5970,146 +5973,146 @@ msgid "Permission denied: You don't have the required capability to delete impor
 msgstr "Permiso denegado: No tienes la capacidad requerida para eliminar términos importados. Por favor, contacta a tu administrador del sitio."
 
 #. translators: %s: URL
-#: inc/classes/class-astra-sites-importer.php:333
+#: inc/classes/class-astra-sites-importer.php:345
 #, php-format
 msgid "Invalid URL format - %s"
 msgstr "Formato de URL no válido - %s"
 
 #. translators: %s: URL
-#: inc/classes/class-astra-sites-importer.php:345
+#: inc/classes/class-astra-sites-importer.php:357
 #, php-format
 msgid "Invalid data file URL - %s"
 msgstr "URL de archivo de datos no válido - %s"
 
-#: inc/classes/class-astra-sites-importer.php:358
-#: inc/lib/starter-templates-importer/importer/st-importer.php:646
+#: inc/classes/class-astra-sites-importer.php:370
+#: inc/lib/starter-templates-importer/importer/st-importer.php:653
 msgid "Could not download data file. Please check your internet connection and try again."
 msgstr "No se pudo descargar el archivo de datos. Por favor, verifica tu conexión a internet e inténtalo de nuevo."
 
 #. translators: %s: Error message
-#: inc/classes/class-astra-sites-importer.php:364
+#: inc/classes/class-astra-sites-importer.php:376
 #, php-format
 msgid "File download failed - %s"
 msgstr "La descarga del archivo falló - %s"
 
-#: inc/classes/class-astra-sites-importer.php:373
+#: inc/classes/class-astra-sites-importer.php:385
 msgid "Downloaded file path is missing in the response."
 msgstr "Falta la ruta del archivo descargado en la respuesta."
 
-#: inc/classes/class-astra-sites-importer.php:383
+#: inc/classes/class-astra-sites-importer.php:395
 msgid "Downloaded file is missing. Please retry the import."
 msgstr "El archivo descargado falta. Por favor, intente importar de nuevo."
 
-#: inc/classes/class-astra-sites-importer.php:391
+#: inc/classes/class-astra-sites-importer.php:403
 msgid "Downloaded file is not readable. Please check server file permissions."
 msgstr "El archivo descargado no es legible. Por favor, verifica los permisos del archivo en el servidor."
 
-#: inc/classes/class-astra-sites-importer.php:400
+#: inc/classes/class-astra-sites-importer.php:412
 msgid "The file must be in JSON format."
 msgstr "El archivo debe estar en formato JSON."
 
-#: inc/classes/class-astra-sites-importer.php:415
+#: inc/classes/class-astra-sites-importer.php:427
 msgid "Could not read the file from the server."
 msgstr "No se pudo leer el archivo del servidor."
 
-#: inc/classes/class-astra-sites-importer.php:422
+#: inc/classes/class-astra-sites-importer.php:434
 msgid "The file is empty."
 msgstr "El archivo está vacío."
 
 #. translators: %s: JSON error
-#: inc/classes/class-astra-sites-importer.php:435
+#: inc/classes/class-astra-sites-importer.php:447
 #, php-format
 msgid "Invalid JSON format - %s"
 msgstr "Formato JSON inválido - %s"
 
-#: inc/classes/class-astra-sites-importer.php:462
+#: inc/classes/class-astra-sites-importer.php:474
 msgid "Permission denied: You don't have the required capability to import forms. Please contact your site administrator."
 msgstr "Permiso denegado: No tienes la capacidad requerida para importar formularios. Por favor, contacta a tu administrador del sitio."
 
 #. translators: %s is Elementor plugin name.
-#: inc/classes/class-astra-sites-importer.php:478
+#: inc/classes/class-astra-sites-importer.php:490
 #, php-format
 msgid "WPForms import failed: Template ID is missing. Unable to proceed with %s import."
 msgstr "La importación de WPForms falló: falta el ID de la plantilla. No se puede continuar con la importación de %s."
 
 #. translators: %s is the error message.
-#: inc/classes/class-astra-sites-importer.php:497
+#: inc/classes/class-astra-sites-importer.php:509
 #, php-format
 msgid "WPForms import failed: %s"
 msgstr "La importación de WPForms falló: %s"
 
 #. translators: %s is exception error message.
-#: inc/classes/class-astra-sites-importer.php:612
+#: inc/classes/class-astra-sites-importer.php:624
 #, php-format
 msgid "WPForms import failed: Unexpected error - %s"
 msgstr "La importación de WPForms falló: Error inesperado - %s"
 
 #. translators: %s: Fatal error message.
-#: inc/classes/class-astra-sites-importer.php:621
+#: inc/classes/class-astra-sites-importer.php:633
 #, php-format
 msgid "WPForms import failed: Fatal Error: %s"
 msgstr "La importación de WPForms falló: Error fatal: %s"
 
-#: inc/classes/class-astra-sites-importer.php:646
+#: inc/classes/class-astra-sites-importer.php:658
 msgid "Permission Denied: You don't have permission to import CartFlows flows. Please contact your site administrator."
 msgstr "Permiso denegado: No tienes permiso para importar flujos de CartFlows. Por favor, contacta a tu administrador del sitio."
 
 #. translators: %s is the error message.
 #. translators: Sending cartflows import failed.
-#: inc/classes/class-astra-sites-importer.php:669
-#: inc/classes/class-astra-sites-importer.php:708
+#: inc/classes/class-astra-sites-importer.php:681
+#: inc/classes/class-astra-sites-importer.php:720
 #, php-format
 msgid "CartFlows import failed: %s"
 msgstr "La importación de CartFlows falló: %s"
 
 #. translators: %s: Exception error message.
-#: inc/classes/class-astra-sites-importer.php:716
+#: inc/classes/class-astra-sites-importer.php:728
 #, php-format
 msgid "CartFlows import failed: Unexpected error - %s"
 msgstr "La importación de CartFlows falló: Error inesperado - %s"
 
 #. translators: %s: Fatal error message.
-#: inc/classes/class-astra-sites-importer.php:720
+#: inc/classes/class-astra-sites-importer.php:732
 #, php-format
 msgid "CartFlows import failed: Fatal Error - %s"
 msgstr "La importación de CartFlows falló: Error fatal - %s"
 
-#: inc/classes/class-astra-sites-importer.php:748
+#: inc/classes/class-astra-sites-importer.php:760
 msgid "Permission denied: You don't have permission to import Cart Abandonment Recovery data. Please contact your site administrator."
 msgstr "Permiso denegado: No tienes permiso para importar datos de Recuperación de Carritos Abandonados. Por favor, contacta a tu administrador del sitio."
 
 #. translators: %s: Exception error message.
-#: inc/classes/class-astra-sites-importer.php:803
+#: inc/classes/class-astra-sites-importer.php:815
 #, php-format
 msgid "Cart Abandonment Recovery import failed: Unexpected error - %s"
 msgstr "La importación de recuperación de abandono de carrito falló: Error inesperado - %s"
 
 #. translators: %s: Fatal error message.
-#: inc/classes/class-astra-sites-importer.php:806
+#: inc/classes/class-astra-sites-importer.php:818
 #, php-format
 msgid "Cart Abandonment Recovery import failed: Fatal Error - %s"
 msgstr "La importación de recuperación de abandono de carrito falló: Error fatal - %s"
 
-#: inc/classes/class-astra-sites-importer.php:828
+#: inc/classes/class-astra-sites-importer.php:840
 msgid "Permission denied: You don't have permission to import LatePoint data. Please contact your site administrator."
 msgstr "Permiso denegado: No tienes permiso para importar datos de LatePoint. Por favor, contacta con el administrador de tu sitio."
 
 #. translators: %s is the error message.
 #. translators: %s is exception error message.
-#: inc/classes/class-astra-sites-importer.php:842
-#: inc/classes/class-astra-sites-importer.php:869
+#: inc/classes/class-astra-sites-importer.php:854
+#: inc/classes/class-astra-sites-importer.php:881
 #, php-format
 msgid "LatePoint import failed: %s"
 msgstr "La importación de LatePoint falló: %s"
 
 #. translators: %s is exception error message.
-#: inc/classes/class-astra-sites-importer.php:876
+#: inc/classes/class-astra-sites-importer.php:888
 #, php-format
 msgid "LatePoint import failed: Unexpected error - %s"
 msgstr "La importación de LatePoint falló: Error inesperado - %s"
 
 #. translators: %s: Fatal error message.
-#: inc/classes/class-astra-sites-importer.php:881
+#: inc/classes/class-astra-sites-importer.php:893
 #, php-format
 msgid "LatePoint import failed: Fatal Error - %s"
 msgstr "La importación de LatePoint falló: Error fatal - %s"
@@ -6118,127 +6121,127 @@ msgstr "La importación de LatePoint falló: Error fatal - %s"
 msgid "Import failed due to insufficient memory. Please increase the PHP memory_limit on your server and retry. If you're unsure how to do this, contact your hosting provider for assistance."
 msgstr "La importación falló debido a memoria insuficiente. Por favor, aumente el memory_limit de PHP en su servidor e intente de nuevo. Si no está seguro de cómo hacerlo, contacte a su proveedor de alojamiento para obtener ayuda."
 
-#: inc/classes/class-astra-sites.php:1536
+#: inc/classes/class-astra-sites.php:1549
 msgid "Failed to download the image. Please verify the URL and your network connection, then try again."
 msgstr "Error al descargar la imagen. Por favor, verifica la URL y tu conexión de red, luego intenta de nuevo."
 
-#: inc/classes/class-astra-sites.php:2030
+#: inc/classes/class-astra-sites.php:2043
 msgid "<p>The import process was interrupted as Debug mode is currently enabled on your site.</p><p>Kindly disable debug mode and try importing Starter Template again.</p><p>You can add the following code into the wp-config.php file to disable debug mode.</p><p><code>define('WP_DEBUG', false);</code></p>"
 msgstr "<p>El proceso de importación fue interrumpido ya que el modo de depuración está actualmente habilitado en su sitio.</p><p>Por favor, desactive el modo de depuración e intente importar la Plantilla de Inicio nuevamente.</p><p>Puede agregar el siguiente código en el archivo wp-config.php para desactivar el modo de depuración.</p><p><code>define('WP_DEBUG', false);</code></p>"
 
 #. translators: %s is a documentation link.
-#: inc/classes/class-astra-sites.php:2032
+#: inc/classes/class-astra-sites.php:2045
 #, php-format
 msgid "<p>Template import was interrupted due to a temporary error.</p><p>Read <a href=\"%s\" target=\"_blank\">article</a> to resolve the issue and continue importing template.</p>"
 msgstr "<p>La importación de la plantilla fue interrumpida debido a un error temporal.</p><p>Lea el <a href=\"%s\" target=\"_blank\">artículo</a> para resolver el problema y continuar importando la plantilla.</p>"
 
 #. translators: %s is a documentation link.
-#: inc/classes/class-astra-sites.php:2034
+#: inc/classes/class-astra-sites.php:2047
 #, php-format
 msgid "<p>Failed to install one or more required plugins.</p><p>Read&nbsp;<a href=\"%s\" target=\"_blank\">article</a>&nbsp;to resolve the issue and continue importing template.</p>"
 msgstr "<p>No se pudo instalar uno o más complementos necesarios.</p><p>Lea&nbsp;<a href=\"%s\" target=\"_blank\">el artículo</a>&nbsp;para resolver el problema y continuar importando la plantilla.</p>"
 
 #. translators: %s are white label strings.
-#: inc/classes/class-astra-sites.php:2038
+#: inc/classes/class-astra-sites.php:2051
 #, php-format
 msgid "Warning! %1$s Closing this window will cancel the process. Do you still want to leave?"
 msgstr "¡Advertencia! %1$s Cerrar esta ventana cancelará el proceso. ¿Todavía quieres salir?"
 
-#: inc/classes/class-astra-sites.php:2079
+#: inc/classes/class-astra-sites.php:2092
 msgid "Couldn't start import process. WordPress returned:"
 msgstr "No se pudo iniciar el proceso de importación. WordPress devolvió:"
 
 #. translators: %s HTML tags
-#: inc/classes/class-astra-sites.php:2085
+#: inc/classes/class-astra-sites.php:2098
 #, php-format
 msgid "%1$sAJAX request failed. WordPress returned:%2$s"
 msgstr "%1$sLa solicitud AJAX falló. WordPress devolvió:%2$s"
 
 #. translators: %s URL to document.
-#: inc/classes/class-astra-sites.php:2096
+#: inc/classes/class-astra-sites.php:2109
 #, php-format
 msgid "%1$sImport process interrupted due to an AJAX error:%2$s"
 msgstr "%1$sEl proceso de importación se interrumpió debido a un error AJAX:%2$s"
 
 #. translators: %s update page link.
-#: inc/classes/class-astra-sites.php:2405
+#: inc/classes/class-astra-sites.php:2418
 msgid "Updates are available for one or more plugins used by this starter template."
 msgstr "Hay actualizaciones disponibles para uno o más complementos utilizados por esta plantilla de inicio."
 
-#: inc/lib/ai-builder/inc/ajax/importer.php:342
+#: inc/lib/ai-builder/inc/ajax/importer.php:348
 msgid "Permission denied: You don't have sufficient permissions to import Spectra settings. Please contact your site administrator."
 msgstr "Permiso denegado: No tienes permisos suficientes para importar la configuración de Spectra. Por favor, contacta a tu administrador del sitio."
 
-#: inc/lib/ai-builder/inc/ajax/importer.php:350
+#: inc/lib/ai-builder/inc/ajax/importer.php:356
 msgid "Spectra settings import failed: ST_Importer class not found. Please ensure the importer is properly loaded."
 msgstr "La importación de configuraciones de Spectra falló: clase ST_Importer no encontrada. Por favor, asegúrese de que el importador esté cargado correctamente."
 
-#: inc/lib/ai-builder/inc/ajax/importer.php:364
+#: inc/lib/ai-builder/inc/ajax/importer.php:370
 msgid "No Spectra settings found for this template."
 msgstr "No se encontraron configuraciones de Spectra para esta plantilla."
 
-#: inc/lib/ai-builder/inc/ajax/importer.php:379
+#: inc/lib/ai-builder/inc/ajax/importer.php:385
 msgid "Unknown error occurred during Spectra settings import."
 msgstr "Se produjo un error desconocido durante la importación de la configuración de Spectra."
 
 #. translators: %s is the error message.
 #. translators: %s is the exception message.
-#: inc/lib/ai-builder/inc/ajax/importer.php:383
+#: inc/lib/ai-builder/inc/ajax/importer.php:389
 #: inc/lib/starter-templates-importer/importer/st-importer.php:163
 #, php-format
 msgid "Spectra settings import failed: %s"
 msgstr "La importación de configuraciones de Spectra falló: %s"
 
 #. translators: %s is exception error message.
-#: inc/lib/ai-builder/inc/ajax/importer.php:411
+#: inc/lib/ai-builder/inc/ajax/importer.php:417
 #, php-format
 msgid "Spectra settings import failed: Unexpected error - %s"
 msgstr "La importación de configuraciones de Spectra falló: Error inesperado - %s"
 
 #. translators: %s is exception error message.
-#: inc/lib/ai-builder/inc/ajax/importer.php:426
+#: inc/lib/ai-builder/inc/ajax/importer.php:432
 #, php-format
 msgid "Spectra settings import failed: Fatal error - %s"
 msgstr "La importación de configuraciones de Spectra falló: Error fatal - %s"
 
-#: inc/lib/ai-builder/inc/ajax/importer.php:448
+#: inc/lib/ai-builder/inc/ajax/importer.php:454
 msgid "Permission denied: You don't have sufficient permissions to import SureCart settings. Please contact your site administrator."
 msgstr "Permiso denegado: No tienes permisos suficientes para importar la configuración de SureCart. Por favor, contacta al administrador de tu sitio."
 
 #: inc/classes/class-astra-sites-wp-cli.php:313
-#: inc/lib/ai-builder/inc/ajax/importer.php:454
+#: inc/lib/ai-builder/inc/ajax/importer.php:460
 msgid "SureCart import failed: ST_Importer class not found. Please ensure the importer is properly loaded."
 msgstr "Error de importación de SureCart: clase ST_Importer no encontrada. Por favor, asegúrese de que el importador esté cargado correctamente."
 
 #. translators: %s: Error message.
 #: inc/classes/class-astra-sites-wp-cli.php:320
-#: inc/lib/ai-builder/inc/ajax/importer.php:464
+#: inc/lib/ai-builder/inc/ajax/importer.php:470
 #, php-format
 msgid "SureCart import failed: %s"
 msgstr "Error al importar SureCart: %s"
 
-#: inc/lib/ai-builder/inc/traits/helper.php:568
+#: inc/lib/ai-builder/inc/traits/helper.php:702
 msgid "Error: You don't have the required permissions to activate plugins."
 msgstr "Error: No tienes los permisos necesarios para activar plugins."
 
-#: inc/lib/ai-builder/inc/traits/helper.php:765
+#: inc/lib/ai-builder/inc/traits/helper.php:919
 msgid "Permission denied: You don't have sufficient permissions to import. Please contact your site administrator."
 msgstr "Permiso denegado: No tienes permisos suficientes para importar. Por favor, contacta a tu administrador del sitio."
 
-#: inc/lib/ai-builder/inc/traits/helper.php:770
+#: inc/lib/ai-builder/inc/traits/helper.php:924
 msgid "Import failed: ST_Importer_File_System class not found. Please ensure the importer is properly loaded."
 msgstr "Error de importación: clase ST_Importer_File_System no encontrada. Por favor, asegúrese de que el importador esté cargado correctamente."
 
 #. translators: %s: Error message.
 #. translators: %s is the exception message.
-#: inc/lib/ai-builder/inc/traits/helper.php:783
+#: inc/lib/ai-builder/inc/traits/helper.php:937
 #: inc/lib/onboarding/classes/class-astra-sites-onboarding-setup.php:178
 #, php-format
 msgid "Import failed: Unexpected error - %s"
 msgstr "Importación fallida: Error inesperado - %s"
 
 #. translators: %s: Error message.
-#: inc/lib/ai-builder/inc/traits/helper.php:787
+#: inc/lib/ai-builder/inc/traits/helper.php:941
 #: inc/lib/onboarding/classes/class-astra-sites-onboarding-setup.php:181
 #, php-format
 msgid "Import failed: Fatal error - %s"
@@ -6399,13 +6402,13 @@ msgid "Spectra plugin installed but class not loaded. Please refresh and try aga
 msgstr "El complemento Spectra está instalado pero la clase no se ha cargado. Por favor, actualice y vuelva a intentarlo."
 
 #. translators: %s is the error message.
-#: inc/lib/starter-templates-importer/importer/st-importer.php:606
+#: inc/lib/starter-templates-importer/importer/st-importer.php:613
 #, php-format
 msgid "Error occurred while inserting XML file: %s"
 msgstr "Se produjo un error al insertar el archivo XML: %s"
 
 #. translators: %s is the download error message.
-#: inc/lib/starter-templates-importer/importer/st-importer.php:653
+#: inc/lib/starter-templates-importer/importer/st-importer.php:660
 #, php-format
 msgid "File download failed: %s"
 msgstr "La descarga del archivo falló: %s"
@@ -6466,52 +6469,52 @@ msgstr "La activación del complemento falló: %s"
 msgid "Plugin activated successfully."
 msgstr "Plugin activado con éxito."
 
-#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:748
+#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:772
 msgid "Permission denied: You don't have sufficient permissions to perform this action. Please contact your site administrator."
 msgstr "Permiso denegado: No tienes permisos suficientes para realizar esta acción. Por favor, contacta a tu administrador del sitio."
 
-#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:808
+#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:832
 msgid "Template content file not found or inaccessible. The import process cannot continue without the content file. Please try importing again."
 msgstr "Archivo de contenido de plantilla no encontrado o inaccesible. El proceso de importación no puede continuar sin el archivo de contenido. Por favor, intente importar de nuevo."
 
-#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:831
+#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:855
 msgid "Template content file does not exist on the server. The file may have been deleted or moved. Please try re-importing the template."
 msgstr "El archivo de contenido de la plantilla no existe en el servidor. Es posible que el archivo haya sido eliminado o movido. Por favor, intente volver a importar la plantilla."
 
-#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:855
+#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:879
 msgid "Template content file cannot be read due to file permission issues. Please contact your hosting provider to fix file permissions."
 msgstr "No se puede leer el archivo de contenido de la plantilla debido a problemas de permisos de archivo. Por favor, contacte a su proveedor de alojamiento para corregir los permisos de archivo."
 
-#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:989
+#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:1013
 msgid "A fatal error occurred during import, likely due to server resource limitations. Try a different template, or contact your hosting provider to increase server resources."
 msgstr "Se produjo un error fatal durante la importación, probablemente debido a limitaciones de recursos del servidor. Intenta con una plantilla diferente o contacta a tu proveedor de alojamiento para aumentar los recursos del servidor."
 
-#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:1057
+#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:1081
 msgid "Import failed due to server memory limitations. This template may be too large for your current server configuration. Try importing a smaller template, or contact your hosting provider to increase memory limits."
 msgstr "La importación falló debido a las limitaciones de memoria del servidor. Esta plantilla puede ser demasiado grande para la configuración actual de su servidor. Intente importar una plantilla más pequeña o contacte a su proveedor de alojamiento para aumentar los límites de memoria."
 
-#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:1063
+#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:1087
 msgid "Import timed out due to server limitations. The template import process took too long to complete. Try again, or contact your hosting provider to increase execution time limits."
 msgstr "La importación se agotó debido a limitaciones del servidor. El proceso de importación de la plantilla tardó demasiado en completarse. Inténtalo de nuevo o contacta a tu proveedor de alojamiento para aumentar los límites de tiempo de ejecución."
 
-#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:1070
+#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:1094
 msgid "Import failed due to database issues. This could be due to database connection problems or insufficient database permissions. Please contact your hosting provider."
 msgstr "La importación falló debido a problemas con la base de datos. Esto podría deberse a problemas de conexión con la base de datos o permisos insuficientes en la base de datos. Por favor, contacte a su proveedor de alojamiento."
 
-#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:1077
+#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:1101
 msgid "Import failed due to file permission issues. The server cannot create or write files needed for the import. Please contact your hosting provider to fix file permissions."
 msgstr "La importación falló debido a problemas de permisos de archivo. El servidor no puede crear ni escribir los archivos necesarios para la importación. Por favor, contacte a su proveedor de alojamiento para corregir los permisos de archivo."
 
-#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:1084
+#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:1108
 msgid "Import completed but some images or media files could not be downloaded. This could be due to network issues or the original files being unavailable. The template structure has been imported successfully."
 msgstr "La importación se completó, pero algunas imágenes o archivos multimedia no se pudieron descargar. Esto podría deberse a problemas de red o a que los archivos originales no están disponibles. La estructura de la plantilla se ha importado con éxito."
 
-#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:1090
+#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:1114
 msgid "Import failed due to corrupted template content. The template file appears to be damaged or incomplete. Please try importing again, or select a different template."
 msgstr "La importación falló debido a contenido de plantilla corrupto. El archivo de plantilla parece estar dañado o incompleto. Por favor, intente importar de nuevo o seleccione una plantilla diferente."
 
 #. translators: Import encountered error text.
-#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:1096
+#: inc/lib/starter-templates-importer/importer/wxr-importer/st-wxr-importer.php:1120
 #, php-format
 msgid "Import process encountered an error: %s. Please try again, or contact support if the issue persists."
 msgstr "El proceso de importación encontró un error: %s. Por favor, inténtelo de nuevo o contacte con soporte si el problema persiste."
@@ -6685,31 +6688,31 @@ msgstr "Plantilla insertada con éxito."
 msgid "Insert Template"
 msgstr "Insertar plantilla"
 
-#: inc/classes/class-astra-sites-importer.php:507
+#: inc/classes/class-astra-sites-importer.php:519
 msgid "No WP Forms to import."
 msgstr "No hay formularios de WP para importar."
 
-#: inc/classes/class-astra-sites-importer.php:600
+#: inc/classes/class-astra-sites-importer.php:612
 msgid "WP Forms Imported."
 msgstr "Formularios de WP importados."
 
-#: inc/classes/class-astra-sites-importer.php:679
+#: inc/classes/class-astra-sites-importer.php:691
 msgid "No CartFlows data to import."
 msgstr "No hay datos de CartFlows para importar."
 
 #. translators: %s is the URL.
-#: inc/classes/class-astra-sites-importer.php:725
-#: inc/classes/class-astra-sites-importer.php:887
+#: inc/classes/class-astra-sites-importer.php:737
+#: inc/classes/class-astra-sites-importer.php:899
 #, php-format
 msgid "Imported from %s"
 msgstr "Importado desde %s"
 
-#: inc/classes/class-astra-sites-importer.php:771
+#: inc/classes/class-astra-sites-importer.php:783
 msgid "No Cart Abandonment Recovery data to import."
 msgstr "No hay datos de recuperación de carritos abandonados para importar."
 
 #. translators: %s is the URL.
-#: inc/classes/class-astra-sites-importer.php:799
+#: inc/classes/class-astra-sites-importer.php:811
 #, php-format
 msgid "Imported Cart Abandonment Recovery data from %s"
 msgstr "Datos de recuperación de carritos abandonados importados desde %s"
@@ -6820,44 +6823,44 @@ msgstr "Los siguientes plugins no pudieron ser activados debido a problemas de d
 msgid "Activating plugin: %s"
 msgstr "Activando plugin: %s"
 
-#: inc/lib/ai-builder/inc/ajax/importer.php:260
-#: inc/lib/ai-builder/inc/ajax/importer.php:272
+#: inc/lib/ai-builder/inc/ajax/importer.php:266
+#: inc/lib/ai-builder/inc/ajax/importer.php:278
 msgid "Image not downloaded!"
 msgstr "¡Imagen no descargada!"
 
-#: inc/lib/ai-builder/inc/ajax/importer.php:309
+#: inc/lib/ai-builder/inc/ajax/importer.php:315
 msgid "Required function not found!"
 msgstr "¡Función requerida no encontrada!"
 
 #. translators: 1: Error message.
-#: inc/lib/ai-builder/inc/traits/helper.php:631
+#: inc/lib/ai-builder/inc/traits/helper.php:765
 #, php-format
 msgid "Plugin Activation Error: %s"
 msgstr "Error de activación del plugin: %s"
 
 #. translators: %s: Log file path.
-#: inc/lib/ai-builder/inc/traits/helper.php:678
+#: inc/lib/ai-builder/inc/traits/helper.php:812
 #, php-format
 msgid "File generated at %s"
 msgstr "Archivo generado en %s"
 
-#: inc/lib/ai-builder/inc/traits/helper.php:752
+#: inc/lib/ai-builder/inc/traits/helper.php:900
 msgid "Widget Imported!"
 msgstr "¡Widget importado!"
 
-#: inc/lib/ai-builder/inc/traits/helper.php:806
+#: inc/lib/ai-builder/inc/traits/helper.php:977
 msgid "Import completed successfully!"
 msgstr "¡Importación completada con éxito!"
 
-#: inc/lib/ai-builder/inc/traits/helper.php:830
+#: inc/lib/ai-builder/inc/traits/helper.php:1001
 msgid "Deleted Customizer Settings!"
 msgstr "¡Configuraciones del personalizador eliminadas!"
 
-#: inc/lib/ai-builder/inc/traits/helper.php:854
+#: inc/lib/ai-builder/inc/traits/helper.php:1025
 msgid "Deleted Site Options!"
 msgstr "¡Opciones del sitio eliminadas!"
 
-#: inc/lib/ai-builder/inc/ajax/importer.php:626
+#: inc/lib/ai-builder/inc/ajax/importer.php:637
 #: inc/lib/onboarding/classes/class-astra-sites-onboarding-setup.php:91
 msgid "Invalid step."
 msgstr "Paso inválido."
@@ -6874,11 +6877,11 @@ msgstr "Por favor, contacte a su administrador de red para instalar y activar es
 msgid "Go To Main Screen"
 msgstr "Ir a la pantalla principal"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:180
+#: inc/lib/ai-builder/inc/assets/build/main.js:195
 msgid "You've chosen a Premium Design. Access this design and all others with our paid plans."
 msgstr "Has elegido un diseño premium. Accede a este diseño y a todos los demás con nuestros planes de pago."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:123
 msgid "Astra Theme Already Installed."
 msgstr "Tema Astra ya instalado."
@@ -6895,57 +6898,57 @@ msgstr "Seleccionar versión de Spectra Blocks"
 msgid "Access this template and all others with Essentials & Business Toolkit package."
 msgstr "Accede a esta plantilla y a todas las demás con el paquete Essentials & Business Toolkit."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:180
+#: inc/lib/ai-builder/inc/assets/build/main.js:195
 msgid "Special BLACK FRIDAY Offer"
 msgstr "Oferta especial de BLACK FRIDAY"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:180
+#: inc/lib/ai-builder/inc/assets/build/main.js:195
 msgid "Small Business Saturday Offer"
 msgstr "Oferta de Small Business Saturday"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:180
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Give Back Sunday Offer"
 msgstr "Oferta de Give Back Sunday"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:180
+#: inc/lib/ai-builder/inc/assets/build/main.js:195
 msgid "Cyber Monday Offer"
 msgstr "Oferta de Cyber Monday"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:180
+#: inc/lib/ai-builder/inc/assets/build/main.js:195
 msgid "Unlock this premium template and many powerful tools with an incredible"
 msgstr "Desbloquea esta plantilla premium y muchas herramientas poderosas con un increíble"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:180
+#: inc/lib/ai-builder/inc/assets/build/main.js:195
 msgid "discount!"
 msgstr "¡descuento!"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:180
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "You'll pay only on the final step before your site is generated."
 msgstr "Solo pagarás en el paso final antes de que se genere tu sitio."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "BLACK FRIDAY SALE"
 msgstr "VENTA DE BLACK FRIDAY"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Small Business Saturday Sale"
 msgstr "Venta de Small Business Saturday"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Cyber Monday SALE"
 msgstr "VENTA DE Cyber Monday"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "BLACK FRIDAY SALE!"
 msgstr "¡VENTA DE BLACK FRIDAY!"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Unlock all premium templates and useful design tools with an incredible"
 msgstr "Desbloquea todas las plantillas premium y herramientas de diseño útiles con un increíble"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "discount."
 msgstr "descuento."
 
@@ -6963,15 +6966,15 @@ msgstr "Plantillas Personalizadas"
 msgid "Go to Templates"
 msgstr "Ir a Plantillas"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
 msgid "Switch Team"
 msgstr "Cambiar de Equipo"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:188
+#: inc/lib/ai-builder/inc/assets/build/main.js:203
 msgid "Disconnect"
 msgstr "Desconectar"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "41%"
 msgstr "41%"
 
@@ -6987,7 +6990,7 @@ msgstr "Advertencia: Error al inicializar el Controlador de Widgets de Astra Bui
 msgid "Warning: Fatal error encountered while initializing Astra Builder Widget Controller. Error: %s"
 msgstr "Advertencia: Error fatal encontrado al inicializar el Controlador de Widgets de Astra Builder. Error: %s"
 
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:846
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:866
 msgid "We couldn't verify an active plan for your account. Please check your ZipWP subscription."
 msgstr "No pudimos verificar un plan activo para su cuenta. Por favor, revise su suscripción a ZipWP."
 
@@ -6999,19 +7002,19 @@ msgstr "Resaltar"
 msgid "The image file is too large to process with the current server memory settings."
 msgstr "El archivo de imagen es demasiado grande para procesar con la configuración de memoria actual del servidor."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 msgid "Skip Images?"
 msgstr "¿Omitir Imágenes?"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 msgid "We will choose placeholder images ourselves!"
 msgstr "¡Elegiremos imágenes de marcador de posición nosotros mismos!"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 msgid "No, I'll Select"
 msgstr "No, Seleccionaré"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 msgid "Yes, Skip"
 msgstr "Sí, Omitir"
 
@@ -7020,32 +7023,32 @@ msgid "Your current site will be updated with the selected layout, design, conte
 msgstr "Su sitio actual se actualizará con el diseño, contenido y páginas seleccionados."
 
 #. translators: %1$s: Plugin name
-#: inc/classes/class-astra-sites-importer.php:1159
+#: inc/classes/class-astra-sites-importer.php:1171
 #, php-format
 msgid "%1$s import failed: Plugin files not found. Please ensure %1$s is properly installed."
 msgstr "%1$s importación fallida: Archivos del plugin no encontrados. Por favor, asegúrese de que %1$s esté correctamente instalado."
 
 #. translators: %1$s: Plugin name
-#: inc/classes/class-astra-sites-importer.php:1171
+#: inc/classes/class-astra-sites-importer.php:1183
 #, php-format
 msgid "%1$s import failed: Plugin is installed but not activated. Please activate %1$s and try again."
 msgstr "%1$s importación fallida: El plugin está instalado pero no activado. Por favor, active %1$s e intente de nuevo."
 
 #. translators: %s: Plugin name
-#: inc/classes/class-astra-sites-importer.php:1199
+#: inc/classes/class-astra-sites-importer.php:1211
 #, php-format
 msgid "%s import failed: Plugin class/functions not available after loading. Please try again or contact support."
 msgstr "%s importación fallida: Clase/funciones del plugin no disponibles después de cargar. Por favor, intente de nuevo o contacte al soporte."
 
 #. translators: %1$s: Import name, %2$d: current attempt, %3$d: max attempts.
-#: inc/lib/ai-builder/inc/assets/build/main.js:211
+#: inc/lib/ai-builder/inc/assets/build/main.js:226
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:159
 #, js-format
 msgid "%1$s (retry attempt %2$d/%3$d)…"
 msgstr "%1$s (intento de reintento %2$d/%3$d)…"
 
 #. translators: Import name, seconds to wait.
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:162
 #, js-format
 msgid "%1$s encountered an error. Retrying in %2$d seconds…"
@@ -7107,15 +7110,15 @@ msgstr "Por favor, comparta al menos 50 caracteres para que podamos entender mej
 msgid "characters (minimum)"
 msgstr "caracteres (mínimo)"
 
-#: inc/lib/ai-builder/inc/traits/helper.php:575
+#: inc/lib/ai-builder/inc/traits/helper.php:709
 msgid "Error: Missing or invalid plugin initialization parameter."
 msgstr "Error: Parámetro de inicialización del plugin faltante o inválido."
 
-#: inc/lib/starter-templates-importer/importer/st-importer-log.php:791
+#: inc/lib/starter-templates-importer/importer/st-importer-log.php:793
 msgid "Log Files"
 msgstr "Archivos de Registro"
 
-#: inc/lib/starter-templates-importer/importer/st-importer-log.php:805
+#: inc/lib/starter-templates-importer/importer/st-importer-log.php:807
 msgid "Backup Files"
 msgstr "Archivos de Respaldo"
 
@@ -7124,24 +7127,24 @@ msgid "Always open Design Library when creating new pages"
 msgstr "Abrir siempre la Biblioteca de Diseño al crear nuevas páginas"
 
 #. translators: %s is the error message.
-#: inc/classes/class-astra-sites-importer.php:760
+#: inc/classes/class-astra-sites-importer.php:772
 #, php-format
 msgid "Cart Abandonment Recovery import failed: %s"
 msgstr "La importación de recuperación de abandono de carrito falló: %s"
 
-#: inc/classes/class-astra-sites-importer.php:906
+#: inc/classes/class-astra-sites-importer.php:918
 msgid "Permission denied: You do not have permission to verify plugins."
 msgstr "Permiso denegado: No tienes permiso para verificar plugins."
 
-#: inc/classes/class-astra-sites-importer.php:925
+#: inc/classes/class-astra-sites-importer.php:937
 msgid "No plugins to verify."
 msgstr "No hay plugins para verificar."
 
-#: inc/classes/class-astra-sites-importer.php:975
+#: inc/classes/class-astra-sites-importer.php:987
 msgid "Some required plugins are not ready."
 msgstr "Algunos plugins requeridos no están listos."
 
-#: inc/classes/class-astra-sites-importer.php:987
+#: inc/classes/class-astra-sites-importer.php:999
 msgid "All plugins verified."
 msgstr "Todos los plugins verificados."
 
@@ -7157,15 +7160,15 @@ msgstr "Valor de sort.by no válido."
 msgid "Invalid sort.order value."
 msgstr "Valor de sort.order no válido."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Newest"
 msgstr "Más reciente"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "No templates found"
 msgstr "No se encontraron plantillas"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "Try changing your search keyword or sort options."
 msgstr "Intenta cambiar tu palabra clave de búsqueda o las opciones de ordenación."
 
@@ -7173,7 +7176,7 @@ msgstr "Intenta cambiar tu palabra clave de búsqueda o las opciones de ordenaci
 msgid "Plugin verification failed."
 msgstr "La verificación del plugin falló."
 
-#: inc/classes/class-astra-sites.php:1447
+#: inc/classes/class-astra-sites.php:1460
 msgid "Pixabay API key is not configured. Set it via the astra_sites_pixabay_api_key filter or option."
 msgstr "La clave de la API de Pixabay no está configurada. Configúrala a través del filtro astra_sites_pixabay_api_key o la opción."
 
@@ -7181,15 +7184,15 @@ msgstr "La clave de la API de Pixabay no está configurada. Configúrala a trav�
 msgid "Missing required authentication data."
 msgstr "Faltan datos de autenticación requeridos."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Default"
 msgstr "Predeterminado"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "Select 15 to 18 images for best results."
 msgstr "Seleccione de 15 a 18 imágenes para obtener los mejores resultados."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:208
+#: inc/lib/ai-builder/inc/assets/build/main.js:223
 msgid "Shuffle Colors"
 msgstr "Mezclar colores"
 
@@ -7229,12 +7232,12 @@ msgstr "Instala y activa las Plantillas de Inicio Premium"
 msgid "[Need Help?]"
 msgstr "[¿Necesitas ayuda?]"
 
-#: inc/lib/nps-survey/classes/nps-survey-script.php:431
+#: inc/lib/nps-survey/classes/nps-survey-script.php:505
 #: inc/lib/zipwp-images/classes/zipwp-images-api.php:222
 msgid "Remote request failed."
 msgstr "La solicitud remota falló."
 
-#: inc/lib/nps-survey/classes/nps-survey-script.php:466
+#: inc/lib/nps-survey/classes/nps-survey-script.php:540
 msgid "Request failed."
 msgstr "La solicitud falló."
 
@@ -7246,43 +7249,43 @@ msgstr "La solicitud falló."
 msgid "Insufficient permissions"
 msgstr "Permisos insuficientes"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:180
+#: inc/lib/ai-builder/inc/assets/build/main.js:195
 msgid "your team"
 msgstr "tu equipo"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:180
+#: inc/lib/ai-builder/inc/assets/build/main.js:195
 msgid "your current plan"
 msgstr "tu plan actual"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Connect ZipWP to access images"
 msgstr "Conecta ZipWP para acceder a imágenes"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Sign up for a free ZipWP account to load curated images for your region and finish building your website."
 msgstr "Regístrate para obtener una cuenta gratuita de ZipWP para cargar imágenes seleccionadas para tu región y terminar de construir tu sitio web."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 msgid "Connect ZipWP to load images for your region"
 msgstr "Conecta ZipWP para cargar imágenes para tu región"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 msgid "Image search uses an API key from your ZipWP account. Connect a free account to load images available in your region."
 msgstr "La búsqueda de imágenes utiliza una clave API de tu cuenta ZipWP. Conecta una cuenta gratuita para cargar imágenes disponibles en tu región."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 msgid "Connect ZipWP"
 msgstr "Conecta ZipWP"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 msgid "Log in"
 msgstr "Iniciar sesión"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 msgid "OR"
 msgstr "O"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#: inc/lib/ai-builder/inc/assets/build/main.js:207
 msgid "Upload your own"
 msgstr "Sube la tuya"
 
@@ -7381,19 +7384,19 @@ msgstr "La activación falló."
 msgid "An error occurred while processing your request."
 msgstr "Ocurrió un error mientras se procesaba tu solicitud."
 
-#: inc/classes/class-astra-sites.php:2436
+#: inc/classes/class-astra-sites.php:2449
 msgid "Low Max Execution Time"
 msgstr "Tiempo Máximo de Ejecución Bajo"
 
-#: inc/classes/class-astra-sites.php:2437
+#: inc/classes/class-astra-sites.php:2450
 msgid "Your server's max_execution_time is below the recommended 300 seconds. This may cause import timeouts. Please contact your hosting provider to increase it."
 msgstr "El max_execution_time de su servidor está por debajo de los 300 segundos recomendados. Esto puede causar tiempos de espera en las importaciones. Por favor, contacte a su proveedor de hosting para aumentarlo."
 
-#: inc/classes/class-astra-sites.php:2440
+#: inc/classes/class-astra-sites.php:2453
 msgid "MySQL Version Too Old"
 msgstr "Versión de MySQL Demasiado Antigua"
 
-#: inc/classes/class-astra-sites.php:2441
+#: inc/classes/class-astra-sites.php:2454
 msgid "Your MySQL version is below 5.7. Some templates require MySQL 5.7 or higher for full utf8mb4 collation support. Please upgrade your database server."
 msgstr "Su versión de MySQL es inferior a 5.7. Algunas plantillas requieren MySQL 5.7 o superior para soporte completo de collation utf8mb4. Por favor, actualice su servidor de base de datos."
 
@@ -7417,27 +7420,27 @@ msgstr "El servidor devolvió una respuesta no JSON. Esto generalmente significa
 msgid "View import log"
 msgstr "Ver registro de importación"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:220
+#: inc/lib/ai-builder/inc/assets/build/main.js:235
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:165
 msgid "Customizer Import"
 msgstr "Importación del Personalizador"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:220
+#: inc/lib/ai-builder/inc/assets/build/main.js:235
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:165
 msgid "Spectra Settings Import"
 msgstr "Importación de Configuraciones de Spectra"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:226
+#: inc/lib/ai-builder/inc/assets/build/main.js:241
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:165
 msgid "Site Options Import"
 msgstr "Importación de Opciones del Sitio"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:226
+#: inc/lib/ai-builder/inc/assets/build/main.js:241
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:165
 msgid "Widgets Import"
 msgstr "Importación de Widgets"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:226
+#: inc/lib/ai-builder/inc/assets/build/main.js:241
 #: inc/lib/onboarding/assets/dist/onboarding/main.js:165
 msgid "Final Finishings"
 msgstr "Acabados Finales"
@@ -7450,36 +7453,36 @@ msgstr "CRM y Contactos"
 msgid "Keep all your customer relationships in one place"
 msgstr "Mantén todas tus relaciones con clientes en un solo lugar"
 
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:831
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:851
 msgid "Your ZipWP team was not found. Please reconnect your account to continue."
 msgstr "No se encontró su equipo de ZipWP. Por favor, reconecte su cuenta para continuar."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Reconnect Your ZipWP Account"
 msgstr "Reconectar Su Cuenta de ZipWP"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Your account isn't linked to an active ZipWP team. Log in to create or join a team and continue building your website."
 msgstr "Su cuenta no está vinculada a un equipo activo de ZipWP. Inicie sesión para crear o unirse a un equipo y continuar construyendo su sitio web."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:191
+#: inc/lib/ai-builder/inc/assets/build/main.js:206
 msgid "Reconnect to ZipWP"
 msgstr "Reconectar a ZipWP"
 
-#: inc/lib/ai-builder/inc/ajax/importer.php:577
+#: inc/lib/ai-builder/inc/ajax/importer.php:588
 msgid "Template type is not AI."
 msgstr "El tipo de plantilla no es AI."
 
-#: inc/lib/ai-builder/inc/ajax/importer.php:612
+#: inc/lib/ai-builder/inc/ajax/importer.php:623
 msgid "Customizer images replaced."
 msgstr "Imágenes del personalizador reemplazadas."
 
-#: inc/lib/ai-builder/inc/ajax/importer.php:621
+#: inc/lib/ai-builder/inc/ajax/importer.php:632
 msgid "Image replacement cleanup complete."
 msgstr "Limpieza de reemplazo de imagen completa."
 
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:2064
-#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:2144
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:2097
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:2177
 msgid "Site not found."
 msgstr "Sitio no encontrado."
 
@@ -7507,147 +7510,147 @@ msgstr "Legado de Spectra"
 msgid "Spectra Blocks"
 msgstr "Bloques de Spectra"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Don't worry — the credit used for this site is being restored to your account automatically. This usually takes under a minute."
 msgstr "No te preocupes: el crédito utilizado para este sitio se está restaurando automáticamente en tu cuenta. Esto generalmente toma menos de un minuto."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "If a credit was used for this attempt, it will be restored to your account. Tap Restore credit to check the status."
 msgstr "Si se utilizó un crédito para este intento, se restaurará en tu cuenta. Toca Restaurar crédito para verificar el estado."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Credit already restored"
 msgstr "Crédito ya restaurado"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Credit restored"
 msgstr "Crédito restaurado"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Your credit has been restored. You can try again."
 msgstr "Tu crédito ha sido restaurado. Puedes intentarlo de nuevo."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "No credit to restore"
 msgstr "No hay crédito para restaurar"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "We couldn't find a credit deduction for this site. If you were charged, please contact support."
 msgstr "No pudimos encontrar una deducción de crédito para este sitio. Si se te cobró, por favor contacta al soporte."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Restore failed"
 msgstr "Restauración fallida"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Could not restore your credit. Please try again or contact support."
 msgstr "No se pudo restaurar tu crédito. Por favor, inténtalo de nuevo o contacta al soporte."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Restoring…"
 msgstr "Restaurando…"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Restore credit"
 msgstr "Restaurar crédito"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "AI Site Builder"
 msgstr "Constructor de Sitios AI"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Describe your business, get a full website."
 msgstr "Describe tu negocio, obtén un sitio web completo."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "AI Site Planner"
 msgstr "Planificador de Sitios AI"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Plan your pages and structure before you build."
 msgstr "Planifica tus páginas y estructura antes de construir."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Build with Claude, Host with ZipWP"
 msgstr "Construye con Claude, Aloja con ZipWP"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "The world's best AI, with hosting built around it."
 msgstr "La mejor IA del mundo, con alojamiento construido a su alrededor."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Buy Domains Directly"
 msgstr "Compra Dominios Directamente"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Search, buy, and connect domains without leaving ZipWP."
 msgstr "Busca, compra y conecta dominios sin salir de ZipWP."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Premium Hosting"
 msgstr "Alojamiento Premium"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Fast, secure hosting that grows with your site."
 msgstr "Alojamiento rápido y seguro que crece con tu sitio."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Classic Templates"
 msgstr "Plantillas Clásicas"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#: inc/lib/ai-builder/inc/assets/build/main.js:210
 msgid "Prefer not to use AI? Start from a human-designed, conversion-ready template."
 msgstr "¿Prefieres no usar AI? Comienza con una plantilla diseñada por humanos, lista para la conversión."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 msgid "This is taking longer than expected and we couldn't finish creating your site. Please try again."
 msgstr "Esto está tomando más tiempo de lo esperado y no pudimos terminar de crear tu sitio. Por favor, inténtalo de nuevo."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:226
+#: inc/lib/ai-builder/inc/assets/build/main.js:241
 msgid "Replacing images in pages."
 msgstr "Reemplazando imágenes en páginas."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:226
+#: inc/lib/ai-builder/inc/assets/build/main.js:241
 msgid "Image replacement in pages failed."
 msgstr "El reemplazo de imágenes en páginas falló."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:226
+#: inc/lib/ai-builder/inc/assets/build/main.js:241
 msgid "Replacing images in posts."
 msgstr "Reemplazando imágenes en publicaciones."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:226
+#: inc/lib/ai-builder/inc/assets/build/main.js:241
 msgid "Image replacement in posts failed."
 msgstr "El reemplazo de imágenes en publicaciones falló."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:226
+#: inc/lib/ai-builder/inc/assets/build/main.js:241
 msgid "Updating customizer images."
 msgstr "Actualizando imágenes del personalizador."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:226
+#: inc/lib/ai-builder/inc/assets/build/main.js:241
 msgid "Customizer image replacement failed."
 msgstr "El reemplazo de imágenes del personalizador falló."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:226
+#: inc/lib/ai-builder/inc/assets/build/main.js:241
 msgid "Cleaning up temporary data."
 msgstr "Limpiando datos temporales."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:226
+#: inc/lib/ai-builder/inc/assets/build/main.js:241
 msgid "Image cleanup failed."
 msgstr "La limpieza de imágenes falló."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:244
+#: inc/lib/ai-builder/inc/assets/build/main.js:259
 msgid "Building your website"
 msgstr "Construyendo tu sitio web"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:244
+#: inc/lib/ai-builder/inc/assets/build/main.js:259
 msgid "Sit back. We're building your website"
 msgstr "Relájate. Estamos construyendo tu sitio web"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:244
+#: inc/lib/ai-builder/inc/assets/build/main.js:259
 msgid "This usually takes under a minute. While you wait, here's what you can do with ZipWP."
 msgstr "Esto generalmente toma menos de un minuto. Mientras esperas, aquí está lo que puedes hacer con ZipWP."
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:244
+#: inc/lib/ai-builder/inc/assets/build/main.js:259
 msgid "Ask Me"
 msgstr "Pregúntame"
 
@@ -7773,58 +7776,58 @@ msgstr "¡Ups! Algo salió mal. Por favor, actualiza la página e inténtalo de 
 msgid "If you have a moment, please share why you are deactivating the plugin."
 msgstr "Si tienes un momento, por favor comparte por qué estás desactivando el plugin."
 
-#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:105
+#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:106
 msgid "Icon"
 msgstr "Icono"
 
-#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:132
-#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:308
+#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:133
+#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:445
 msgid "Please tell us more details."
 msgstr "Por favor, cuéntanos más detalles."
 
 #. translators: %1$s: link html start, %2$s: link html end
-#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:141
+#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:142
 #, php-format
 msgid "Need help from our experts? %1$sClick here to contact us.%2$s"
 msgstr "¿Necesitas ayuda de nuestros expertos? %1$sHaz clic aquí para contactarnos.%2$s"
 
-#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:152
+#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:155
 msgid "Submit & Deactivate"
 msgstr "Enviar y Desactivar"
 
-#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:153
+#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:156
 msgid "Skip & Deactivate"
 msgstr "Omitir y Desactivar"
 
-#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:283
+#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:420
 msgid "This is a temporary deactivation for testing."
 msgstr "Esta es una desactivación temporal para pruebas."
 
-#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:284
+#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:421
 msgid "How can we assist you?"
 msgstr "¿Cómo podemos asistirte?"
 
-#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:289
+#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:426
 msgid "The plugin isn't working properly."
 msgstr "El plugin no está funcionando correctamente."
 
-#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:290
+#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:427
 msgid "Please tell us more about what went wrong?"
 msgstr "¿Podrías contarnos más sobre qué salió mal?"
 
-#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:295
+#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:432
 msgid "I found a better alternative plugin."
 msgstr "Encontré un plugin alternativo mejor."
 
-#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:296
+#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:433
 msgid "Could you please specify which plugin?"
 msgstr "¿Podrías especificar qué plugin?"
 
-#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:301
+#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:438
 msgid "It's missing a specific feature."
 msgstr "Falta una función específica."
 
-#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:302
+#: admin/bsf-analytics/modules/deactivation-survey/classes/class-deactivation-survey-feedback.php:439
 msgid "Please tell us more about the feature."
 msgstr "Por favor, cuéntanos más sobre la función."
 
@@ -7944,7 +7947,7 @@ msgstr "Ruta predeterminada de respaldo"
 msgid "Zip - Your AI Assistant"
 msgstr "Zip - Tu asistente de IA"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:217
+#: inc/lib/ai-builder/inc/assets/build/main.js:232
 msgid "Failed to save Color Palettes"
 msgstr "No se pudo guardar las paletas de colores"
 
@@ -7963,13 +7966,13 @@ msgid "Invalid Template ID - %s"
 msgstr "ID de plantilla no válido - %s"
 
 #. translators: %s are link.
-#: inc/classes/class-astra-sites.php:2612
+#: inc/classes/class-astra-sites.php:2625
 #, php-format
 msgid "This is a premium template available with Essential and Business Toolkits. <a href=\"%s\" target=\"_blank\">View pricing</a> to get access."
 msgstr "Esta es una plantilla premium disponible con los kits de herramientas Essential y Business. <a href=\"%s\" target=\"_blank\">Ver precios</a> para obtener acceso."
 
 #. translators: %s are link.
-#: inc/classes/class-astra-sites.php:2616
+#: inc/classes/class-astra-sites.php:2629
 #, php-format
 msgid "This is a premium template available with Essential and Business Toolkits. <a href=\"%s\" target=\"_blank\">Validate your license key</a> to import this template."
 msgstr "Esta es una plantilla premium disponible con los kits de herramientas Essential y Business. <a href=\"%s\" target=\"_blank\">Valide su clave de licencia</a> para importar esta plantilla."
@@ -7986,11 +7989,11 @@ msgstr "Añadiendo tus productos y sus imágenes…"
 msgid "Organizing your catalog and product pages…"
 msgstr "Organizando tu catálogo y las páginas de productos…"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:214
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
 msgid "Import already in progress…"
 msgstr "Importación ya en progreso…"
 
-#: inc/lib/ai-builder/inc/assets/build/main.js:244
+#: inc/lib/ai-builder/inc/assets/build/main.js:259
 msgid "Migrating"
 msgstr "Migrando"
 
@@ -8054,19 +8057,90 @@ msgstr "Color Personalizado"
 msgid "We could not load that template. Choose another one to continue."
 msgstr "No pudimos cargar esa plantilla. Elige otra para continuar."
 
-#: inc/classes/class-astra-sites.php:1511
+#: inc/classes/class-astra-sites.php:1524
 #: inc/lib/zipwp-images/classes/zipwp-images-api.php:287
 msgid "Invalid image URL."
 msgstr "URL de imagen no válida."
 
+#: inc/lib/ai-builder/inc/traits/helper.php:969
+msgid "Import completed with warnings."
+msgstr "Importación completada con advertencias."
+
+#: inc/lib/ai-builder/inc/traits/helper.php:971
+msgid "A finishing action failed. Check the import log for details."
+msgstr "Una acción final falló. Consulte el registro de importación para más detalles."
+
+#: inc/classes/class-astra-sites.php:1047
+msgid "The template data received from the server is empty or invalid. Please try again."
+msgstr "Los datos de la plantilla recibidos del servidor están vacíos o no son válidos. Por favor, inténtalo de nuevo."
+
+#: inc/lib/ai-builder/inc/classes/zipwp/class-ai-builder-zipwp-api.php:1154
+msgid "Website data is not ready yet. Please try again."
+msgstr "Los datos del sitio web aún no están listos. Por favor, inténtalo de nuevo."
+
+#: inc/lib/ai-builder/inc/assets/build/main.js:229
+#: inc/lib/onboarding/assets/dist/onboarding/main.js:162
+msgid "Your login session has expired. Please reload the page, log in again and retry the import."
+msgstr "Tu sesión de inicio ha expirado. Por favor, recarga la página, inicia sesión de nuevo y vuelve a intentar la importación."
+
+#: inc/lib/onboarding/assets/dist/onboarding/main.js:165
+msgid "The plugin verification request timed out."
+msgstr "La solicitud de verificación del complemento ha expirado."
+
+#: inc/lib/ai-builder/inc/assets/build/main.js:180
+msgid "We’re Almost There!"
+msgstr "¡Ya casi estamos!"
+
+#: inc/lib/ai-builder/inc/assets/build/main.js:180
+msgid "This template needs a few plugins that cannot be installed on your site yet. Your current PHP or WordPress version is below what these plugins require, so the import would fail midway."
+msgstr "Esta plantilla necesita algunos plugins que aún no se pueden instalar en tu sitio. Tu versión actual de PHP o WordPress está por debajo de lo que requieren estos plugins, por lo que la importación fallaría a mitad de camino."
+
+#. translators: %s: current PHP version.
+#: inc/lib/ai-builder/inc/assets/build/main.js:183
+#, js-format
+msgid "Current PHP version: %s"
+msgstr "Versión actual de PHP: %s"
+
+#. translators: %s: current WordPress version.
+#: inc/lib/ai-builder/inc/assets/build/main.js:186
+#, js-format
+msgid "Current WordPress version: %s"
+msgstr "Versión actual de WordPress: %s"
+
+#: inc/lib/ai-builder/inc/assets/build/main.js:186
+msgid "Incompatible plugins:"
+msgstr "Plugins incompatibles:"
+
+#. translators: %s: required PHP version.
+#: inc/lib/ai-builder/inc/assets/build/main.js:189
+#, js-format
+msgid "PHP %s or higher"
+msgstr "PHP %s o superior"
+
+#. translators: %s: required WordPress version.
+#: inc/lib/ai-builder/inc/assets/build/main.js:192
+#, js-format
+msgid "WordPress %s or higher"
+msgstr "WordPress %s o superior"
+
+#. translators: 1: plugin name, 2: comma-separated version requirements.
+#: inc/lib/ai-builder/inc/assets/build/main.js:195
+#, js-format
+msgid "%1$s - requires %2$s"
+msgstr "%1$s - requiere %2$s"
+
+#: inc/lib/ai-builder/inc/assets/build/main.js:195
+msgid "Ask your hosting provider to update PHP (and WordPress) to the required version, or pick a template that works with your current setup, then try again."
+msgstr "Pide a tu proveedor de hosting que actualice PHP (y WordPress) a la versión requerida, o elige una plantilla que funcione con tu configuración actual, luego intenta de nuevo."
+
 #. translators: %1$s Memory Limit, %2$s Recommended memory limit.
-#: inc/lib/starter-templates-importer/importer/st-importer-log.php:590
+#: inc/lib/starter-templates-importer/importer/st-importer-log.php:592
 #, php-format
 msgctxt "Recommended Memory Limit"
 msgid "Current memory limit %1$s. We recommend setting memory to at least %2$s."
 msgstr "Límite de memoria actual %1$s. Recomendamos establecer la memoria a al menos %2$s."
 
-#: inc/lib/starter-templates-importer/importer/st-importer-log.php:671
+#: inc/lib/starter-templates-importer/importer/st-importer-log.php:673
 msgctxt "PHP Version"
 msgid "We recommend to use php 5.4 or higher"
 msgstr "Recomendamos usar PHP 5.4 o superior"

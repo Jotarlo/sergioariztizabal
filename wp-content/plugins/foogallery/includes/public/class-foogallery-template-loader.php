@@ -18,6 +18,25 @@ class FooGallery_Template_Loader {
 	 * @param      $args array       Arguments passed in from the shortcode
 	 */
 	public function render_template( $args ) {
+		global $foogallery_mobile_caption_field_snapshot;
+
+		// A render-scoped metadata snapshot, independent of retained gallery globals.
+		// Restore an outer scope if a template triggers a nested render.
+		$previous_snapshot                        = $foogallery_mobile_caption_field_snapshot;
+		$foogallery_mobile_caption_field_snapshot = array();
+		try {
+			$this->render_template_in_context( $args );
+		} finally {
+			$foogallery_mobile_caption_field_snapshot = $previous_snapshot;
+		}
+	}
+
+	/**
+	 * Render inside the mobile caption metadata scope.
+	 *
+	 * @param array $args Gallery arguments.
+	 */
+	protected function render_template_in_context( $args ) {
 		//do some work before we locate the template
 		global $current_foogallery;
 		global $current_foogallery_arguments;
@@ -103,6 +122,7 @@ class FooGallery_Template_Loader {
 			if ( false !== ( $template_location = $loader->locate_file( "gallery-{$current_foogallery_template}.php" ) ) ) {
 
 				//we have found a template!
+				ob_start();
 				do_action( 'foogallery_located_template', $current_foogallery );
 				do_action( "foogallery_located_template-{$current_foogallery_template}", $current_foogallery );
 
@@ -138,17 +158,21 @@ class FooGallery_Template_Loader {
 					$this->add_style_block( $current_foogallery, $current_foogallery_template );
 					$this->load_gallery_template( $current_foogallery, $template_location['path'] );
 					do_action( 'foogallery_loaded_template_after', $current_foogallery );
-				}
 
-				//cater for lightbox extensions needing to add styles and javascript
-				$lightbox = foogallery_gallery_template_setting_lightbox();
-				if ( !empty( $lightbox ) ) {
-					do_action( "foogallery_template_lightbox-{$lightbox}", $current_foogallery );
-				}
+					//cater for lightbox extensions needing to add styles and javascript
+					$lightbox = foogallery_gallery_template_setting_lightbox();
+					if ( !empty( $lightbox ) ) {
+						do_action( "foogallery_template_lightbox-{$lightbox}", $current_foogallery );
+					}
 
-				//we have loaded all files, now let extensions do some stuff
-				do_action( "foogallery_loaded_template", $current_foogallery );
-				do_action( "foogallery_loaded_template-($current_foogallery_template)", $current_foogallery );
+					//we have loaded all files, now let extensions do some stuff
+					do_action( "foogallery_loaded_template", $current_foogallery );
+					do_action( "foogallery_loaded_template-($current_foogallery_template)", $current_foogallery );
+
+					$rendered_output = ob_get_clean();
+					$rendered_output = apply_filters( 'foogallery_rendered_gallery_output', $rendered_output, $current_foogallery, $current_foogallery_template );
+					echo $rendered_output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Complete rendered gallery HTML.
+				}
 			} else {
 				//we could not find a template!
 				esc_html_e( 'No gallery layout found!', 'foogallery' );

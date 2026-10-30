@@ -1,0 +1,17 @@
+.sa-ul-image-preview {
+	margin-top: 14px;
+	max-width: 360px;
+}
+
+.sa-ul-image-preview img {
+	display: block;
+	width: 100%;
+	height: auto;
+	border: 2px solid #dba515;
+	padding: 5px;
+	background: #1d1b1a;
+}
+
+.sa-ul-image-picker .button-link-delete {
+	margin-left: 10px;
+}
