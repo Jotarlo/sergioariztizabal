@@ -19,7 +19,7 @@ class FooGallery_Jobs {
 	 * @return mixed
 	 */
 	public static function schedule( $hook, $args = array(), $group = 'foogallery-improve', $when = 0, $interval = 0 ) {
-		if ( ! did_action( 'action_scheduler_init' ) || ! in_array( $group, array( 'foogallery-improve', 'foogallery-media-audit' ), true ) || 0 !== strpos( $hook, 'foogallery_' ) ) {
+		if ( ! did_action( 'action_scheduler_init' ) || ! in_array( $group, array( 'foogallery-improve', 'foogallery-media-audit', 'foogallery-gallery-usage' ), true ) || 0 !== strpos( $hook, 'foogallery_' ) ) {
 			return 0;
 		}
 		foreach ( $args as $value ) {

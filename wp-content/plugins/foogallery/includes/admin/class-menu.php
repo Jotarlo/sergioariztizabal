@@ -38,6 +38,7 @@ if ( ! class_exists( 'FooGallery_Admin_Menu' ) ) {
 		function register_menu_items() {
 			//we rely on the register_post_type call to add our main menu items
 			$parent_slug = foogallery_admin_menu_parent_slug();
+			add_filter( 'submenu_file', array( 'FooGallery_Admin_Setup', 'filter_submenu_file' ) );
 
 			//allow extensions to add their own menu items beforehand
 			do_action( 'foogallery_admin_menu_before' );
@@ -71,6 +72,7 @@ if ( ! class_exists( 'FooGallery_Admin_Menu' ) ) {
 
 			add_submenu_page( $parent_slug, $menu_labels[0]['page_title'], $menu_labels[0]['menu_title'], $capability, 'foogallery-settings', array( $this, 'foogallery_settings' ) );
 			add_submenu_page( $parent_slug, $menu_labels[1]['page_title'], $menu_labels[1]['menu_title'], $capability, 'foogallery-features', array( $this, 'foogallery_features' ) );
+			add_submenu_page( $parent_slug, __( 'FooGallery License & Trial', 'foogallery' ), __( 'License & Trial', 'foogallery' ), $capability, 'foogallery-license-trial', array( 'FooGallery_Admin_Setup', 'render' ) );
 			add_submenu_page( $parent_slug, $menu_labels[2]['page_title'], $menu_labels[2]['menu_title'], $capability, 'foogallery-help', array( $this, 'foogallery_help' ) );
 
 			if ( current_user_can( 'activate_plugins' ) ) {

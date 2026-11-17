@@ -23,7 +23,9 @@ https://www.youtube.com/watch?v=WNM6b1HUdog
 
 [Live Gallery Demos](https://fooplugins.com/foogallery-wordpress-gallery-plugin/demos/)
 
-Design galleries with live previews, a visual layout selector, mobile controls, the WordPress block editor, and shortcodes. FooGallery includes seven free gallery layouts including Responsive, Image Viewer, Masonry, Portfolio, Justified, Single Thumbnail, and Carousel. FooGallery Pro adds video galleries, filtering, dynamic galleries, advanced pagination, WooCommerce selling tools, watermarking, mobile settings, and image protection.
+Design galleries with live previews, a visual layout selector, mobile controls, the WordPress block editor, and shortcodes. FooGallery includes seven free gallery layouts including Responsive, Image Viewer, Masonry, Portfolio, Justified, Single Thumbnail, and Carousel. FooGallery Pro adds Polaroid, Grid, Slider, Spotlight, Mosaic, and Wall layouts, video galleries, filtering, dynamic galleries, advanced pagination, WooCommerce selling tools, watermarking, mobile settings, and image protection.
+
+Explore more creative layouts with PRO Starter: create animated photo walls with [Wall PRO](https://fooplugins.com/foogallery-wordpress-gallery-plugin/wall-gallery/), give favorite images greater prominence where space allows with [Mosaic PRO](https://fooplugins.com/foogallery-wordpress-gallery-plugin/mosaic-gallery/), or customize [Slider PRO](https://fooplugins.com/foogallery-wordpress-gallery-plugin/slider-gallery/) with rounded corners, borders, shadows and separate desktop/mobile height limits. All three layouts are included in PRO Starter and higher.
 
 [Launch Your Own FooGallery Demo (Backend included)](https://app.instawp.io/launch?t=foogallery-free&d=v2)
 
@@ -42,9 +44,11 @@ Design galleries with live previews, a visual layout selector, mobile controls, 
 *   Advanced Customization:
     Control thumbnail sizes, spacing, hover effects, caption line limits, mobile columns, background fill, custom attributes, and more.
 *   Visual Gallery Builder:
-    Use the gallery layout selector, live preview device switcher, drag-and-drop uploads, advanced attachment modal, and shortcode helpers to build galleries faster.
+    Build galleries with live previews, drag-and-drop uploads, a visual layout selector, an advanced attachment modal and shortcode helpers. Open a separate preview window to check unsaved changes in desktop, tablet and mobile views, try different background colors, and choose automatic updates or manual refresh.
 *   Block Editor & Shortcodes:
     Add galleries with the WordPress block editor, preview them live while editing, and fine-tune output with shortcode arguments and page/offset controls.
+*   Gallery Animations:
+    Use Morph page transitions to move photos into place as visitors browse. Visitors who prefer reduced motion see instant changes, and existing galleries keep their instant transitions unless you choose Morph.
 *	Performance Optimized:
 	Lazy loading, pagination, reduced layout shifts, fingerprinted assets, and broad compatibility with image optimization and caching plugins for fast loading times.
 *	SEO-Ready:
@@ -98,15 +102,17 @@ Our PRO Starter plan is our most affordable plan and includes features that take
 
 [View PRO Starter Details](https://fooplugins.com/foogallery-wordpress-gallery-plugin/pro-starter) 
 
-*   4 additional gallery layouts:
+*   6 additional gallery layouts:
     *   Polaroid Gallery - [demo](https://fooplugins.com/foogallery-wordpress-gallery-plugin/polaroid-gallery/)
     *   Grid Gallery - [demo](https://fooplugins.com/foogallery-wordpress-gallery-plugin/grid-gallery/)
-    *	Slider - [demo](https://fooplugins.com/foogallery-wordpress-gallery-plugin/slider-gallery/)
+    *   Slider Gallery - customize rounded corners, borders, shadows and thumbnail separators, with separate desktop/mobile height limits and refined thumbnail navigation. [demo](https://fooplugins.com/foogallery-wordpress-gallery-plugin/slider-gallery/)
     *   Spotlight Gallery - [demo](https://fooplugins.com/foogallery-wordpress-gallery-plugin/spotlight-gallery/)
+    *   Mosaic Gallery - responsive tiles with favorite images given more prominence where space allows. [demo](https://fooplugins.com/foogallery-wordpress-gallery-plugin/mosaic-gallery/)
+    *   Wall Gallery - animated photo walls behind content or inline, with lightbox and fullscreen gallery options. [demo](https://fooplugins.com/foogallery-wordpress-gallery-plugin/wall-gallery/)
 *   11 hover effect presets - [demo](https://fooplugins.com/foogallery-wordpress-gallery-plugin/hover-presets/)
 *   12 CSS thumbnail effects (Instagram-style) - [demo](https://fooplugins.com/foogallery-wordpress-gallery-plugin/filter-effects/)
 *   Mobile Gallery Settings:
-    Tailor supported layouts for smaller screens while using the live mobile preview. Set mobile-specific columns, gaps, Masonry layout and thumbnail width, Justified row size, Carousel items and controls, pagination, caption alignment, and caption line limits. PRO Starter layouts also include mobile controls for Slider aspect ratio, Spotlight autoplay and pagination position, Grid columns and panels, and PRO Portfolio spacing. Settings automatically fall back to their desktop values when no mobile override is set.
+    Tailor supported layouts for smaller screens while using the live mobile preview. Set mobile-specific columns, gaps, Masonry layout and thumbnail width, Justified row size, Carousel items and controls, pagination, caption alignment, and caption line limits. PRO Starter layouts also include mobile controls for Slider aspect ratio, Spotlight autoplay and pagination position, Grid columns and panels, Mosaic tile density and gaps, Wall columns, and PRO Portfolio spacing. Settings automatically fall back to their desktop values when no mobile override is set.
 *   Colors and color sorting:
     Extract dominant colors from images, sort galleries by color, and apply opaque or tinted backgrounds for a more art-directed look.
 
@@ -119,11 +125,11 @@ Our PRO Expert plan unlocks exactly what you would expect – expert-level featu
 *   Video Galleries:
 	Import from YouTube, YouTube Shorts, Vimeo, or self-hosted sources [demos](https://fooplugins.com/foogallery-wordpress-gallery-plugin/video-gallery/)
 *	Filtering & Tagging:
-	Filter by Media Tags or Categories with multi-level filtering, search, dropdown filter styles, and advanced selection modes [demos](https://fooplugins.com/foogallery-wordpress-gallery-plugin/filtering/)
+	Filter by Media Tags or Categories with multi-level filtering, search, dropdown filter styles, and advanced selection modes. Optional Morph filtering animations move photos into place as the selection changes, with instant changes for visitors who prefer reduced motion. [demos](https://fooplugins.com/foogallery-wordpress-gallery-plugin/filtering/)
 *	Dynamic Galleries:
 	Load images from folders, Lightroom, Real Media Library, [Infinite Uploads](https://infiniteuploads.com/?via=fooplugins), or posts, with support for ACF fields and richer post query controls. [demos](https://fooplugins.com/foogallery-wordpress-gallery-plugin/dynamic-galleries/)
 *	Advanced Pagination:
-	Load More, Infinite Scroll, and Numbered pagination [demos](https://fooplugins.com/foogallery-wordpress-gallery-plugin/pagination/)
+	Load More, Infinite Scroll, and Numbered pagination, with Morph page transitions and fading images when more photos are added. [demos](https://fooplugins.com/foogallery-wordpress-gallery-plugin/pagination/)
 *	Advanced Custom Captions
 	Create captions using placeholders & custom HTML [demos](https://fooplugins.com/foogallery-wordpress-gallery-plugin/custom-captions/)
 *	EXIF metadata
@@ -153,7 +159,7 @@ Our PRO Commerce plan is for the photographers who make a living from selling th
 *   Product Info in Lightbox
     Show product details, price, stock messaging, add-to-cart, checkout, view product, and download actions directly in the lightbox.
 *	Gallery Blueprints
-    Create Gallery Templates that share settings across galleries for faster gallery management - [docs](https://fooplugins.com/documentation/foogallery/pro-commerce/use-master-gallery/)
+    Share settings across galleries with clearer setup, switching and removal controls. See which galleries use a blueprint, understand which settings they inherit, and assign blueprints in bulk. [docs](https://fooplugins.com/documentation/foogallery/pro-commerce/use-master-gallery/)
 
 **PRO Addons**
 
@@ -183,7 +189,7 @@ We also have a collection of powerful add-ons available to enhance your gallery 
 *	Works seamlessly in the Block Editor / Gutenberg.
 *	WooCommerce integration to sell photos online.
 *	Lightbox plugins : FooBox, dFactory.
-*	Page builders : Elementor, Divi.
+*	Page builders : Elementor and Divi, including a native Divi 5 FooGallery module with a gallery selector and live previews.
 *	SEO Plugins: Yoast, Rank Math, AIOSEO.
 *	Caching Plugins: WP Rocket, W3 Total Cache, Autoptimize, WPOptimize.
 *	Media Tools: ShortPixel, Imagify, Real Media Library, and [Infinite Uploads](https://infiniteuploads.com/?via=fooplugins).
@@ -258,14 +264,13 @@ First thing to do is restore your site to it's previous working state.
 
 = Do you care about Google's Core Web Vitals? =
 
-A faster gallery now means a more favourable ranking in Google!
-FooGallery continues to be optimized for Core Web Vitals with faster client-side code, lazy loading, improved layout stability, and broader compatibility with performance plugins.
-We focus on the speed of our javascript code and the visual stability of all gallery layouts.
-This helps improve the 3 key Lighthouse factors including:
+FooGallery focuses on loading performance, responsiveness and visual stability to support a better browsing experience. Lazy loading, efficient client-side code, reduced layout shifts and compatibility with performance plugins support these goals.
 
-*   Largest Contentful Paint - galleries load and appear quicker for your visitors
-*   First Input Delay - you can interact with the gallery sooner
-*   Cumulative Layout Shift - gallery images shift around a lot less than before!
+The three Core Web Vitals measure:
+
+*   Largest Contentful Paint (LCP) - loading performance
+*   Interaction to Next Paint (INP) - responsiveness to interactions
+*   Cumulative Layout Shift (CLS) - visual stability
 
 = I purchased a PRO license, but the Free version is still running. =
 
@@ -351,12 +356,71 @@ The Patchstack team will assist you with verification, CVE assignment, and notif
 8. Frontend example with single thumbnail layout
 9. Frontend example with carousel layout
 10. Lightbox
+11. Pop-out gallery preview with desktop, tablet and mobile views, background color selection, and automatic or manual refresh
 
 == Upgrade Notice ==
 
-Please update in order for FooGallery to work effectively.
+This update adds improved gallery previews, native Divi 5 integration and gallery display refinements, plus security fixes for public embeds and service connections.
 
 == Changelog ==
+
+= 3.3.37 =
+
+* Date Updated : 07 Nov 2026
+* Fix : Protected gallery demo configuration files from being loaded directly outside WordPress.
+
+= 3.3.36 =
+
+* Date Updated : 07 Nov 2026
+* Fix : Restored third-party settings updates after gallery layout changes, including Upload Access controls with existing User Uploads installations.
+
+= 3.3.35 =
+
+* Date Updated : 07 Nov 2026
+* Update : Faster gallery editing with deferred shortcode helpers, optimized settings tabs and background loading of additional layout settings.
+* Update : Pause automatic previews while making bulk changes and refresh manually. Managing items queues one refresh for when Gallery Preview is reopened.
+* Fix : Stalled layout changes now time out after 15 seconds or can be canceled without losing settings or blocking saving. Loading messages and Retry appear beside Gallery Settings.
+* Fix : Automatic previews resume with the latest changes after a canceled or failed layout request, while respecting manual preview mode.
+* Fix : Preserved add-on settings and gallery-specific Social warnings when switching layouts, and kept the Gallery Items heading on one line during loading.
+
+= 3.3.34 =
+
+* Date Updated : 06 Nov 2026
+* New : Pause automatic gallery previews with the Auto-update preview checkbox and refresh manually when ready, including in the pop-out preview window.
+* Update : Preview controls are hidden and preview updates are paused while managing items. Returning to Gallery Preview automatically refreshes the latest changes, even when auto-update is off.
+* Update : Simplified preview controls with left-aligned icons and loading indicator, a right-aligned auto-update checkbox, and instant tooltips. The refresh icon changes color and tooltip when the preview is out of date.
+* Fix : Rapid gallery edits now queue the latest preview refresh instead of starting overlapping requests, and outdated responses no longer replace the current preview.
+
+= 3.3.29 =
+
+* Date Updated : 03 Nov 2026
+* Update : Refreshed PRO layout previews in the free plugin with WebP images and direct demo links.
+* Security : Prevent private and unpublished galleries from appearing in public embeds.
+* Update : Improved lightbox and panel controls for easier browsing on touch screens and with a mouse.
+* Fix : Smoother Carousel transitions without images jumping into view.
+* New : Preview galleries against a background color of your choice in the pop-out preview window.
+* Fix : Portfolio images now keep their full height when using Inner Rounded Corners.
+* New : Adjust image corners independently of the outer frame with the new Inner Rounded Corners setting.
+* Update : Added Extra Large Rounded Corners to more gallery layouts, including Image Viewer.
+* Fix : Improved rounded corners around borders, consistent Masonry corner sizes and smoother thumbnail corners during hover.
+* Fix : Image Viewer navigation arrows return after clicking and moving the mouse away.
+* Update : Refreshed demo galleries to match layout defaults while preserving variation demos.
+* Fix : Preserved custom colors when switching gallery layouts.
+* Fix : Kept open lightboxes on the same image when rotating a device, and restored page scrolling when the viewer closes or is destroyed.
+
+= 3.3.20 =
+
+* Date Updated : 27 Oct 2026
+* Fix : Required verified HTTPS for Freemius service requests and blocked insecure transport fallbacks.
+* Fix : Escaped gallery titles in the pop-out preview window document header.
+* Fix : Excluded renamed imported demo galleries from rating notice checks, including previously saved show decisions.
+* Fix : Made Responsive gallery images fill their frames when mobile columns apply, including the mobile editor preview, while preserving desktop thumbnail sizing.
+* Fix : Corrected gallery Usage detection for nested blocks, single-quoted shortcodes and Elementor changes, excluded escaped shortcode examples, and added automatic repair of existing usage records.
+* Fix : Improved gallery editor button spacing and borders when Manage Items and Gallery Preview wrap on narrow screens.
+* New : Added a native Divi 5 FooGallery module with a gallery selector, live previews and conversion of existing Divi gallery modules.
+* New : Added Morph page animations, while preserving existing galleries' instant page changes and respecting reduced-motion preferences.
+* New : Added a pop-out gallery preview window that follows unsaved editor changes and reconnects after the editor reloads, with desktop, tablet and mobile views and automatic inline preview pausing.
+* Known issue : Grid PRO first-row expansion and FooBox lightboxes still need fixes in native Divi 5 editor previews; frontend galleries continue to work.
 
 = 3.3.17 =
 

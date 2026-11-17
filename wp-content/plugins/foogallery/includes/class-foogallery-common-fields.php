@@ -194,12 +194,34 @@ if ( ! class_exists( 'FooGallery_Common_Fields' ) ) {
 						'fg-round-small'  => __( 'Small', 'foogallery' ),
 						'fg-round-medium' => __( 'Medium', 'foogallery' ),
 						'fg-round-large'  => __( 'Large', 'foogallery' ),
+						'fg-round-large-extra' => __( 'Extra Large', 'foogallery' ),
 						'fg-round-full'   => __( 'Full', 'foogallery' ),
 					),
 					'row_data' => array(
 						'data-foogallery-change-selector' => 'input:radio',
 						'data-foogallery-preview'         => 'shortcode'
 					)
+				);
+
+				$fields[] = array(
+					'id'         => 'inner_rounded_corners',
+					'title'      => __( 'Inner Rounded Corners', 'foogallery' ),
+					'desc'       => __( 'The rounded corners of the image inside its border. Auto uses the layout\'s existing rounding.', 'foogallery' ),
+					'section_id' => 'appearance',
+					'type'       => 'radio',
+					'default'    => 'auto',
+					'choices'    => array(
+						'auto'                      => __( 'Auto', 'foogallery' ),
+						'fg-inner-round-none'        => __( 'None', 'foogallery' ),
+						'fg-inner-round-small'       => __( 'Small', 'foogallery' ),
+						'fg-inner-round-medium'      => __( 'Medium', 'foogallery' ),
+						'fg-inner-round-large'       => __( 'Large', 'foogallery' ),
+						'fg-inner-round-large-extra' => __( 'Extra Large', 'foogallery' ),
+					),
+					'row_data'   => array(
+						'data-foogallery-change-selector' => 'input:radio',
+						'data-foogallery-preview'         => 'shortcode',
+					),
 				);
 
 				$fields[] = array(
@@ -946,6 +968,12 @@ if ( ! class_exists( 'FooGallery_Common_Fields' ) ) {
 				$classes[] = foogallery_gallery_template_setting( 'theme', 'fg-light' );
 				$classes[] = foogallery_gallery_template_setting( 'border_size', 'fg-border-thin' );
 				$classes[] = foogallery_gallery_template_setting( 'rounded_corners', '' );
+				if ( 'slider' !== $gallery->gallery_template ) {
+					$inner_corners = foogallery_gallery_template_setting( 'inner_rounded_corners', 'auto' );
+					if ( in_array( $inner_corners, array( 'fg-inner-round-none', 'fg-inner-round-small', 'fg-inner-round-medium', 'fg-inner-round-large', 'fg-inner-round-large-extra' ), true ) ) {
+						$classes[] = $inner_corners;
+					}
+				}
 				$classes[] = foogallery_gallery_template_setting( 'drop_shadow', 'fg-shadow-outline' );
 				$classes[] = foogallery_gallery_template_setting( 'inner_shadow', '' );
 				$classes[] = foogallery_gallery_template_setting( 'loading_icon', 'fg-loading-default' );

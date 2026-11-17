@@ -107,8 +107,11 @@ FooGallery.autoEnabled = false;
 			$('.foogallery-preview-actions .foogallery-preview-refresh-btn').on('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation(); // Prevent event bubbling
-                FOOGALLERY.reloadGalleryPreview();
+                FOOGALLERY.previewState.refresh(true);
             });
+			$('.foogallery-preview-auto').on('change', function() {
+				FOOGALLERY.previewState.setAuto(this.checked);
+			});
             
             // Viewport button clicks
 			$('.foogallery-preview-actions .foogallery-viewport-btn').on('click', function(e) {
@@ -126,15 +129,7 @@ FooGallery.autoEnabled = false;
 				FOOGALLERY.handleSettingsShowRules();
 			});
 
-			var $currentButton = $('.foogallery-items-view-switch-container a.current'),
-				currentValue = $currentButton.data('value');
-
-			if ( currentValue === 'preview' ) {
-				//show the viewport buttons
-				$('.foogallery-preview-actions').show();
-			} else {
-				$('.foogallery-preview-actions').hide();
-			}
+			// Header controls stay available in both item views.
         },
         
         setViewport: function(viewport, scroll) {
@@ -294,6 +289,8 @@ FooGallery.autoEnabled = false;
         $('#foogallery_datasource').val('media_library');
 
 		$('.foogallery_preview_container').addClass('foogallery-preview-force-refresh');
+
+		FOOGALLERY.previewState.changed();
     };
 
 	FOOGALLERY.calculateHiddenAreas = function() {
@@ -343,6 +340,27 @@ FooGallery.autoEnabled = false;
 					$newCheckbox = $target.find('input[type="checkbox"]');
 				if ($newCheckbox.length && $newCheckbox.is(':checked') !== isChecked) {
 					$newCheckbox.prop('checked', isChecked).trigger('change');
+					return true;
+				}
+				break;
+			case 'checkboxlist':
+				var selectedValues = $source.find('input[type="checkbox"]:checked').map(function() {
+					return this.value;
+				}).get(),
+					checkboxesChanged = false;
+				$target.find('input[type="checkbox"]').each(function() {
+					var checked = selectedValues.indexOf(this.value) !== -1;
+					if (this.checked !== checked) {
+						$(this).prop('checked', checked).trigger('change');
+						checkboxesChanged = true;
+					}
+				});
+				return checkboxesChanged;
+			case 'colorpicker':
+				var color = $source.find('.colorpicker').val(),
+					$newColor = $target.find('.colorpicker');
+				if ($newColor.length && $newColor.val() !== color) {
+					$newColor.spectrum('set', color).trigger('change');
 					return true;
 				}
 				break;
@@ -584,8 +602,255 @@ FooGallery.autoEnabled = false;
 			} );
 	};
 
+	FOOGALLERY.templateSettingsHtmlCache = Object.create( null );
+	FOOGALLERY.backgroundTemplateSettingsStarted = false;
+	FOOGALLERY.backgroundTemplateSettingsComplete = false;
+	FOOGALLERY.backgroundTemplateSettingsRequest = null;
+
+	FOOGALLERY.maybeLoadBackgroundTemplateSettings = function () {
+		if ( ! FOOGALLERY.initialPreviewReady || ! FOOGALLERY.layoutSettingsWindowLoaded ||
+			FOOGALLERY.backgroundTemplateSettingsStarted || ! $( '#foogallery_layout_settings_nonce' ).length ) return;
+		FOOGALLERY.backgroundTemplateSettingsStarted = true;
+		window.setTimeout( function () {
+			var request = $.ajax( {
+				type: 'POST',
+				url: ajaxurl,
+				dataType: 'json',
+				data: {
+					action: 'foogallery_layout_settings_batch',
+					foogallery_id: $( '#post_ID' ).val(),
+					exclude: FOOGALLERY.initialGalleryTemplate,
+					nonce: $( '#foogallery_layout_settings_nonce' ).val()
+				}
+			} );
+			FOOGALLERY.backgroundTemplateSettingsRequest = request;
+			request.done( function ( response ) {
+				var layouts = response && response.success && response.data && response.data.layouts;
+				if ( ! layouts || typeof layouts !== 'object' ) return;
+				Object.keys( layouts ).forEach( function ( slug ) {
+					if ( typeof layouts[ slug ] !== 'string' || ! layouts[ slug ] ||
+						! $( '.foogallery-template-card' ).filter( function () { return $( this ).data( 'template' ) === slug; } ).length ||
+						FOOGALLERY.templateSettingsHtmlCache[ slug ] ||
+						( FOOGALLERY.templateSettingsRequests && FOOGALLERY.templateSettingsRequests[ slug ] ) ||
+						( FOOGALLERY.templateSettings && FOOGALLERY.templateSettings.filter( '.foogallery-settings-container-' + slug ).length ) ||
+						$( '.foogallery-settings-container-' + slug ).length ) return;
+					FOOGALLERY.templateSettingsHtmlCache[ slug ] = layouts[ slug ];
+				} );
+			} ).always( function () {
+				FOOGALLERY.backgroundTemplateSettingsRequest = null;
+				FOOGALLERY.backgroundTemplateSettingsComplete = true;
+			} );
+		}, 0 );
+	};
+
+	FOOGALLERY.initBackgroundTemplateSettings = function () {
+		FOOGALLERY.initialGalleryTemplate = FOOGALLERY.selected_gallery_template;
+		var windowLoaded = function () {
+			FOOGALLERY.layoutSettingsWindowLoaded = true;
+			if ( ! FOOGALLERY.initialPreviewReady ) {
+				FOOGALLERY.backgroundPreviewWaitStarted = Date.now();
+				var checkPreview = function () {
+					if ( FOOGALLERY.initialPreviewReady ) return;
+					if ( FOOGALLERY.previewState.requestActive || FOOGALLERY.previewState.rendering ||
+						( FOOGALLERY.initialPreviewPending && Date.now() - FOOGALLERY.backgroundPreviewWaitStarted < ( FOOGALLERY.backgroundPreviewMaxWaitMs || 30000 ) ) ) {
+						FOOGALLERY.backgroundPreviewWaitTimer = window.setTimeout( checkPreview, FOOGALLERY.backgroundPreviewWaitMs || 5000 );
+						return;
+					}
+					FOOGALLERY.initialPreviewReady = true;
+					FOOGALLERY.maybeLoadBackgroundTemplateSettings();
+				};
+				FOOGALLERY.backgroundPreviewWaitTimer = window.setTimeout( checkPreview, FOOGALLERY.backgroundPreviewWaitMs || 5000 );
+			}
+			FOOGALLERY.maybeLoadBackgroundTemplateSettings();
+		};
+		if ( document.readyState === 'complete' ) {
+			windowLoaded();
+		} else {
+			$( window ).one( 'load.foogalleryLayoutSettings', windowLoaded );
+		}
+	};
+
+	FOOGALLERY.bindLayoutSettings = function ( $layout ) {
+		$layout.find( '.foogallery_template_field[data-foogallery-change-selector]' ).each( function () {
+			var $field = $( this );
+			$field.find( $field.data( 'foogallery-change-selector' ) ).on( 'change', function () {
+				FOOGALLERY.handleSettingControlChange( $field, this );
+			} );
+		} );
+		$layout.find( '.colorpicker' ).spectrum( {
+			preferredFormat: 'rgb',
+			showInput: true,
+			clickoutFiresChange: true
+		} );
+		if ( typeof FooGallery !== 'undefined' && FooGallery.Settings ) {
+			var settings = new FooGallery.Settings( $layout.find( '.foogallery-settings' ), { mobile: 960 } );
+			settings.init();
+			$layout.data( 'foogallery-settings-instance', settings );
+		}
+	};
+
+	FOOGALLERY.layoutSettingsStatus = function () {
+		var $metabox = $( '#foogallery_settings' ),
+			$heading = $metabox.find( '.hndle' ).first(),
+			$title = $heading.children( 'span' ).not( '#foogallery_layout_settings_status, .foogallery-template-selector' ).first(),
+			$status = $( '#foogallery_layout_settings_status' );
+		if ( ! $title.length ) $title = $heading;
+		if ( ! $status.length ) {
+			$status = $( '<span id="foogallery_layout_settings_status" class="foogallery-layout-settings-status" role="status" aria-live="polite"></span>' )
+				.on( 'click keydown', function ( event ) { event.stopPropagation(); } );
+		}
+		if ( $title.length ) {
+			$heading.addClass( 'foogallery-layout-settings-header' );
+			var $selector = $title.find( '.foogallery-template-selector' ).first();
+			if ( $selector.length ) $status.insertBefore( $selector );
+			else $status.appendTo( $title );
+		} else {
+			$status.prependTo( $metabox.find( '.inside' ).first() );
+		}
+		return $status;
+	};
+
+	FOOGALLERY.resumePreviewAfterLayoutInterruption = function () {
+		var state = FOOGALLERY.previewState;
+		if ( ! state || ! state.dirty ) return;
+		if ( state.isManage() ) {
+			state.pendingViewRefresh = true;
+			return;
+		}
+		if ( state.auto && ! state.batch &&
+			( FOOGALLERY.previewWindow.connected || $( '.foogallery_preview_container' ).is( ':visible' ) ) ) {
+			state.refresh();
+		}
+	};
+
+	FOOGALLERY.loadTemplateSettings = function ( template, reloadPreview ) {
+		var $metabox = $( '#foogallery_settings' ),
+			$status = FOOGALLERY.layoutSettingsStatus(),
+			$copy = $( '#foogallery_layout_settings_nonce' );
+		$status.empty()
+			.append( $( '<span class="foogallery-layout-settings-message"></span>' ).text( $copy.data( 'loading' ) ) )
+			.append( ' ' )
+			.append( $( '<button type="button" class="button-link foogallery-layout-settings-cancel"></button>' )
+				.text( $copy.data( 'cancel' ) ).on( 'click', function () {
+					FOOGALLERY.cancelTemplateSettings();
+				} ) ).show();
+		FOOGALLERY.templateSettingsLoading = template;
+		FOOGALLERY.pendingTemplate = template;
+		FOOGALLERY.selectTemplateCard( FOOGALLERY.selected_gallery_template );
+		if ( ! FOOGALLERY.templateSettingsRequests ) FOOGALLERY.templateSettingsRequests = {};
+		var accept = function ( response ) {
+				if ( ! response || ! response.success || ! response.data || ! response.data.html ) {
+					FOOGALLERY.layoutSettingsError( template, reloadPreview );
+					return;
+				}
+				var $layout = $( response.data.html ).filter( '.foogallery-settings-container' );
+				if ( $layout.length !== 1 || ! $layout.hasClass( 'foogallery-settings-container-' + template ) ) {
+					FOOGALLERY.layoutSettingsError( template, reloadPreview );
+					return;
+				}
+				FOOGALLERY.initTemplateSettingsStorage();
+				$metabox.find( '.inside' ).first().append( $layout );
+				$layout.hide().find( ':input, range-input' ).attr( 'disabled', true );
+				FOOGALLERY.bindLayoutSettings( $layout );
+				if ( FOOGALLERY.templateSettings ) {
+					var placeholder = document.createComment( 'FooGallery layout settings' );
+					$layout.before( placeholder ).data( 'foogallery-settings-placeholder', placeholder );
+					FOOGALLERY.templateSettings = FOOGALLERY.templateSettings.add( $layout );
+				}
+				$( 'body' ).trigger( 'foogallery-gallery-settings-loaded', [ template, $layout ] );
+				if ( FOOGALLERY.pendingTemplate === template ) {
+					FOOGALLERY.selectTemplateCard( template );
+					FOOGALLERY.pendingTemplate = null;
+					FOOGALLERY.templateSettingsLoading = null;
+					$status.hide();
+					FOOGALLERY.galleryTemplateChanged( reloadPreview );
+				} else {
+					$layout.detach();
+				}
+			};
+		if ( FOOGALLERY.templateSettingsHtmlCache[ template ] ) {
+			var cachedHtml = FOOGALLERY.templateSettingsHtmlCache[ template ];
+			delete FOOGALLERY.templateSettingsHtmlCache[ template ];
+			accept( { success: true, data: { html: cachedHtml } } );
+			return;
+		}
+		if ( ! FOOGALLERY.templateSettingsRequests[ template ] ) {
+			var request = $.ajax( {
+				type: 'POST',
+				url: ajaxurl,
+				dataType: 'json',
+				timeout: 15000,
+				data: {
+					action: 'foogallery_layout_settings',
+					foogallery_id: $( '#post_ID' ).val(),
+					template: template,
+					nonce: $( '#foogallery_layout_settings_nonce' ).val()
+				}
+			} );
+			FOOGALLERY.templateSettingsRequests[ template ] = request;
+			request.done( function ( response ) {
+				if ( FOOGALLERY.templateSettingsRequests[ template ] === request ) accept( response );
+			} ).fail( function ( xhr, status ) {
+				if ( FOOGALLERY.templateSettingsRequests[ template ] === request && status !== 'abort' ) {
+					FOOGALLERY.layoutSettingsError( template, reloadPreview, status === 'timeout' );
+				}
+			} ).always( function () {
+				if ( FOOGALLERY.templateSettingsRequests[ template ] === request ) {
+					delete FOOGALLERY.templateSettingsRequests[ template ];
+				}
+			} );
+		}
+	};
+
+	FOOGALLERY.cancelTemplateSettings = function () {
+		var template = FOOGALLERY.pendingTemplate;
+		if ( ! template ) return;
+		var request = FOOGALLERY.templateSettingsRequests && FOOGALLERY.templateSettingsRequests[ template ];
+		FOOGALLERY.pendingTemplate = null;
+		FOOGALLERY.templateSettingsLoading = null;
+		FOOGALLERY.selectTemplateCard( FOOGALLERY.selected_gallery_template );
+		$( '#foogallery_layout_settings_status' ).empty().hide();
+		if ( request ) {
+			delete FOOGALLERY.templateSettingsRequests[ template ];
+			request.abort();
+		}
+		FOOGALLERY.resumePreviewAfterLayoutInterruption();
+	};
+
+	FOOGALLERY.layoutSettingsError = function ( template, reloadPreview, timedOut ) {
+		if ( FOOGALLERY.pendingTemplate !== template ) return;
+		FOOGALLERY.templateSettingsLoading = null;
+		FOOGALLERY.pendingTemplate = null;
+		var $copy = $( '#foogallery_layout_settings_nonce' );
+		FOOGALLERY.selectTemplateCard( FOOGALLERY.selected_gallery_template );
+		$( '#foogallery_layout_settings_status' ).empty()
+			.append( document.createTextNode( $copy.data( timedOut ? 'timeout' : 'error' ) + ' ' ) )
+			.append( $( '<button type="button" class="button-link"></button>' ).text( $copy.data( 'retry' ) ).on( 'click', function () {
+				FOOGALLERY.selectTemplateCard( template );
+				FOOGALLERY.galleryTemplateChanged( reloadPreview );
+			} ) ).show();
+		FOOGALLERY.resumePreviewAfterLayoutInterruption();
+	};
+
+	FOOGALLERY.selectTemplateCard = function ( template ) {
+		$( '#FooGallerySettings_GalleryTemplate' ).val( template );
+		$( '.foogallery-template-card' ).removeClass( 'selected' )
+			.filter( function () { return $( this ).data( 'template' ) === template; } ).addClass( 'selected' );
+	};
+
 	FOOGALLERY.galleryTemplateChanged = function(reloadPreview) {
+		if ( FOOGALLERY.notifyingTemplateChange ) {
+			return;
+		}
 		const selectedTemplate = FOOGALLERY.getSelectedTemplate();
+		var cached = FOOGALLERY.templateSettings && FOOGALLERY.templateSettings.filter( '.foogallery-settings-container-' + selectedTemplate ).length;
+		if ( ! cached && ! $( '.foogallery-settings-container-' + selectedTemplate ).length && $( '#foogallery_layout_settings_nonce' ).length ) {
+			FOOGALLERY.loadTemplateSettings( selectedTemplate, reloadPreview );
+			return;
+		}
+		FOOGALLERY.templateSettingsLoading = null;
+		FOOGALLERY.pendingTemplate = null;
+		$( '#foogallery_layout_settings_status' ).hide();
 
 		FOOGALLERY.mountTemplateSettings( selectedTemplate );
 
@@ -595,6 +860,10 @@ FooGallery.autoEnabled = false;
 			currentTab = $currentTab.data('name'),
 			currentChildTab = $currentTab.find('.foogallery-vertical-child-tab.foogallery-tab-active').data('name'),
 			previousSelectedTemplate = FOOGALLERY.selected_gallery_template;
+		if ( FOOGALLERY.shortcodeHelpersInitialized && ! $settingsToShow.data( 'foogalleryShortcodeHelpersBuilt' ) ) {
+			FOOGALLERY.buildShortcodeHelpers( $settingsToShow );
+			$settingsToShow.data( 'foogalleryShortcodeHelpersBuilt', true );
+		}
 
 		FOOGALLERY.selected_gallery_template = selectedTemplate;
 
@@ -673,8 +942,26 @@ FooGallery.autoEnabled = false;
 		//trigger a change so custom template js can do something
 		FOOGALLERY.triggerTemplateChangedEvent();
 
-		if (reloadPreview) {
+		if ( reloadPreview ) {
 			FOOGALLERY.reloadGalleryPreview();
+		}
+		// Addons listening for native field changes need the new layout to be active first.
+		if (
+			previousSelectedTemplate &&
+			previousSelectedTemplate !== selectedTemplate
+		) {
+			$( '#FooGallerySettings_GalleryTemplate' ).each( function () {
+				FOOGALLERY.notifyingTemplateChange = true;
+				try {
+					this.dispatchEvent(
+						new this.ownerDocument.defaultView.Event( 'change', {
+							bubbles: true,
+						} )
+					);
+				} finally {
+					FOOGALLERY.notifyingTemplateChange = false;
+				}
+			} );
 		}
 	};
 
@@ -682,9 +969,21 @@ FooGallery.autoEnabled = false;
 
 		//make sure the fields that should be hidden or shown are doing what they need to do
         FOOGALLERY.handleSettingsShowRules();
+		FOOGALLERY.previewState.changed(false);
 
 		//update the gallery preview
-		FOOGALLERY.updateGalleryPreview(reloadPreview, setContainerHeight);
+		if (FOOGALLERY.previewState.auto && !FOOGALLERY.previewState.isManage() && !FOOGALLERY.templateSettingsLoading) {
+			if (FOOGALLERY.previewWindow.isPaused()) {
+				FOOGALLERY.previewState.refresh();
+			} else {
+				var revision = FOOGALLERY.previewState.revision;
+				FOOGALLERY.updateGalleryPreview(reloadPreview, setContainerHeight, function() {
+					if (revision === FOOGALLERY.previewState.revision && !FOOGALLERY.previewState.isManage()) {
+						FOOGALLERY.previewState.complete(FOOGALLERY.getGalleryPreviewRequestData());
+					}
+				});
+			}
+		}
 	};
 
 	FOOGALLERY.handleSettingControlChange = function($fieldContainer, changedElement) {
@@ -824,6 +1123,13 @@ FooGallery.autoEnabled = false;
 	};
 
 	FOOGALLERY.updateGalleryPreview = function( initGallery, setContainerHeight, onUpdated ) {
+		if ( FOOGALLERY.templateSettingsLoading || FOOGALLERY.previewState.isManage() ||
+			(FOOGALLERY.previewWindow.isPaused() && !FOOGALLERY.previewState.initializing) ||
+			(!FOOGALLERY.previewState.auto && !FOOGALLERY.previewState.rendering) ) {
+			if (typeof onUpdated === 'function') onUpdated();
+			return;
+		}
+
 		var $preview = $('.foogallery_preview_container .foogallery'),
 			$preview_container = $('.foogallery_preview_container');
 		var releaseHeight = function() {
@@ -859,6 +1165,32 @@ FooGallery.autoEnabled = false;
 		}
 	};
 
+	FOOGALLERY.initializeSavedGalleryPreview = function() {
+		FOOGALLERY.handleSettingsShowRules();
+		if (FOOGALLERY.previewState.isManage()) {
+			FOOGALLERY.previewState.pendingViewRefresh = true;
+			FOOGALLERY.initialPreviewReady = true;
+			window.clearTimeout( FOOGALLERY.backgroundPreviewWaitTimer );
+			if ( typeof FOOGALLERY.maybeLoadBackgroundTemplateSettings === 'function' ) FOOGALLERY.maybeLoadBackgroundTemplateSettings();
+			return;
+		}
+		var revision = FOOGALLERY.previewState.revision;
+		FOOGALLERY.previewState.rendering = true;
+		FOOGALLERY.previewState.initializing = true;
+		FOOGALLERY.initialPreviewPending = true;
+		FOOGALLERY.updateGalleryPreview(true, false, function() {
+			FOOGALLERY.initialPreviewPending = false;
+			if (revision === FOOGALLERY.previewState.revision && !FOOGALLERY.previewState.isManage()) {
+				FOOGALLERY.previewState.complete(FOOGALLERY.getGalleryPreviewRequestData());
+			}
+			FOOGALLERY.initialPreviewReady = true;
+			window.clearTimeout( FOOGALLERY.backgroundPreviewWaitTimer );
+			if ( typeof FOOGALLERY.maybeLoadBackgroundTemplateSettings === 'function' ) FOOGALLERY.maybeLoadBackgroundTemplateSettings();
+		});
+		FOOGALLERY.previewState.initializing = false;
+		FOOGALLERY.previewState.rendering = false;
+	};
+
 	FOOGALLERY.getGalleryPreviewSettingsData = function($shortcodeFields) {
 		var data = [];
 
@@ -874,37 +1206,22 @@ FooGallery.autoEnabled = false;
 		return data;
 	};
 
-	FOOGALLERY.reloadGalleryPreview = function() {
-		if ( FOOGALLERY.suppressPreviewRefresh ) {
-			return;
-		}
-
-		//make sure the fields that should be hidden or shown are doing what they need to do
-		FOOGALLERY.handleSettingsShowRules();
-
-		var $preview_container = $('.foogallery_preview_container'),
-			$preview = $preview_container.find('.foogallery');
-
-		//set the preview height so there is no jump
-		$preview_container.css('height', $preview_container.height());
-
+	/**
+	 * Build the AJAX request for a preview of the editor's current, unsaved state.
+	 */
+	FOOGALLERY.getGalleryPreviewRequestData = function() {
 		//build up all the data to generate a preview
 		var $shortcodeFields = $('.foogallery-settings-container-active .foogallery-metabox-settings .foogallery_template_field[data-foogallery-preview*="shortcode"]'),
-			data = FOOGALLERY.getGalleryPreviewSettingsData($shortcodeFields),
-			foogallery_id = $('#post_ID').val();
-
-        //clear any items just in case
-		window['foogallery-gallery-' + foogallery_id + '_items'] = null;
+			data = FOOGALLERY.getGalleryPreviewSettingsData($shortcodeFields);
 
         //add additional data for the preview
-		data.push({name: 'foogallery_id', value: foogallery_id});
+		data.push({name: 'foogallery_id', value: $('#post_ID').val()});
 		data.push({name: 'foogallery_template', value: FOOGALLERY.getSelectedTemplate()});
 
 		//include other preview fields
         var previewData = $('[data-foogallery-preview="include"]').serializeArray();
         data = data.concat(previewData);
 
-		//data.push({name: 'foogallery_attachments', value: $('#foogallery_attachments').val()});
         data.push({name: 'foogallery_datasource', value: $('#foogallery_datasource').val()});
         data.push({name: 'foogallery_datasource_value', value: $('#_foogallery_datasource_value').val()});
 
@@ -913,31 +1230,423 @@ FooGallery.autoEnabled = false;
 		data.push({name: 'foogallery_preview_nonce', value: $('#foogallery_preview').val()});
 		data.push({name: '_wp_http_referer', value: encodeURIComponent($('input[name="_wp_http_referer"]').val())});
 
+		return data;
+	};
+
+	// Preview mode belongs to the editor tab, not to saved gallery settings.
+	FOOGALLERY.previewState = {
+		auto: true,
+		dirty: false,
+		failed: false,
+		inlineDirty: false,
+		popupDirty: true,
+		inlineFailed: false,
+		popupFailed: false,
+		lastDataFresh: false,
+		revision: 0,
+		batch: 0,
+		timer: 0,
+		request: null,
+		requestActive: false,
+		pendingRefresh: false,
+		pendingViewRefresh: false,
+		lastData: null,
+		storageKey: '',
+
+		init: function() {
+			this.storageKey = 'foogallery-preview-auto-' + $('#post_ID').val();
+			try {
+				this.auto = window.sessionStorage.getItem(this.storageKey) !== 'off';
+			} catch (error) {
+				this.auto = true;
+			}
+			this.pendingViewRefresh = this.isManage();
+			this.show();
+		},
+
+		isManage: function() {
+			return $('#foogallery_items_view_input').val() === 'manage';
+		},
+
+		enterManage: function() {
+			this.changed(false);
+			this.pendingViewRefresh = true;
+		},
+
+		show: function() {
+			this.dirty = FOOGALLERY.previewWindow.isPaused() ? this.popupDirty : this.inlineDirty;
+			this.failed = FOOGALLERY.previewWindow.isPaused() ? this.popupFailed : this.inlineFailed;
+			$('.foogallery-preview-auto').prop('checked', this.auto).attr('aria-checked', this.auto ? 'true' : 'false');
+			var $refresh = $('.foogallery-preview-refresh-btn'),
+				refreshLabel = this.dirty ? $refresh.attr('data-stale-balloon') : $refresh.attr('data-refresh-balloon');
+			$refresh.toggleClass('is-stale', this.dirty).attr('data-balloon', refreshLabel).attr('aria-label', refreshLabel);
+			var $status = $('.foogallery-preview-status');
+			$status.text(this.failed ? $status.attr('data-failed') :
+				this.dirty ? $status.attr('data-stale') :
+				this.auto ? '' : $status.attr('data-manual'));
+			FOOGALLERY.previewWindow.sendState();
+		},
+
+		cancel: function() {
+			window.clearTimeout(this.timer);
+			window.clearTimeout(FOOGALLERY.previewWindow.timer);
+			this.pendingPopupData = null;
+			FOOGALLERY.previewRequestId = (FOOGALLERY.previewRequestId || 0) + 1;
+			// Invalidate the result, but let active work finish before sending more.
+			this.pendingRefresh = false;
+			$('#foogallery_preview_spinner').removeClass('is-active');
+			$('.foogallery_preview_container').removeClass('loading').css('height', '');
+		},
+
+		changed: function(schedule) {
+			this.cancel();
+			this.revision++;
+			this.inlineDirty = true;
+			this.popupDirty = true;
+			this.inlineFailed = false;
+			this.popupFailed = false;
+			this.lastDataFresh = false;
+			this.pendingPopupData = null;
+			if (this.isManage()) this.pendingViewRefresh = true;
+			$('.foogallery_preview_container').addClass('foogallery-preview-force-refresh');
+			this.show();
+			if (schedule !== false && this.auto && !this.batch && !this.isManage() && !FOOGALLERY.templateSettingsLoading &&
+				(FOOGALLERY.previewWindow.connected || $('.foogallery_preview_container').is(':visible'))) {
+				var self = this;
+				this.timer = window.setTimeout(function() {
+					self.refresh();
+				}, 300);
+			}
+		},
+
+		beginBatch: function() {
+			this.batch++;
+		},
+
+		endBatch: function() {
+			if (this.batch) this.batch--;
+			if (!this.batch && this.isManage() && this.dirty) this.pendingViewRefresh = true;
+			if (!this.batch && this.dirty && this.auto && !this.isManage() &&
+				(FOOGALLERY.previewWindow.connected || $('.foogallery_preview_container').is(':visible'))) this.refresh();
+		},
+
+		setAuto: function(enabled) {
+			this.auto = !!enabled;
+			try {
+				window.sessionStorage.setItem(this.storageKey, this.auto ? 'on' : 'off');
+			} catch (error) {
+				// Session storage is optional.
+			}
+			if (!this.auto) this.cancel();
+			this.show();
+			if (this.auto && this.dirty && !this.batch) {
+				if (this.isManage()) this.pendingViewRefresh = true;
+				else this.refresh();
+			}
+		},
+
+		refresh: function(reveal) {
+			if (this.batch) return;
+			window.clearTimeout(this.timer);
+			this.show();
+			if (reveal && !FOOGALLERY.previewWindow.isPaused() && $('#foogallery_items_view_input').val() !== 'preview') {
+				this.revealingForRefresh = true;
+				$('.foogallery-items-view-switch a[data-value="preview"]').trigger('click');
+				this.revealingForRefresh = false;
+			}
+			if (this.isManage()) {
+				this.pendingViewRefresh = true;
+				this.cancel();
+				this.show();
+				return;
+			}
+			FOOGALLERY.reloadGalleryPreview(true);
+		},
+
+		complete: function(data, surface) {
+			this.lastData = data;
+			this.lastDataFresh = true;
+			if (surface === 'popup') {
+				this.popupDirty = false;
+				this.popupFailed = false;
+			} else {
+				this.inlineDirty = false;
+				this.inlineFailed = false;
+			}
+			this.show();
+		},
+
+		fail: function(surface) {
+			this.lastDataFresh = false;
+			if (surface === 'popup') {
+				this.popupDirty = true;
+				this.popupFailed = true;
+			} else {
+				this.inlineDirty = true;
+				this.inlineFailed = true;
+			}
+			this.show();
+		}
+	};
+
+	/**
+	 * Keeps a pop-out preview window in sync with the editor.
+	 *
+	 * The window listens on a BroadcastChannel named after the gallery and
+	 * replays each preview request itself, so it survives editor reloads.
+	 */
+	FOOGALLERY.previewWindow = {
+		channel: null,
+		timer: 0,
+		closeTimer: 0,
+		lastSeen: 0,
+		connected: false,
+		resumed: false,
+
+		init: function() {
+			var self = this,
+				galleryId = $('#post_ID').val();
+
+			if (!window.BroadcastChannel || !galleryId) {
+				$('.foogallery-preview-popout-btn').hide();
+				return;
+			}
+
+			self.channel = new window.BroadcastChannel('foogallery-preview-' + galleryId);
+			self.channel.onmessage = function(event) {
+				var type = event.data && event.data.type;
+				if (type === 'hello' || type === 'alive') {
+					window.clearTimeout(self.closeTimer);
+					self.lastSeen = Date.now();
+					if (!self.connected) {
+						self.connected = true;
+						if (FOOGALLERY.previewState.auto && !FOOGALLERY.previewState.isManage()) FOOGALLERY.previewState.changed(false);
+						self.applyPause();
+					}
+					if (type === 'hello') {
+						self.sendState();
+						if (FOOGALLERY.previewState.isManage()) {
+							FOOGALLERY.previewState.pendingViewRefresh = true;
+						} else if (FOOGALLERY.previewState.auto) {
+							FOOGALLERY.previewState.refresh();
+						} else if (FOOGALLERY.previewState.lastData) {
+							self.send(FOOGALLERY.previewState.lastData, true, true);
+						}
+					}
+				} else if (type === 'refresh') {
+					FOOGALLERY.previewState.refresh();
+				} else if (type === 'set-auto') {
+					FOOGALLERY.previewState.setAuto(!!event.data.enabled);
+				} else if (type === 'preview-complete' && FOOGALLERY.previewState.pendingPopupData &&
+					event.data.requestId === FOOGALLERY.previewState.pendingPopupRequestId &&
+					event.data.revision === FOOGALLERY.previewState.revision) {
+					FOOGALLERY.previewState.complete(FOOGALLERY.previewState.pendingPopupData, 'popup');
+					FOOGALLERY.previewState.pendingPopupData = null;
+				} else if (type === 'snapshot-complete' && FOOGALLERY.previewState.lastDataFresh &&
+					event.data.revision === FOOGALLERY.previewState.revision) {
+					FOOGALLERY.previewState.popupDirty = false;
+					FOOGALLERY.previewState.popupFailed = false;
+					FOOGALLERY.previewState.show();
+				} else if (type === 'preview-failed' &&
+					event.data.requestId === FOOGALLERY.previewState.pendingPopupRequestId &&
+					event.data.revision === FOOGALLERY.previewState.revision) {
+					FOOGALLERY.previewState.pendingPopupData = null;
+					FOOGALLERY.previewState.fail('popup');
+				} else if (type === 'snapshot-failed' && event.data.revision === FOOGALLERY.previewState.revision) {
+					FOOGALLERY.previewState.fail('popup');
+				} else if (type === 'window-closed') {
+					// A refreshing window says hello again straight away, so wait briefly.
+					window.clearTimeout(self.closeTimer);
+					self.closeTimer = window.setTimeout(function() {
+						self.disconnect();
+					}, 1000);
+				}
+			};
+
+			// Fallback for a window that closed without saying so.
+			window.setInterval(function() {
+				if (self.connected && Date.now() - self.lastSeen > 10000) {
+					self.disconnect();
+				}
+			}, 2000);
+
+			$('.foogallery-preview-popout-btn').on('click', function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				var popup = window.open($(this).data('url'), 'foogallery-preview-' + galleryId, 'popup,width=1280,height=900');
+				if (popup) {
+					popup.focus();
+				}
+			});
+
+			$('.foogallery-preview-resume-btn').on('click', function(e) {
+				e.preventDefault();
+				self.resumed = true;
+				self.applyPause();
+			});
+
+			// Changes that only flag the inline preview as stale.
+			$(document).on('foogallery-datasource-changed', function() {
+				FOOGALLERY.previewState.changed();
+			});
+
+			// Let an open window know the editor is reloading, e.g. after Update.
+			$(window).on('pagehide', function() {
+				self.channel.postMessage({type: 'editor-closed'});
+			});
+
+			// A window left open across an editor reload answers with hello.
+			self.channel.postMessage({type: 'ping'});
+		},
+
+		disconnect: function() {
+			this.connected = false;
+			this.resumed = false;
+			this.applyPause();
+		},
+
+		isPaused: function() {
+			return this.connected && !this.resumed;
+		},
+
+		/**
+		 * While a window shows the preview, swap the inline one for a short notice
+		 * so each change renders only once.
+		 */
+		applyPause: function() {
+			var paused = this.isPaused(),
+				$container = $('.foogallery_preview_container');
+
+			$('.foogallery-preview-popout-btn').toggleClass('is-open', this.connected);
+			$('.foogallery-preview-paused').prop('hidden', !paused);
+			$('.foogallery-preview-wrapper').toggle(!paused);
+			FOOGALLERY.previewState.show();
+
+			if (paused) {
+				$container.addClass('foogallery-preview-force-refresh');
+			} else if (FOOGALLERY.previewState.auto && !FOOGALLERY.previewState.isManage() && $container.is(':visible') && $container.hasClass('foogallery-preview-force-refresh')) {
+				FOOGALLERY.reloadGalleryPreview();
+			}
+		},
+
+		sendState: function() {
+			if (this.channel) {
+				this.channel.postMessage({type: 'state', auto: FOOGALLERY.previewState.auto, stale: FOOGALLERY.previewState.popupDirty, failed: FOOGALLERY.previewState.popupFailed, revision: FOOGALLERY.previewState.revision, manage: FOOGALLERY.previewState.isManage()});
+			}
+		},
+
+		send: function(data, explicit, snapshot) {
+			if (!this.channel) {
+				return;
+			}
+			if (FOOGALLERY.templateSettingsLoading || FOOGALLERY.previewState.isManage() || (!FOOGALLERY.previewState.auto && !explicit)) return;
+			window.clearTimeout(this.timer);
+			var payload = data || FOOGALLERY.getGalleryPreviewRequestData(),
+				revision = FOOGALLERY.previewState.revision,
+				requestId = FOOGALLERY.previewRequestId || 0;
+			if (!snapshot) {
+				FOOGALLERY.previewState.pendingPopupData = payload;
+				FOOGALLERY.previewState.pendingPopupRequestId = requestId;
+				FOOGALLERY.previewState.pendingPopupRevision = revision;
+			}
+			this.channel.postMessage({type: 'preview', data: payload, explicit: !!explicit, snapshot: !!snapshot, snapshotStale: !FOOGALLERY.previewState.lastDataFresh, requestId: requestId, revision: revision});
+		},
+
+		queue: function() {
+			if (!FOOGALLERY.previewState.auto || FOOGALLERY.previewState.batch || FOOGALLERY.previewState.isManage()) return;
+			var self = this;
+			if (!self.channel) {
+				return;
+			}
+			window.clearTimeout(self.timer);
+			self.timer = window.setTimeout(function() {
+				self.send();
+			}, 300);
+		}
+	};
+
+	FOOGALLERY.reloadGalleryPreview = function(explicit) {
+		if ( FOOGALLERY.suppressPreviewRefresh ) {
+			return;
+		}
+		// Dependencies affect saved editor inputs even when preview rendering waits.
+		FOOGALLERY.handleSettingsShowRules();
+		if (!explicit) FOOGALLERY.previewState.changed(false);
+		if (FOOGALLERY.templateSettingsLoading) return;
+		if (FOOGALLERY.previewState.isManage()) {
+			FOOGALLERY.previewState.pendingViewRefresh = true;
+			FOOGALLERY.previewState.cancel();
+			FOOGALLERY.previewState.show();
+			return;
+		}
+		if ((!FOOGALLERY.previewState.auto && !explicit) || FOOGALLERY.previewState.batch) return;
+		FOOGALLERY.previewState.cancel();
+		const requestId = ( FOOGALLERY.previewRequestId || 0 ) + 1;
+		FOOGALLERY.previewRequestId = requestId;
+		if (FOOGALLERY.previewState.requestActive) {
+			FOOGALLERY.previewState.pendingRefresh = true;
+			return;
+		}
+
+		//the preview window renders instead while the inline preview is paused
+		if ( FOOGALLERY.previewWindow.isPaused() ) {
+			var popupData = FOOGALLERY.getGalleryPreviewRequestData();
+			FOOGALLERY.previewWindow.send(popupData, true);
+			return;
+		}
+
+		var $preview_container = $('.foogallery_preview_container'),
+			$preview = $preview_container.find('.foogallery');
+
+		//set the preview height so there is no jump
+		$preview_container.css('height', $preview_container.height());
+
+		var data = FOOGALLERY.getGalleryPreviewRequestData(),
+			foogallery_id = $('#post_ID').val();
+
+		FOOGALLERY.previewState.requestActive = true;
+		FOOGALLERY.previewWindow.send(data, !!explicit);
+
         $('#foogallery_preview_spinner').addClass('is-active');
 		$preview_container.addClass('loading');
 
-		if ($preview.length > 0){
-			var fg = $preview.data("__FooGallery__");
-			if (fg instanceof FooGallery.Template){
-				fg.destroy(false);
-			}
-		}
-
-        $.ajax({
+        FOOGALLERY.previewState.request = $.ajax({
             type: "POST",
             url: ajaxurl,
             data: data,
 			cache: false,
-            success: function(data) {
+            success: function(html) {
+				if ( requestId !== FOOGALLERY.previewRequestId ) {
+					return;
+				}
 				$('.foogallery_preview_container .foogallery').foogallery("destroy");
+				window['foogallery-gallery-' + foogallery_id + '_items'] = null;
 
                 //updated the preview
-				$preview_container.html(data);
+				$preview_container.html(html);
                 $('#foogallery_preview_spinner').removeClass('is-active');
 				$preview_container.removeClass('loading foogallery-preview-force-refresh');
 
+				FOOGALLERY.previewState.rendering = true;
 				FOOGALLERY.updateGalleryPreview(true, true);
-            }
+				FOOGALLERY.previewState.rendering = false;
+				FOOGALLERY.previewState.complete(data);
+			},
+			error: function(xhr, status) {
+				if (requestId !== FOOGALLERY.previewRequestId || status === 'abort') return;
+				$('#foogallery_preview_spinner').removeClass('is-active');
+				$preview_container.removeClass('loading').css('height', '');
+				FOOGALLERY.previewState.fail();
+			},
+			complete() {
+				FOOGALLERY.previewState.request = null;
+				FOOGALLERY.previewState.requestActive = false;
+				if (FOOGALLERY.previewState.pendingRefresh) {
+					FOOGALLERY.previewState.pendingRefresh = false;
+					// Build the request from the latest editor inputs, not queued data.
+					FOOGALLERY.reloadGalleryPreview(true);
+				}
+			}
         });
 	};
 
@@ -1068,7 +1777,23 @@ FooGallery.autoEnabled = false;
 		}
 	};
 
+	FOOGALLERY.guardLayoutSettingsSave = function () {
+		var postForm = document.getElementById( 'post' );
+		if ( postForm ) {
+			postForm.addEventListener( 'submit', function ( event ) {
+				if ( ! FOOGALLERY.templateSettingsLoading ) return;
+				event.preventDefault();
+				event.stopImmediatePropagation();
+				$( '#foogallery_layout_settings_status .foogallery-layout-settings-message' ).text(
+					$( '#foogallery_layout_settings_nonce' ).data( 'wait' )
+				);
+				$( '#foogallery_layout_settings_status' ).show();
+			}, true );
+		}
+	};
+
 	FOOGALLERY.initSettings = function() {
+		FOOGALLERY.guardLayoutSettingsSave();
 		//move the template selector into the metabox heading
 		var $metabox_heading = $('#foogallery_settings .hndle span');
 		//This check is done to accommodate a markup change in WP 5.5
@@ -1101,18 +1826,6 @@ FooGallery.autoEnabled = false;
 				nextSelector = $nextButton.data('container'),
 				value = $nextButton.data('value');
 
-			//if the preview button is already selected, and we are clicking it again, then force a preview refresh
-			if ( currentSelector === nextSelector && value === 'preview' ) {
-				$('.foogallery_preview_container').addClass('foogallery-preview-force-refresh');
-			}
-
-			if ( value === 'preview' ) {
-				//show the viewport buttons
-				$('.foogallery-preview-actions').show();
-			} else {
-				$('.foogallery-preview-actions').hide();
-			}
-
 			//toggle the views
 			$(currentSelector).hide();
 			$(nextSelector).show();
@@ -1123,8 +1836,18 @@ FooGallery.autoEnabled = false;
 
 			//set the input so that it is saved
 			$('#foogallery_items_view_input').val(value);
+			$('.foogallery-items-view-switch-container').attr('data-view', value);
+			if (value === 'manage' && currentSelector !== nextSelector) {
+				FOOGALLERY.previewState.enterManage();
+				return;
+			}
+			if (value === 'preview' && currentSelector !== nextSelector && FOOGALLERY.previewState.pendingViewRefresh) {
+				FOOGALLERY.previewState.pendingViewRefresh = false;
+				if (!FOOGALLERY.previewState.revealingForRefresh) FOOGALLERY.previewState.refresh();
+				return;
+			}
 
-			if ( $('.foogallery_preview_container').is(':visible') ) {
+			if ( !FOOGALLERY.previewState.revealingForRefresh && $('.foogallery_preview_container').is(':visible') ) {
 				FOOGALLERY.updateGalleryPreview(false, false);
 
 				//check if there is no preview
@@ -1135,7 +1858,9 @@ FooGallery.autoEnabled = false;
 			}
 		});
 
+		FOOGALLERY.previewState.init();
 		FOOGALLERY.previewActionsController.init();
+		FOOGALLERY.previewWindow.init();
 
 		$(function() {
 
@@ -1145,7 +1870,7 @@ FooGallery.autoEnabled = false;
 			$( '#foogallery_settings' ).on( 'click', '.hndle', function( event ) {
 
 				// If the user clicks on some form input inside the h3 the box should not be toggled.
-				if ( $( event.target ).filter( 'input, option, label, select' ).length ) {
+				if ( $( event.target ).closest( 'input, option, label, select, button, #foogallery_layout_settings_status' ).length ) {
 					return;
 				}
 
@@ -1177,18 +1902,20 @@ FooGallery.autoEnabled = false;
         });
 
 		$(document).on('change', 'input[name="foogallery_sort"]', function() {
-			$('.foogallery_preview_container').addClass('foogallery-preview-force-refresh');
+			FOOGALLERY.previewState.changed(false);
 
 			if ( $('.foogallery_preview_container').is(':visible') ) {
 				FOOGALLERY.reloadGalleryPreview();
+			} else if (FOOGALLERY.previewWindow.isPaused() && FOOGALLERY.previewState.auto) {
+				FOOGALLERY.previewState.refresh();
 			}
 		});
 
 		//trigger this onload too!
 		FOOGALLERY.galleryTemplateChanged(false);
 
-		//force hidden field state to be correct on load
-		FOOGALLERY.handleSettingFieldChange(true, false);
+		// Initialize the saved HTML once, including when automatic updates are off.
+		FOOGALLERY.initializeSavedGalleryPreview();
 	};
 
 	FOOGALLERY.getSelectedTemplate = function() {
@@ -1197,6 +1924,7 @@ FooGallery.autoEnabled = false;
 
 	FOOGALLERY.triggerTemplateChangedEvent = function() {
 		$('body').trigger('foogallery-gallery-template-changed-' + FOOGALLERY.getSelectedTemplate() );
+		$('body').trigger('foogallery-gallery-template-changed', [FOOGALLERY.getSelectedTemplate()]);
 	};
 
 	FOOGALLERY.triggerAttachmentsChangedEvent = function(action, attachmentId) {
@@ -1285,6 +2013,7 @@ FooGallery.autoEnabled = false;
 			}).on("select", function(){
 				var attachments = FOOGALLERY.media_uploader.state().get('selection').toJSON();
 
+				FOOGALLERY.previewState.beginBatch();
 				$.each(attachments, function(i, item) {
 					if ( item && item.id ) {
 						var attachment = {
@@ -1308,6 +2037,7 @@ FooGallery.autoEnabled = false;
 						alert( 'There was a problem adding the item to the gallery!' );
 					}
 				});
+				FOOGALLERY.previewState.endBatch();
 			})
 			.on( 'open', function() {
 				var selection = FOOGALLERY.media_uploader.state().get('selection');
@@ -1393,6 +2123,7 @@ FooGallery.autoEnabled = false;
 	};
 
 	FOOGALLERY.updateShortcodeArgumentHelpers = function($container) {
+		if (!FOOGALLERY.shortcodeHelpersInitialized) return;
 		$container.find('label[data-setting]').each(function() {
 			var $label = $(this),
 				$helper = $label.find('.foogallery-shortcode-argument-helper'),
@@ -1407,12 +2138,53 @@ FooGallery.autoEnabled = false;
 		});
 	};
 
+	FOOGALLERY.buildShortcodeHelpers = function ( $container ) {
+		$container.find('label[data-setting]').each(function() {
+			var $label = $(this), settingId = $label.data('setting');
+			if ( !settingId || $label.find('.foogallery-shortcode-argument-helper').length ) return;
+			$label.append($('<span class="foogallery-shortcode-argument-helper" aria-hidden="true"></span>')
+				.append($('<code></code>').text(settingId)));
+		});
+		FOOGALLERY.updateShortcodeArgumentHelpers($container);
+		$container.find('.foogallery_metabox_field-radio > label').each(function() {
+			var $label = $(this), $input = $label.find('input[type="radio"]').first(), value = $input.val();
+			if (!$input.length || typeof value === 'undefined' || $label.find('.foogallery-shortcode-choice-helper').length) return;
+			$label.append($('<span class="foogallery-shortcode-choice-helper foogallery-shortcode-choice-helper-radio" aria-hidden="true"></span>')
+				.append($('<code></code>').text(value === '' ? '<empty>' : value)));
+		});
+		$container.find('.foogallery_metabox_field-htmlicon > label[for]').each(function() {
+			var $label = $(this), $input = $container.find('#' + $label.attr('for')), value = $input.val();
+			if (!$input.length || typeof value === 'undefined' || $label.next('.foogallery-shortcode-choice-helper-htmlicon').length) return;
+			var $helper = $('<span class="foogallery-shortcode-choice-helper foogallery-shortcode-choice-helper-htmlicon" aria-hidden="true"></span>')
+				.append($('<code></code>').text(value === '' ? '<empty>' : value));
+			$label.after($helper);
+			if (!$input.parent().hasClass('foogallery-shortcode-choice-group-htmlicon')) {
+				$input.add($label).add($helper).wrapAll('<span class="foogallery-shortcode-choice-group-htmlicon"></span>');
+			}
+		});
+		$container.find('.foogallery_metabox_field-select select').each(function() {
+			var $select = $(this), $helper = $select.siblings('.foogallery-shortcode-select-helper');
+			if (!$helper.length) {
+				$helper = $('<span class="foogallery-shortcode-select-helper" aria-hidden="true"></span>').append($('<code></code>'));
+				$select.after($helper);
+			}
+			var updateHelper = function() {
+				var value = $select.val();
+				if (typeof value !== 'undefined') $helper.find('code').text(value === '' ? '<empty>' : value);
+			};
+			updateHelper();
+			$select.off('change.foogalleryShortcodeHelper').on('change.foogalleryShortcodeHelper', updateHelper);
+		});
+	};
+
 	FOOGALLERY.initShortcodeHelpers = function() {
 		var $toggle = $('#foogallery_toggle_shortcode_helpers');
 
 		if ( !$toggle.length ) {
 			return;
 		}
+		if ($toggle.data('foogalleryShortcodeHelpersBound')) return;
+		$toggle.data('foogalleryShortcodeHelpersBound', true);
 
 		var helperSelector = '.foogallery-shortcode-argument-helper, .foogallery-shortcode-choice-helper, .foogallery-shortcode-select-helper',
 			copyHelperText = function(text, onCopied) {
@@ -1469,86 +2241,12 @@ FooGallery.autoEnabled = false;
 				});
 			});
 
-		$('.foogallery-metabox-settings label[data-setting]').each(function() {
-			var $label = $(this),
-				settingId = $label.data('setting');
-
-			if ( !settingId || $label.find('.foogallery-shortcode-argument-helper').length ) {
-				return;
-			}
-
-			$label.append(
-				$('<span class="foogallery-shortcode-argument-helper" aria-hidden="true"></span>').append(
-					$('<code></code>').text(settingId)
-				)
-			);
-		});
-
-		FOOGALLERY.updateShortcodeArgumentHelpers($('.foogallery-metabox-settings'));
-
-		$('.foogallery_metabox_field-radio > label').each(function() {
-			var $label = $(this),
-				$input = $label.find('input[type="radio"]').first(),
-				choiceValue = $input.val(),
-				choiceHelperText = choiceValue === '' ? '<empty>' : choiceValue;
-
-			if ( !$input.length || typeof choiceValue === 'undefined' || $label.find('.foogallery-shortcode-choice-helper').length ) {
-				return;
-			}
-
-			$label.append(
-				$('<span class="foogallery-shortcode-choice-helper foogallery-shortcode-choice-helper-radio" aria-hidden="true"></span>').append(
-					$('<code></code>').text(choiceHelperText)
-				)
-			);
-		});
-
-		$('.foogallery_metabox_field-htmlicon > label[for]').each(function() {
-			var $label = $(this),
-				inputId = $label.attr('for'),
-				$input = $('#' + inputId),
-				choiceValue = $input.val(),
-				choiceHelperText = choiceValue === '' ? '<empty>' : choiceValue;
-
-			if ( !$input.length || typeof choiceValue === 'undefined' || $label.next('.foogallery-shortcode-choice-helper-htmlicon').length ) {
-				return;
-			}
-
-			var $helper = $('<span class="foogallery-shortcode-choice-helper foogallery-shortcode-choice-helper-htmlicon" aria-hidden="true"></span>').append(
-				$('<code></code>').text(choiceHelperText)
-			);
-
-			$label.after($helper);
-
-			if ( !$input.parent().hasClass('foogallery-shortcode-choice-group-htmlicon') ) {
-				$input.add($label).add($helper).wrapAll('<span class="foogallery-shortcode-choice-group-htmlicon"></span>');
-			}
-		});
-
-		$('.foogallery_metabox_field-select select').each(function() {
-			var $select = $(this),
-				$helper = $select.siblings('.foogallery-shortcode-select-helper'),
-				updateHelper = function() {
-					var selectedValue = $select.val(),
-						helperText = selectedValue === '' ? '<empty>' : selectedValue;
-
-					if ( typeof selectedValue === 'undefined' ) {
-						return;
-					}
-
-					$helper.find('code').text(helperText);
-				};
-
-			if ( !$helper.length ) {
-				$helper = $('<span class="foogallery-shortcode-select-helper" aria-hidden="true"></span>').append(
-					$('<code></code>')
-				);
-				$select.after($helper);
-			}
-
-			updateHelper();
-			$select.off('change.foogalleryShortcodeHelper').on('change.foogalleryShortcodeHelper', updateHelper);
-		});
+		var buildHelpers = function() {
+			if (FOOGALLERY.shortcodeHelpersInitialized) return;
+			FOOGALLERY.shortcodeHelpersInitialized = true;
+			FOOGALLERY.buildShortcodeHelpers($('.foogallery-metabox-settings'));
+			$('.foogallery-settings-container').data('foogalleryShortcodeHelpersBuilt', true);
+		};
 
 		var showLabel = $toggle.data('show-label') || 'Show Argument Helpers',
 			hideLabel = $toggle.data('hide-label') || 'Hide Argument Helpers',
@@ -1560,9 +2258,11 @@ FooGallery.autoEnabled = false;
 
 		updateState(false);
 
-		$toggle.on('click', function(e) {
+		$toggle.on('click.foogalleryShortcodeHelper', function(e) {
 			e.preventDefault();
-			updateState( !$('body').hasClass(stateClass) );
+			var show = !$('body').hasClass(stateClass);
+			if (show) buildHelpers();
+			updateState(show);
 		});
 	};
 
@@ -1585,6 +2285,7 @@ FooGallery.autoEnabled = false;
         FOOGALLERY.initAttachments();
 
 		FOOGALLERY.initSettings();
+		FOOGALLERY.initBackgroundTemplateSettings();
 
 		FOOGALLERY.initUsageMetabox();
 

@@ -5,12 +5,12 @@
 	"license": "GPL-2.0-or-later",
 	"require": {
 		"php": ">=7.4",
-		"automattic/jetpack-connection": "^9.1.1",
+		"automattic/jetpack-connection": "^9.9.1",
 		"automattic/jetpack-constants": "^4.0.0",
-		"automattic/jetpack-password-checker": "^0.5.0",
-		"automattic/jetpack-ip": "^0.6.0",
+		"automattic/jetpack-password-checker": "^0.5.2",
+		"automattic/jetpack-ip": "^0.7.0",
 		"automattic/jetpack-roles": "^4.0.0",
-		"automattic/jetpack-status": "^7.0.0"
+		"automattic/jetpack-status": "^7.1.0"
 	},
 	"require-dev": {
 		"yoast/phpunit-polyfills": "^4.0.0",
@@ -44,7 +44,7 @@
 			"link-template": "https://github.com/Automattic/jetpack-sync/compare/v${old}...v${new}"
 		},
 		"branch-alias": {
-			"dev-trunk": "5.1.x-dev"
+			"dev-trunk": "5.4.x-dev"
 		},
 		"dependencies": {
 			"test-only": [

@@ -118,17 +118,13 @@ if ( ! class_exists( 'FooGallery_Admin_Notices' ) ) {
 				return false; //never show - user has dismissed
 			}
 
-			if ( 'show' === $show_message ) {
-				return true; //always show - user has created 5 or more galleries
-			}
-
 			//do not show the notice if on activation page
 			if ( foogallery_is_activation_page() ) {
 				return false;
 			}
 
-			//we must show the message - get out early
-			if ( 0 === $show_message ) {
+			// Recheck saved show decisions so imported demos cannot keep the notice visible.
+			if ( 0 === $show_message || 'show' === $show_message ) {
 				$gallery_count = 0;
 				$page          = 1;
 				$batch_size    = 25;
@@ -174,9 +170,12 @@ if ( ! class_exists( 'FooGallery_Admin_Notices' ) ) {
 				return 0;
 			}
 
+			$demo_galleries = get_option( FOOGALLERY_OPTION_DEMO_CONTENT_GALLERIES, array() );
+			$demo_ids       = is_array( $demo_galleries ) ? array_map( 'absint', array_values( $demo_galleries ) ) : array();
+
 			$count = 0;
 			foreach ( $galleries as $gallery ) {
-				if ( strpos( $gallery->post_title, 'Demo : ' ) === false ) {
+				if ( ! in_array( (int) $gallery->ID, $demo_ids, true ) && strpos( $gallery->post_title, 'Demo : ' ) === false ) {
 					$count++;
 				}
 			}

@@ -21,6 +21,9 @@ if ( ! class_exists( 'FooGallery_Paging' ) ) {
             // layout settings against the same schema as wp-admin.
             add_filter( 'foogallery_override_gallery_template_fields', array( $this, 'add_paging_fields' ), 10, 2 );
 
+            //show saved galleries without the page animation setting as None
+            add_filter( 'foogallery_render_gallery_template_field_value', array( $this, 'existing_gallery_paging_animation' ), 10, 4 );
+
             add_action( 'foogallery_located_template', array( $this, 'determine_paging' ), 10, 1 );
 
             //add the paging options to the gallery container
@@ -311,6 +314,29 @@ if ( ! class_exists( 'FooGallery_Paging' ) ) {
 				);
 
 				$fields[] = array(
+					'id'      => 'paging_animation',
+					'title'   => __( 'Page Animation', 'foogallery' ),
+					'desc'    => __( 'Morph glides photos into place when the page changes, and fades in photos added by Load More or infinite scroll. Visitors who prefer reduced motion always see an instant change.', 'foogallery' ),
+					'section_id' => 'paging',
+					'type'    => 'radio',
+					'default' => 'morph',
+					'choices' => array(
+						'morph' => __( 'Morph', 'foogallery' ),
+						'none'  => __( 'None', 'foogallery' ),
+					),
+					'row_data'=> array(
+						'data-foogallery-hidden'                   => true,
+						'data-foogallery-show-when-field-operator' => '!==',
+						'data-foogallery-show-when-field'          => 'paging_type',
+						'data-foogallery-show-when-field-value'    => '',
+						'data-foogallery-change-selector'          => 'input',
+						'data-foogallery-preview'                  => 'shortcode',
+						'data-foogallery-value-selector'           => 'input:checked',
+						'data-foogallery-persist'                  => true
+					)
+				);
+
+				$fields[] = array(
 					'id'      => 'paging_limit',
 					'title'   => __( 'Paging Limit', 'foogallery' ),
 					'desc'    => __( 'The maximum number of page links to display for the gallery.', 'foogallery' ),
@@ -439,6 +465,24 @@ if ( ! class_exists( 'FooGallery_Paging' ) ) {
 		}
 
 		/**
+		 * New galleries default to Morph; galleries saved before the setting existed show None,
+		 * so re-saving them does not turn the morph on.
+		 *
+		 * @param mixed      $value    The field value.
+		 * @param array      $field    The field.
+		 * @param FooGallery $gallery  The gallery being edited.
+		 * @param array      $template The gallery template.
+		 *
+		 * @return mixed
+		 */
+		function existing_gallery_paging_animation( $value, $field, $gallery, $template ) {
+			if ( 'paging_animation' === $field['id'] && foogallery_saved_gallery_missing_setting( $gallery, $template, $field['id'] ) ) {
+				return 'none';
+			}
+			return $value;
+		}
+
+		/**
 		 * Add the required paging data options if needed
 		 *
 		 * @param $attributes array
@@ -449,6 +493,9 @@ if ( ! class_exists( 'FooGallery_Paging' ) ) {
 		function add_paging_data_options($options, $gallery, $attributes) {
 			if ( foogallery_current_gallery_has_cached_value('paging' ) ) {
 				$options['paging'] = foogallery_current_gallery_get_cached_value( 'paging' );
+				// Tell the client whether to morph items between layouts when the page changes.
+				// Galleries saved before this setting existed have no value and keep their instant page changes.
+				$options['morph']['paging'] = 'morph' === foogallery_gallery_template_setting( 'paging_animation', 'none' );
 			}
 			return $options;
 		}

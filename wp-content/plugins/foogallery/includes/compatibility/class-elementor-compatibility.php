@@ -11,8 +11,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( 'FooGallery_Elementor_Compatibility' ) ) {
 
     class FooGallery_Elementor_Compatibility {
+        /** @var array|null Current editor data while handling Elementor's save hook. */
+        private $saving_editor_data = null;
+
         function __construct() {
             add_action( 'elementor/editor/after_save', array( $this, 'save_elementor_data' ), 10, 2 );
+            add_filter( 'foogallery_find_galleries_in_post', array( $this, 'find_galleries_in_post' ), 10, 2 );
             add_action( 'plugins_loaded', array( $this, 'init' ) );
 
             add_action( 'elementor/preview/enqueue_scripts', array( $this, 'enqueue_assets' ) );
@@ -79,18 +83,31 @@ if ( ! class_exists( 'FooGallery_Elementor_Compatibility' ) ) {
             ]);
         }
 
+        /**
+         * Include persisted widgets when rebuilding references or saving via REST.
+         *
+         * @param array   $gallery_ids Gallery IDs found in post content.
+         * @param WP_Post $post Saved post.
+         * @return array Gallery IDs including Elementor widgets.
+         */
+        public function find_galleries_in_post( $gallery_ids, $post ) {
+            // Elementor retains its data when a page switches back to WordPress.
+            if ( null === $this->saving_editor_data && ! get_post_meta( $post->ID, '_elementor_edit_mode', true ) ) {
+                return $gallery_ids;
+            }
+            $data = null !== $this->saving_editor_data ? $this->saving_editor_data : get_post_meta( $post->ID, '_elementor_data', true );
+            if ( is_string( $data ) ) {
+                $data = json_decode( $data, true );
+            }
+            return array_merge( $gallery_ids, $this->find_galleries_recursive( $data ) );
+        }
+
         function save_elementor_data( $post_id, $editor_data) {
-            //loop through the $editor_data and find any FooGallery widgets or shortcodes
-
-            $gallery_ids = $this->find_galleries_recursive( $editor_data );
-
-            if ( is_array( $gallery_ids ) && count( $gallery_ids ) > 0 ) {
-
-                foreach ( $gallery_ids as $gallery_id) {
-                    //if the content contains the foogallery shortcode then add a custom field
-                    add_post_meta( $post_id, FOOGALLERY_META_POST_USAGE, $gallery_id, false );
-                    do_action( 'foogallery_attach_gallery_to_post', $post_id, $gallery_id );
-                }
+            $this->saving_editor_data = is_array( $editor_data ) ? $editor_data : array();
+            try {
+                FooGallery_Gallery_Usage::sync_post( $post_id );
+            } finally {
+                $this->saving_editor_data = null;
             }
         }
 

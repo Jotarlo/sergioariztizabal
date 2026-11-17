@@ -120,6 +120,9 @@ class FooGallery_Admin_Usage_Settings {
 		if ( class_exists( 'FooGallery_Admin_Usage_Onboarding' ) && FooGallery_Admin_Usage_Onboarding::is_connect_screen() ) {
 			return;
 		}
+		if ( is_callable( array( 'FooGallery_Admin_Trial_Experience', 'status_notice_visible' ) ) && FooGallery_Admin_Trial_Experience::status_notice_visible() ) {
+			return;
+		}
 		$status = FooGallery_Usage::instance()->status();
 		if ( ! empty( $status['dismissed'] ) || empty( $status['available'] ) ) {
 			return;

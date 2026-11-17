@@ -47,11 +47,26 @@ if ( ! class_exists( 'FooGallery_Gutenberg' ) ) {
 			$parser = new WP_Block_Parser();
 			$blocks = $parser->parse( $post->post_content );
 
+			return array_values( array_unique( array_merge( $galleries, $this->find_galleries_in_blocks( $blocks ) ) ) );
+		}
+
+		/**
+		 * Find galleries at every depth, including Group and Columns blocks.
+		 *
+		 * @param array $blocks Parsed blocks.
+		 * @return array Gallery IDs.
+		 */
+		private function find_galleries_in_blocks( $blocks ) {
+			$galleries = array();
+
 			foreach ( $blocks as $block ) {
 				if ( array_key_exists( 'blockName', $block ) && 'fooplugins/foogallery' === $block['blockName'] ) {
-					if ( array_key_exists( 'id', $block['attrs'] ) ) {
-						$galleries[] = $block['attrs']['id'];
+					if ( isset( $block['attrs']['id'] ) && is_numeric( $block['attrs']['id'] ) && (int) $block['attrs']['id'] > 0 ) {
+						$galleries[] = (int) $block['attrs']['id'];
 					}
+				}
+				if ( ! empty( $block['innerBlocks'] ) ) {
+					$galleries = array_merge( $galleries, $this->find_galleries_in_blocks( $block['innerBlocks'] ) );
 				}
 			}
 

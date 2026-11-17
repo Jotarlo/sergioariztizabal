@@ -34,6 +34,8 @@ if ( ! class_exists( 'FooGallery_Divi_Compatibility' ) ) {
 		 * Register Divi compatibility hooks.
 		 */
 		public function __construct() {
+			require_once __DIR__ . '/divi5/class-foogallery-divi5.php';
+			new FooGallery_Divi5();
 			add_action( 'init', array( $this, 'register_shortcode_fallback' ), 5 );
 			add_action( 'et_builder_ready', array( $this, 'register_module' ) );
 			add_action( 'et_builder_module_lazy_shortcodes_registered', array( $this, 'register_module' ) );
@@ -178,8 +180,25 @@ if ( ! class_exists( 'FooGallery_Divi_Compatibility' ) ) {
 				$gallery_ids = array();
 			}
 
-			if ( ! is_object( $post ) || empty( $post->post_content ) || false === strpos( $post->post_content, '[foogallery_divi_gallery' ) ) {
+			if ( ! is_object( $post ) || empty( $post->post_content ) || ( false === strpos( $post->post_content, '[foogallery_divi_gallery' ) && false === strpos( $post->post_content, 'foogallery/gallery' ) ) ) {
 				return $gallery_ids;
+			}
+
+			// Divi uses WordPress serialized block comments (wp:namespace/module).
+			if ( false !== strpos( $post->post_content, 'foogallery/gallery' ) && function_exists( 'parse_blocks' ) ) {
+				$pending = parse_blocks( $post->post_content );
+				while ( $pending ) {
+					$block = array_pop( $pending );
+					if ( 'foogallery/gallery' === ( $block['blockName'] ?? '' ) ) {
+						$id = FooGallery_Divi5::gallery_id( $block['attrs']['galleryId']['innerContent']['desktop']['value'] ?? '' );
+						if ( $id ) {
+							$gallery_ids[] = $id;
+						}
+					}
+					foreach ( $block['innerBlocks'] ?? array() as $child ) {
+						$pending[] = $child;
+					}
+				}
 			}
 
 			$pattern = get_shortcode_regex( array( 'foogallery_divi_gallery' ) );

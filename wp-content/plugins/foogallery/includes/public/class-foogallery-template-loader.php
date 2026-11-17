@@ -7,6 +7,12 @@
  * @author  Brad vincent
  */
 class FooGallery_Template_Loader {
+	/**
+	 * Exact saved gallery authorized for a scoped editor preview on this loader instance.
+	 *
+	 * @var FooGallery|null
+	 */
+	private $authorized_preview_gallery = null;
 
 	/**
 	 * Locates and renders the gallery based on the template
@@ -32,6 +38,45 @@ class FooGallery_Template_Loader {
 	}
 
 	/**
+	 * Render one saved gallery for a caller that has already authenticated preview access.
+	 *
+	 * The gallery ID is bound to this loader instance and rechecked at the render sink.
+	 * A shortcode or block attribute cannot enable this path.
+	 *
+	 * @param int   $gallery_id Gallery ID.
+	 * @param array $args       Optional preview arguments.
+	 * @return void
+	 */
+	public function render_preview( $gallery_id, $args = array() ) {
+		$gallery_id = absint( $gallery_id );
+		$gallery    = $gallery_id ? FooGallery::get_by_id( $gallery_id ) : false;
+		$post       = $gallery instanceof FooGallery ? $gallery->_post : null;
+		if (
+			! $post ||
+			! ( $post instanceof WP_Post ) ||
+			(int) $gallery->ID !== $gallery_id ||
+			(int) $post->ID !== $gallery_id ||
+			FOOGALLERY_CPT_GALLERY !== $post->post_type ||
+			'trash' === $post->post_status ||
+			! current_user_can( 'read_post', $gallery_id )
+		) {
+			return;
+		}
+
+		$previous_preview_gallery = $this->authorized_preview_gallery;
+		$this->authorized_preview_gallery = $gallery;
+		$args = is_array( $args ) ? $args : array();
+		$args['id']      = $gallery_id;
+		$args['preview'] = true;
+
+		try {
+			$this->render_template( $args );
+		} finally {
+			$this->authorized_preview_gallery = $previous_preview_gallery;
+		}
+	}
+
+	/**
 	 * Render inside the mobile caption metadata scope.
 	 *
 	 * @param array $args Gallery arguments.
@@ -53,6 +98,13 @@ class FooGallery_Template_Loader {
 		if ( false === $current_foogallery ) {
 			//we could not find the gallery!
 			esc_html_e( 'The gallery was not found!', 'foogallery' );
+			$current_foogallery = null;
+			return;
+		}
+
+		// Public embeds only render publicly visible stored galleries, even for logged-in users.
+		// This prevents a private gallery from entering page or gallery output caches.
+		if ( ! $this->is_gallery_renderable_in_context( $current_foogallery ) ) {
 			$current_foogallery = null;
 			return;
 		}
@@ -103,6 +155,17 @@ class FooGallery_Template_Loader {
 
 		//allow for any other gallery argument overrides
         $current_foogallery = apply_filters( 'foogallery_render_template_argument_overrides', $current_foogallery, $args );
+
+		// Recheck the final gallery because this filter may substitute its object.
+		if ( ! $this->is_gallery_renderable_in_context( $current_foogallery ) ) {
+			$current_foogallery = null;
+			return;
+		}
+		if ( post_password_required( $current_foogallery->_post ) ) {
+			echo get_the_password_form( $current_foogallery->_post ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			$current_foogallery = null;
+			return;
+		}
 
 		//check that we have a datasource. If not then set it to the default
 		if ( empty( $current_foogallery->datasource_name ) ) {
@@ -291,6 +354,12 @@ class FooGallery_Template_Loader {
 
 		if ( $id > 0 ) {
 			//load gallery by ID
+			if (
+				$this->authorized_preview_gallery instanceof FooGallery &&
+				(int) $this->authorized_preview_gallery->ID === $id
+			) {
+				return $this->authorized_preview_gallery;
+			}
 			return FooGallery::get_by_id( $id );
 		}
 
@@ -319,6 +388,39 @@ class FooGallery_Template_Loader {
 
 		//allow for other forms of dynamic galleries (e.g. for other datasources)
 		return apply_filters('foogallery_build_dynamic_gallery', false, $args);
+	}
+
+	/**
+	 * Check stored gallery visibility for ordinary rendering or a bound preview.
+	 *
+	 * Dynamic galleries have no stored post and remain renderable. Stored posts must
+	 * have a publicly viewable status unless this exact object was loaded for an
+	 * authenticated preview and the current user can read it.
+	 *
+	 * @param mixed $gallery Candidate gallery.
+	 * @return bool
+	 */
+	private function is_gallery_renderable_in_context( $gallery ) {
+		if ( ! ( $gallery instanceof FooGallery ) ) {
+			return false;
+		}
+
+		$post = $gallery->_post ?? null;
+		if ( null === $post ) {
+			return 0 === (int) $gallery->ID;
+		}
+		if (
+			! ( $post instanceof WP_Post ) ||
+			(int) $post->ID !== (int) $gallery->ID ||
+			FOOGALLERY_CPT_GALLERY !== $post->post_type ||
+			'trash' === $post->post_status
+		) {
+			return false;
+		}
+		if ( is_post_status_viewable( $post->post_status ) ) {
+			return true;
+		}
+		return $gallery === $this->authorized_preview_gallery && current_user_can( 'read_post', (int) $post->ID );
 	}
 
 	/**

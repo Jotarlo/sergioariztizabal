@@ -104,7 +104,7 @@ if ( ! class_exists( 'FooGallery_Admin_Gallery_MetaBox_Template' ) ) {
 						$extra_html = $template['html'] ?? '';
 						?>
 						<div class="foogallery-template-card <?php echo esc_attr( $selected_class ); ?> <?php echo esc_attr( $extra_class ); ?>" 
-							data-template="<?php echo esc_attr( $template['slug'] ); ?>">
+							data-template="<?php echo esc_attr( $template['slug'] ); ?>" data-foogallery-promo-preview="<?php echo empty( $template['promo_preview'] ) ? 'false' : 'true'; ?>">
 							<?php echo wp_kses( $template['icon'], $svg_allowed ); ?>
 							<h4><?php echo esc_html( $template['name'] ); ?></h4>
 							<?php echo wp_kses_post( $extra_html ); ?>

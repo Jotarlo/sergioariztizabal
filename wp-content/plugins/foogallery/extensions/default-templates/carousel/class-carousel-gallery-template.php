@@ -597,6 +597,7 @@ if ( ! class_exists( 'FooGallery_Carousel_Gallery_Template' ) ) {
 				'border_size' => 'fg-border-medium',
 				'drop_shadow' => 'fg-shadow-medium',
 				'rounded_corners' => 'fg-round-small',
+				'inner_rounded_corners' => 'fg-inner-round-small',
 				'inner_shadow' => '',
 				'hover_effect_icon' => 'fg-hover-circle-plus2',
 				'hover_effect_scale' => 'fg-hover-semi-zoomed'

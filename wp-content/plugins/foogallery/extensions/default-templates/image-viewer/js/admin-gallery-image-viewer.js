@@ -99,19 +99,19 @@
 			'input[name="foogallery_settings[image-viewer_theme_custom_textcolor]"], ' +
 			'input[name="foogallery_settings[image-viewer_theme_custom_bordercolor]"], ' +
 			'input[name="foogallery_settings[image-viewer_theme_custom_hovercolor]"]';
-		$(ps).change(function() {
+		$(document).on('change', ps, function() {
 			IMAGE_VIEWER_TEMPLATE_FOOGALLERY_EXTENSION.setPreviewClasses();
 		});
 
-		$('input[name="foogallery_settings[image-viewer_caption-content]"]').change(function() {
+		$(document).on('change', 'input[name="foogallery_settings[image-viewer_caption-content]"]', function() {
 			IMAGE_VIEWER_TEMPLATE_FOOGALLERY_EXTENSION.showHideCaptionContent();
 		});
 
-		$('input[name="foogallery_settings[image-viewer_theme]"]').change(function() {
+		$(document).on('change', 'input[name="foogallery_settings[image-viewer_theme]"]', function() {
 			IMAGE_VIEWER_TEMPLATE_FOOGALLERY_EXTENSION.showHideRows();
 		});
 
-		$('.foogallery-image-viewer-preview').on('click', function(e) {
+		$(document).on('click', '.foogallery-image-viewer-preview', function(e) {
 			e.preventDefault();
 		});
 	};

@@ -36,7 +36,7 @@ if ( ! class_exists( 'FooGallery_Admin_Gallery_MetaBox_Fields' ) ) {
 			$field_class = empty($class) ? '' : ' class="' . $class . '"';
 			$field_disabled = ! empty( $field['disabled'] ) ? ' disabled="disabled"' : '';
 
-			$field['choices'] = apply_filters( 'foogallery_render_gallery_template_field_choices', $choices, $field, $gallery );
+			$field['choices'] = $choices = apply_filters( 'foogallery_render_gallery_template_field_choices', $choices, $field, $gallery );
 
 			//allow for UI customization
 			do_action( 'foogallery_render_gallery_template_field_before', $field, $gallery );

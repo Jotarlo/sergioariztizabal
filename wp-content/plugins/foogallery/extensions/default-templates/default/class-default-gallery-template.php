@@ -102,6 +102,10 @@ if ( ! class_exists( 'FooGallery_Default_Gallery_Template' ) ) {
 				//default layout. Do as before.
 				if ( $width > 0 ) {
 					$css[] = '#' . $id . ' .fg-image { width: ' . $width . 'px; }';
+					// Let mobile columns override the fixed thumbnail width, including editor previews.
+					$mobile_rule = '#' . $id . ':is(.fg-m-col1,.fg-m-col2,.fg-m-col3) .fg-image { width: 100%; }';
+					$css[]       = '@media only screen and (max-width: ' . foogallery_get_mobile_size() . 'px) { ' . $mobile_rule . ' }';
+					$css[]       = '.foogallery-preview-wrapper.viewport-mobile ' . $mobile_rule;
 				}
 			}
 			$spacing = foogallery_intval( foogallery_gallery_template_setting( 'spacing', '10' ) );

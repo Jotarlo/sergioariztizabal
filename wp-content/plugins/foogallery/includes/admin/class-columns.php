@@ -88,9 +88,9 @@ if ( ! class_exists( 'FooGallery_Admin_Columns' ) ) {
 					$posts = $gallery->find_usages();
 					if ( $posts && count( $posts ) > 0 ) {
 						echo '<ul class="ul-disc">';
-						foreach ( $posts as $post ) {
+						foreach ( $posts as $usage_post ) {
 							echo edit_post_link( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-					 		$post->post_title, '<li>', '</li>', $post->ID );
+							esc_html( $usage_post->post_title ), '<li>', '</li>', $usage_post->ID );
 						}
 						echo '</ul>';
 					} else {

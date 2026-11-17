@@ -347,7 +347,7 @@ if ( ! class_exists( 'FooGallery_Admin_Gallery_MetaBox_Settings_Helper' ) ) {
 		private function render_gallery_template_settings( $template ) {
 			$sections = $this->build_model_for_template( $template );
 			?>
-			<div class="foogallery-settings">
+			<div class="foogallery-settings<?php echo empty( $template['promo_preview'] ) ? '' : ' foogallery-settings-layout-promo'; ?>">
 				<div class="foogallery-vertical-tabs">
 					<?php $this->render_gallery_template_settings_tabs( $template, $sections ); ?>
 				</div>
@@ -359,19 +359,60 @@ if ( ! class_exists( 'FooGallery_Admin_Gallery_MetaBox_Settings_Helper' ) ) {
 		}
 
 		/**
-		 * Public method to render gallery settings for all templates.
+		 * Render one registered layout, including every control needed by the normal save path.
+		 *
+		 * @param string $slug Registered layout slug.
+		 * @return bool Whether the layout was rendered.
+		 */
+		public function render_gallery_settings_for_template( $slug ) {
+			foreach ( $this->gallery_templates as $template ) {
+				if ( $slug !== $template['slug'] ) {
+					continue;
+				}
+				?><div class="foogallery-settings-container foogallery-settings-container-<?php echo esc_attr( $template['slug'] ); ?>">
+				<?php $this->render_gallery_template_settings( $template ); ?>
+				</div><?php
+				return true;
+			}
+			return false;
+		}
+
+		/**
+		 * Render the remaining registered layouts for the background HTML cache.
+		 *
+		 * @param string $exclude Layout already present in the editor.
+		 * @return array<string,string>|false Layout HTML, or false for an unknown slug.
+		 */
+		public function render_gallery_settings_except_template( $exclude ) {
+			$known = false;
+			foreach ( $this->gallery_templates as $template ) {
+				if ( $exclude === $template['slug'] ) {
+					$known = true;
+					break;
+				}
+			}
+			if ( ! $known ) {
+				return false;
+			}
+			$html = array();
+			foreach ( $this->gallery_templates as $template ) {
+				if ( $exclude === $template['slug'] ) {
+					continue;
+				}
+				ob_start();
+				$this->render_gallery_settings_for_template( $template['slug'] );
+				$html[ $template['slug'] ] = ob_get_clean();
+			}
+			return $html;
+		}
+
+		/**
+		 * Render only the saved layout on the initial editor request.
 		 *
 		 * @return void
 		 */
 		public function render_gallery_settings() {
-			foreach ( $this->gallery_templates as $template ) {
-				$field_visibility = ( $this->current_gallery_template !== $template['slug'] ) ? 'style="display:none"' : '';
-				?><div
-				class="foogallery-settings-container foogallery-settings-container-<?php echo $template['slug']; ?>"
-				<?php echo $field_visibility; ?>>
-				<?php $this->render_gallery_template_settings( $template ); ?>
-				</div><?php
-			}
+			$this->render_gallery_settings_for_template( $this->current_gallery_template );
 		}
 
 		/**

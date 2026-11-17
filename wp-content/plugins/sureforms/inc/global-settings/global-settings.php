@@ -10,6 +10,7 @@ namespace SRFM\Inc\Global_Settings;
 
 use SRFM\Inc\Client_Logger;
 use SRFM\Inc\Events_Scheduler;
+use SRFM\Inc\Features;
 use SRFM\Inc\Helper;
 use SRFM\Inc\Payments\Payment_Helper;
 use SRFM\Inc\Traits\Get_Instance;
@@ -126,6 +127,8 @@ class Global_Settings {
 			case 'email-notification-settings':
 				self::srfm_save_email_notification_settings( $setting_options );
 				break;
+			case 'features-settings':
+				return Features::rest_save( $setting_options );
 			default:
 				return new WP_Error( 'srfm_invalid_tab', __( 'Invalid settings tab.', 'sureforms' ), [ 'status' => 400 ] );
 		}
@@ -272,7 +275,9 @@ class Global_Settings {
 
 		Events_Scheduler::unschedule_events( 'srfm_weekly_scheduled_events' );
 
-		if ( $srfm_email_summary ) {
+		// The summary reads the entries table and its handler only boots with Entries on;
+		// Features::save() schedules it when Entries is turned back on.
+		if ( $srfm_email_summary && Features::is_enabled( 'entries' ) ) {
 			Email_Summary::schedule_weekly_entries_email();
 		}
 
@@ -304,27 +309,49 @@ class Global_Settings {
 		$srfm_cf_appearance_mode      = sanitize_text_field( Helper::get_string_value( $setting_options['srfm_cf_appearance_mode'] ?? 'auto' ) );
 		$srfm_cf_turnstile_site_key   = sanitize_text_field( Helper::get_string_value( $setting_options['srfm_cf_turnstile_site_key'] ?? '' ) );
 		$srfm_cf_turnstile_secret_key = sanitize_text_field( Helper::get_string_value( $setting_options['srfm_cf_turnstile_secret_key'] ?? '' ) );
-		$srfm_hcaptcha_site_key       = sanitize_text_field( Helper::get_string_value( $setting_options['srfm_hcaptcha_site_key'] ?? '' ) );
-		$srfm_hcaptcha_secret_key     = sanitize_text_field( Helper::get_string_value( $setting_options['srfm_hcaptcha_secret_key'] ?? '' ) );
-		$srfm_honeypot                = $setting_options['srfm_honeypot'] ?? false;
+		// Stored as a boolean: the challenge either waits for the visitor or it does not.
+		$srfm_cf_turnstile_on_interaction = ! empty( $setting_options['srfm_cf_turnstile_on_interaction'] );
+		$srfm_hcaptcha_site_key           = sanitize_text_field( Helper::get_string_value( $setting_options['srfm_hcaptcha_site_key'] ?? '' ) );
+		$srfm_hcaptcha_secret_key         = sanitize_text_field( Helper::get_string_value( $setting_options['srfm_hcaptcha_secret_key'] ?? '' ) );
+		$srfm_honeypot                    = $setting_options['srfm_honeypot'] ?? false;
+		$srfm_v3_score_threshold          = self::sanitize_recaptcha_v3_threshold( $setting_options['srfm_v3_score_threshold'] ?? null );
 
 		return update_option(
 			'srfm_security_settings_options',
 			[
-				'srfm_v2_checkbox_site_key'    => $srfm_v2_checkbox_site_key,
-				'srfm_v2_checkbox_secret_key'  => $srfm_v2_checkbox_secret_key,
-				'srfm_v2_invisible_site_key'   => $srfm_v2_invisible_site_key,
-				'srfm_v2_invisible_secret_key' => $srfm_v2_invisible_secret_key,
-				'srfm_v3_site_key'             => $srfm_v3_site_key,
-				'srfm_v3_secret_key'           => $srfm_v3_secret_key,
-				'srfm_cf_appearance_mode'      => $srfm_cf_appearance_mode,
-				'srfm_cf_turnstile_site_key'   => $srfm_cf_turnstile_site_key,
-				'srfm_cf_turnstile_secret_key' => $srfm_cf_turnstile_secret_key,
-				'srfm_hcaptcha_site_key'       => $srfm_hcaptcha_site_key,
-				'srfm_hcaptcha_secret_key'     => $srfm_hcaptcha_secret_key,
-				'srfm_honeypot'                => $srfm_honeypot,
+				'srfm_v2_checkbox_site_key'        => $srfm_v2_checkbox_site_key,
+				'srfm_v2_checkbox_secret_key'      => $srfm_v2_checkbox_secret_key,
+				'srfm_v2_invisible_site_key'       => $srfm_v2_invisible_site_key,
+				'srfm_v2_invisible_secret_key'     => $srfm_v2_invisible_secret_key,
+				'srfm_v3_site_key'                 => $srfm_v3_site_key,
+				'srfm_v3_secret_key'               => $srfm_v3_secret_key,
+				'srfm_v3_score_threshold'          => $srfm_v3_score_threshold,
+				'srfm_cf_appearance_mode'          => $srfm_cf_appearance_mode,
+				'srfm_cf_turnstile_site_key'       => $srfm_cf_turnstile_site_key,
+				'srfm_cf_turnstile_secret_key'     => $srfm_cf_turnstile_secret_key,
+				'srfm_cf_turnstile_on_interaction' => $srfm_cf_turnstile_on_interaction,
+				'srfm_hcaptcha_site_key'           => $srfm_hcaptcha_site_key,
+				'srfm_hcaptcha_secret_key'         => $srfm_hcaptcha_secret_key,
+				'srfm_honeypot'                    => $srfm_honeypot,
 			]
 		);
+	}
+
+	/**
+	 * Normalise a reCAPTCHA v3 score threshold.
+	 *
+	 * Used both when the setting is saved and when Form_Submit reads it, so a
+	 * stored value is only ever a float in 0-1 with at most two decimals. A value
+	 * that is not a finite number becomes $default. Recaptcha.js applies the same
+	 * rule on blur.
+	 *
+	 * @param mixed $value   Submitted or stored threshold.
+	 * @param float $default Threshold used when $value is not a finite number.
+	 * @since 2.13.1
+	 * @return float
+	 */
+	public static function sanitize_recaptcha_v3_threshold( $value, $default = 0.5 ) {
+		return is_numeric( $value ) && is_finite( (float) $value ) ? round( max( 0.0, min( 1.0, (float) $value ) ), 2 ) : $default;
 	}
 
 	/**
@@ -657,6 +684,7 @@ class Global_Settings {
 			'srfm_compliance_settings_options',
 			'srfm_form_confirmation_settings_options',
 			'srfm_email_notification_settings_options',
+			Features::OPTION,
 		];
 		$options_to_get  = array_values( array_intersect( array_map( 'sanitize_text_field', $options_to_get ), $allowed_options ) );
 
@@ -714,19 +742,26 @@ class Global_Settings {
 		}
 		if ( empty( $global_setting_options['srfm_security_settings_options'] ) ) {
 			$global_setting_options['srfm_security_settings_options'] = [
-				'srfm_v2_checkbox_site_key'    => '',
-				'srfm_v2_checkbox_secret_key'  => '',
-				'srfm_v2_invisible_site_key'   => '',
-				'srfm_v2_invisible_secret_key' => '',
-				'srfm_v3_site_key'             => '',
-				'srfm_v3_secret_key'           => '',
-				'srfm_cf_appearance_mode'      => 'auto',
-				'srfm_cf_turnstile_site_key'   => '',
-				'srfm_cf_turnstile_secret_key' => '',
-				'srfm_hcaptcha_site_key'       => '',
-				'srfm_hcaptcha_secret_key'     => '',
-				'srfm_honeypot'                => false,
+				'srfm_v2_checkbox_site_key'        => '',
+				'srfm_v2_checkbox_secret_key'      => '',
+				'srfm_v2_invisible_site_key'       => '',
+				'srfm_v2_invisible_secret_key'     => '',
+				'srfm_v3_site_key'                 => '',
+				'srfm_v3_secret_key'               => '',
+				'srfm_v3_score_threshold'          => 0.5,
+				'srfm_cf_appearance_mode'          => 'auto',
+				'srfm_cf_turnstile_site_key'       => '',
+				'srfm_cf_turnstile_secret_key'     => '',
+				'srfm_cf_turnstile_on_interaction' => false,
+				'srfm_hcaptcha_site_key'           => '',
+				'srfm_hcaptcha_secret_key'         => '',
+				'srfm_honeypot'                    => false,
 			];
+		}
+
+		// Report the threshold Form_Submit applies, including for options saved before the setting existed.
+		if ( is_array( $global_setting_options['srfm_security_settings_options'] ?? null ) ) {
+			$global_setting_options['srfm_security_settings_options']['srfm_v3_score_threshold'] = self::sanitize_recaptcha_v3_threshold( $global_setting_options['srfm_security_settings_options']['srfm_v3_score_threshold'] ?? null );
 		}
 
 		if ( empty( $global_setting_options['srfm_mcp_settings_options'] ) ) {

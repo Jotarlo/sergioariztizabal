@@ -1,12 +1,27 @@
 .foogallery-datasource-modal-title {
+	display: flex;
+	align-items: center;
+	gap: 12px;
 	position: absolute;
 	top: 0;
 	left: 0;
 	right: 0;
 	height: 50px;
 	z-index: 200;
-	padding-left: 16px;
+	padding: 0 60px 0 16px;
 	border-bottom: 1px solid #ddd;
+}
+
+.foogallery-datasource-modal-title h1 {
+	margin: 0;
+	line-height: 1.2;
+}
+
+.foogallery-datasource-modal-title .foogallery-datasource-modal-reload {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	flex-shrink: 0;
 }
 
 .foogallery-datasource-modal-sidebar {
@@ -100,6 +115,9 @@
 }
 
 .foogallery-datasource-modal-toolbar-inner {
+	display: flex;
+	align-items: center;
+	gap: 16px;
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -108,6 +126,27 @@
 	height: 60px;
 	padding: 0 16px;
 	overflow: hidden;
+}
+
+.foogallery-datasources-modal-wrapper .foogallery-datasource-modal-toolbar .foogallery-datasource-modal-toolbar-inner .media-toolbar-secondary {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex: 1;
+	min-width: 0;
+	height: auto;
+	float: none;
+}
+
+.foogallery-datasource-modal-toolbar-inner .media-toolbar-primary {
+	flex-shrink: 0;
+	height: auto;
+	float: none;
+}
+
+.foogallery-datasource-modal-toolbar-inner .media-button {
+	flex-shrink: 0;
+	margin: 0;
 }
 
 .foogallery-datasource-modal-container-inner .spinner {
@@ -161,4 +200,9 @@
 .foogallery-datasource-missing-plugin__permissions {
 	display: inline-block;
 	color: #646970;
+}
+
+.foogallery-datasource-modal-toolbar .foogallery-datasource-modal-toolbar-inner .media-toolbar-secondary > p {
+	margin: 0;
+	line-height: 1.4;
 }

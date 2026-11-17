@@ -5358,6 +5358,20 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
 			 */
 			self.state = _.components.make("state", self);
 			/**
+			 * @summary Animates items to their new positions when the gallery is filtered or paged.
+			 * @memberof FooGallery.Template#
+			 * @name morph
+			 * @type {FooGallery.Morph}
+			 */
+			self.morph = _.components.make("morph", self);
+			/**
+			 * @summary Whether filter and page changes may be morphed. Templates that only show one item at a time set this to false.
+			 * @memberof FooGallery.Template#
+			 * @name morphable
+			 * @type {boolean}
+			 */
+			self.morphable = true;
+			/**
 			 * @summary The promise object returned by the {@link FooGallery.Template#initialize|initialize} method.
 			 * @memberof FooGallery.Template#
 			 * @name _initialize
@@ -5770,6 +5784,7 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
 			self.robserver.disconnect();
             $(window).off(self.namespace);
             self.state.destroy(preserveState);
+            self.morph.destroy();
             if (self.filter) self.filter.destroy();
             if (self.pages) self.pages.destroy();
             self.items.destroy();
@@ -6066,18 +6081,57 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
 
 		if (state) {
 			state.requested = _.isMobile;
+			if (state.panel) state.panel.resize();
 			return;
 		}
 		if (!(current instanceof _.Template)) {
 			return;
 		}
 
+		// Only modal/maximized viewers defer rebuilding. Inline templates must
+		// reapply their native mobile options even if they never close.
+		var panel = current.panel instanceof _.Panel && current.panel.isAttached
+			? current.panel : current.lightbox;
+		if (panel instanceof _.Panel && panel.isAttached && (!panel.isInline || panel.isMaximized)) {
+			state = { requested: _.isMobile, panel: panel };
+			$element.data(refreshData, state);
+			function cancel() {
+				panel.off("closed", release);
+				panel.off("restored", release);
+				panel.off("destroyed", cancel);
+				$element.removeData(refreshData);
+			}
+			function release() {
+				cancel();
+				if ($element.data(_.DATA_TEMPLATE) === current && !current.destroying && !current.destroyed) {
+					refreshGallery(element);
+				}
+			}
+			panel.on("closed", release);
+			panel.on("restored", release);
+			panel.on("destroyed", cancel);
+			panel.resize();
+			return;
+		}
+
+		// Restore runtime selection before the replacement's initial state is applied.
+		// Do not rely on URL state (usually disabled), or retain destroyed Item objects.
+		var selection = panel instanceof _.Panel && panel.isAttached && panel.isInline
+			? current.state.get(panel.currentItem) : null,
+			itemId = selection && selection.item ? selection.item.id : null;
 		state = { requested: _.isMobile };
 		$element.data(refreshData, state);
 
 		function run() {
 			var requested = state.requested;
-			_.init({}, $element).always(function(){
+			function restore(event, value) {
+				var template = event.target;
+				template.off("before-state.mobileRefresh", restore);
+				value.filter = selection.filter;
+				value.page = selection.page;
+				value.item = template.items.find(template.items.all(), function(item){ return item.id === itemId; });
+			}
+			_.init(selection ? { on: { "before-state.mobileRefresh": restore } } : {}, $element).always(function(){
 				if (requested !== state.requested) {
 					run();
 					return;
@@ -6564,6 +6618,372 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
 	FooGallery.utils.str,
 	FooGallery.utils.obj
 );
+(function($, _, _utils, _is, _obj){
+
+	/**
+	 * @summary Low level helpers used to animate elements between two layouts.
+	 * @memberof FooGallery
+	 * @namespace morph
+	 * @description These helpers implement the FLIP technique (First, Last, Invert, Play) using the Web Animations API. They are used by the {@link FooGallery.Morph} component and are also available to templates that need to animate elements between two different layouts.
+	 */
+	_.morph = {
+		/**
+		 * @summary Whether or not morph animations can run in the current browser.
+		 * @memberof FooGallery.morph
+		 * @function supported
+		 * @returns {boolean} False if the Web Animations API is unavailable or the visitor prefers reduced motion.
+		 */
+		supported: function(){
+			if ( typeof Element === "undefined" || !_is.fn( Element.prototype.animate ) ) return false;
+			return !( _is.fn( window.matchMedia ) && window.matchMedia( "(prefers-reduced-motion: reduce)" ).matches );
+		},
+		/**
+		 * @summary Get the bounding rectangle of an element relative to an optional container rectangle.
+		 * @memberof FooGallery.morph
+		 * @function rect
+		 * @param {Element} element - The element to measure.
+		 * @param {DOMRect|object} [relativeTo] - The rectangle to measure from. If not supplied viewport coordinates are returned.
+		 * @returns {{left: number, top: number, width: number, height: number}}
+		 * @description The measurement includes any transform or animation currently applied so an interrupted animation can be retargeted from where the element is actually drawn.
+		 */
+		rect: function( element, relativeTo ){
+			var r = element.getBoundingClientRect(),
+				left = relativeTo ? relativeTo.left : 0,
+				top = relativeTo ? relativeTo.top : 0;
+			return { left: r.left - left, top: r.top - top, width: r.width, height: r.height };
+		},
+		/**
+		 * @summary Animate an element from a previous rectangle to its current layout position.
+		 * @memberof FooGallery.morph
+		 * @function move
+		 * @param {Element} element - The element to animate. It must already be in its final position.
+		 * @param {object} from - The previous rectangle, in the same coordinate space as `to`.
+		 * @param {object} to - The current rectangle.
+		 * @param {object} options - The animation timing options.
+		 * @returns {?Animation} Null if the element did not move.
+		 */
+		move: function( element, from, to, options ){
+			var dx = from.left - to.left,
+				dy = from.top - to.top,
+				sx = to.width > 0 ? from.width / to.width : 1,
+				sy = to.height > 0 ? from.height / to.height : 1;
+			if ( Math.abs( dx ) < 0.5 && Math.abs( dy ) < 0.5 && Math.abs( sx - 1 ) < 0.005 && Math.abs( sy - 1 ) < 0.005 ){
+				return null;
+			}
+			// A lone keyframe is treated as the end state unless given offset 0, so mark it as the start:
+			// the element then animates from its old position back to its own (underlying) transform.
+			return element.animate( [ {
+				offset: 0,
+				transformOrigin: "0 0",
+				transform: "translate(" + dx + "px, " + dy + "px) scale(" + sx + ", " + sy + ")"
+			} ], {
+				duration: options.duration,
+				easing: options.easing
+			} );
+		},
+		/**
+		 * @summary Fade and scale an element into place.
+		 * @memberof FooGallery.morph
+		 * @function enter
+		 * @param {Element} element - The element to animate.
+		 * @param {object} options - The animation timing options.
+		 * @param {number} [delay=0] - The delay before the animation starts.
+		 * @returns {Animation}
+		 */
+		enter: function( element, options, delay ){
+			return element.animate( [
+				{ opacity: 0, transform: "scale(" + options.scale + ")" },
+				{ opacity: 1, transform: "none" }
+			], {
+				duration: options.duration,
+				easing: options.easing,
+				delay: delay || 0,
+				fill: "backwards"
+			} );
+		},
+		/**
+		 * @summary Fade and scale an element out of view.
+		 * @memberof FooGallery.morph
+		 * @function leave
+		 * @param {Element} element - The element to animate.
+		 * @param {object} options - The animation timing options.
+		 * @returns {Animation}
+		 */
+		leave: function( element, options ){
+			return element.animate( [
+				{ opacity: 1, transform: "none" },
+				{ opacity: 0, transform: "scale(" + options.scale + ")" }
+			], {
+				duration: Math.round( options.duration * 0.6 ),
+				easing: options.easing,
+				fill: "forwards"
+			} );
+		},
+		/**
+		 * @summary Create an inert copy of an element to stand in for it while it animates out.
+		 * @memberof FooGallery.morph
+		 * @function ghost
+		 * @param {Element} element - The element to copy.
+		 * @param {object} rect - Where to place the copy, relative to its new parent.
+		 * @returns {Element}
+		 */
+		ghost: function( element, rect ){
+			var copy = element.cloneNode( true );
+			copy.removeAttribute( "id" );
+			$( copy ).find( "[id]" ).removeAttr( "id" );
+			copy.setAttribute( "aria-hidden", "true" );
+			copy.setAttribute( "inert", "" );
+			copy.classList.add( "fg-morph-ghost" );
+			copy.style.position = "absolute";
+			copy.style.left = rect.left + "px";
+			copy.style.top = rect.top + "px";
+			copy.style.width = rect.width + "px";
+			copy.style.height = rect.height + "px";
+			copy.style.margin = "0";
+			copy.style.maxHeight = "none";
+			copy.style.display = "";
+			return copy;
+		}
+	};
+
+	_.Morph = _.Component.extend(/** @lends FooGallery.Morph.prototype */{
+		/**
+		 * @summary Animates gallery items between layouts when the gallery is filtered or paged.
+		 * @memberof FooGallery
+		 * @constructs Morph
+		 * @param {FooGallery.Template} template - The template to animate.
+		 * @augments FooGallery.Component
+		 * @borrows FooGallery.utils.Class.extend as extend
+		 * @borrows FooGallery.utils.Class.override as override
+		 * @description Items that remain visible glide and resize to their new positions, new items fade and scale in, and removed items fade out where they stood. Templates whose layout is not a grid of thumbnails can opt out by setting `morphable` to `false`.
+		 */
+		construct: function( template ){
+			var self = this;
+			self._super( template );
+			/**
+			 * @summary The morph specific options for the template.
+			 * @memberof FooGallery.Morph#
+			 * @name opt
+			 * @type {FooGallery.Morph~Options}
+			 */
+			self.opt = _obj.extend( {}, self.tmpl.opt.morph );
+			/**
+			 * @summary The item positions recorded before the current change.
+			 * @memberof FooGallery.Morph#
+			 * @name _snapshot
+			 * @type {?object}
+			 * @private
+			 */
+			self._snapshot = null;
+			self._animations = [];
+			self._layer = null;
+			self.tmpl.on( {
+				"before-filter-change": self.onBeforeFilterChange,
+				"after-filter-change": self.onAfterFilterChange,
+				"before-page-change": self.onBeforePageChange,
+				"after-page-change": self.onAfterPageChange,
+				"destroy": self.onDestroy
+			}, self );
+		},
+		/**
+		 * @summary Whether or not the supplied kind of change should be animated.
+		 * @memberof FooGallery.Morph#
+		 * @function isEnabled
+		 * @param {string} kind - Either "filtering" or "paging".
+		 * @returns {boolean}
+		 */
+		isEnabled: function( kind ){
+			var self = this;
+			return !!self.opt[ kind ] && self.tmpl.morphable !== false && self.tmpl.initialized && _.morph.supported();
+		},
+		/**
+		 * @summary Record where every attached item is drawn before the gallery changes.
+		 * @memberof FooGallery.Morph#
+		 * @function capture
+		 */
+		capture: function(){
+			var self = this, el = self.tmpl.el, box = el.getBoundingClientRect(), items = new Map();
+			self.tmpl.items.detachable( self.tmpl.items.all() ).forEach( function( item ){
+				var rect = _.morph.rect( item.el, box );
+				if ( rect.width > 0 && rect.height > 0 ){
+					items.set( item, rect );
+				}
+			} );
+			// Measure first, then stop: an interrupted morph continues from where items are actually drawn.
+			self.stop();
+			self._snapshot = { items: items, height: box.height };
+		},
+		/**
+		 * @summary Animate from the recorded positions to the gallery's new layout.
+		 * @memberof FooGallery.Morph#
+		 * @function play
+		 */
+		play: function(){
+			var self = this, snapshot = self._snapshot;
+			self._snapshot = null;
+			if ( !snapshot || !self.tmpl || !self.tmpl.el ) return;
+
+			var el = self.tmpl.el, box = el.getBoundingClientRect(), opt = self.opt,
+				viewport = window.innerHeight || document.documentElement.clientHeight,
+				animations = [], entering = 0, budget = opt.limit;
+
+			el.classList.add( "fg-morphing" );
+
+			self.tmpl.items.detachable( self.tmpl.items.all() ).forEach( function( item ){
+				var to = _.morph.rect( item.el, box ), from = snapshot.items.get( item ), anim = null;
+				snapshot.items.delete( item );
+				if ( budget <= 0 || to.width === 0 || to.height === 0 ) return;
+				if ( from ){
+					anim = _.morph.move( item.el, from, to, opt );
+				} else if ( box.top + to.top < viewport && box.top + to.top + to.height > 0 ){
+					anim = _.morph.enter( item.el, opt, Math.min( entering++ * opt.stagger, opt.duration ) );
+				}
+				if ( anim ){
+					animations.push( anim );
+					budget--;
+				}
+			} );
+
+			// Anything left in the snapshot was removed; fade a copy out where the original stood.
+			snapshot.items.forEach( function( from, item ){
+				if ( budget-- <= 0 || box.top + from.top > viewport || box.top + from.top + from.height < 0 ) return;
+				var ghost = _.morph.ghost( item.el, from );
+				self.layer().appendChild( ghost );
+				var anim = _.morph.leave( ghost, opt );
+				anim.ghost = ghost;
+				animations.push( anim );
+			} );
+
+			if ( Math.abs( snapshot.height - box.height ) > 1 ){
+				animations.push( el.animate( [
+					{ height: snapshot.height + "px" },
+					{ height: box.height + "px" }
+				], { duration: opt.duration, easing: opt.easing } ) );
+			}
+
+			self._animations = animations;
+			if ( animations.length === 0 ){
+				self.cleanup();
+				return;
+			}
+			Promise.all( animations.map( function( anim ){
+				return anim.finished.catch( function(){} );
+			} ) ).then( function(){
+				if ( self._animations === animations ) self.cleanup();
+			} );
+		},
+		/**
+		 * @summary Immediately stop any running morph and remove its temporary elements.
+		 * @memberof FooGallery.Morph#
+		 * @function stop
+		 */
+		stop: function(){
+			var self = this;
+			self._animations.forEach( function( anim ){
+				anim.cancel();
+			} );
+			self.cleanup();
+		},
+		/**
+		 * @summary Remove temporary elements and classes once a morph has finished.
+		 * @memberof FooGallery.Morph#
+		 * @function cleanup
+		 */
+		cleanup: function(){
+			var self = this;
+			self._animations = [];
+			if ( self._layer !== null ){
+				self._layer.remove();
+				self._layer = null;
+			}
+			if ( self.tmpl && self.tmpl.el ) self.tmpl.el.classList.remove( "fg-morphing" );
+		},
+		/**
+		 * @summary Get the layer that holds copies of removed items while they fade out.
+		 * @memberof FooGallery.Morph#
+		 * @function layer
+		 * @returns {Element}
+		 */
+		layer: function(){
+			var self = this;
+			if ( self._layer === null ){
+				self._layer = document.createElement( "div" );
+				self._layer.className = "fg-morph-layer";
+				self._layer.setAttribute( "aria-hidden", "true" );
+				self.tmpl.el.appendChild( self._layer );
+			}
+			return self._layer;
+		},
+		/**
+		 * @summary Play once the template has finished laying out the new items.
+		 * @memberof FooGallery.Morph#
+		 * @function schedule
+		 * @description Templates relayout in their own handlers for the same event, which run after this component's, so the measurement waits for the current call stack to finish but still happens before the browser paints.
+		 */
+		schedule: function(){
+			var self = this;
+			Promise.resolve().then( function(){
+				self.play();
+			} );
+		},
+		onBeforeFilterChange: function(){
+			var self = this;
+			if ( self.isEnabled( "filtering" ) ) self.capture();
+		},
+		onAfterFilterChange: function(){
+			var self = this;
+			if ( self._snapshot !== null ) self.schedule();
+		},
+		onBeforePageChange: function( event, current, next, setPage, isFilter ){
+			var self = this;
+			// A page change caused by filtering is animated as part of the filter change.
+			if ( !isFilter && self.isEnabled( "paging" ) ) self.capture();
+		},
+		onAfterPageChange: function( event, current, prev, isFilter ){
+			var self = this;
+			if ( !isFilter && self._snapshot !== null ) self.schedule();
+		},
+		onDestroy: function(){
+			var self = this;
+			self._snapshot = null;
+			self.stop();
+		}
+	});
+
+	_.components.register( "morph", _.Morph );
+
+	_.template.configure( "core", {
+		morph: {
+			filtering: false,
+			paging: false,
+			duration: 450,
+			stagger: 25,
+			scale: 0.85,
+			limit: 150,
+			easing: "cubic-bezier(.2, .8, .2, 1)"
+		}
+	} );
+
+	/**
+	 * @summary An object containing the morph options for the template.
+	 * @typedef {object} FooGallery.Morph~Options
+	 * @property {boolean} [filtering=true] - Whether items morph to their new positions when the gallery is filtered.
+	 * @property {boolean} [paging=true] - Whether items morph to their new positions when the page changes.
+	 * @property {number} [duration=450] - The duration of each item animation in milliseconds.
+	 * @property {number} [stagger=25] - The delay in milliseconds between each new item appearing.
+	 * @property {number} [scale=0.85] - The scale new items grow from and removed items shrink to.
+	 * @property {number} [limit=150] - The maximum number of items animated in a single change.
+	 * @property {string} [easing="cubic-bezier(.2, .8, .2, 1)"] - The easing used by every animation.
+	 */
+
+})(
+	FooGallery.$,
+	FooGallery,
+	FooGallery.utils,
+	FooGallery.utils.is,
+	FooGallery.utils.obj
+);
+
 (function ($, _, _utils, _is, _fn, _obj) {
 
 	_.Items = _.Component.extend(/** @lends FooGallery.Items.prototype */{
@@ -8532,12 +8952,20 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
 					.addClass(self.cls.loading);
 
 				self.loadIMG().then(function(){
+					if (self.isDestroyed || !self.tmpl || self.tmpl.destroying || self.tmpl.destroyed){
+						self.isLoading = false;
+						return def.reject("item destroyed");
+					}
 					self.isLoading = false;
 					self.isLoaded = true;
 					self.$el.removeClass(self.cls.loading).addClass(self.cls.loaded);
 					self.tmpl.trigger("loaded-item", [self]);
 					def.resolve(self);
 				}, function(reason){
+					if (self.isDestroyed || !self.tmpl || self.tmpl.destroying || self.tmpl.destroyed){
+						self.isLoading = false;
+						return def.reject("item destroyed");
+					}
 					self.isLoading = false;
 					self.isError = true;
 					self.$el.removeClass(self.cls.loading).addClass(self.cls.error);
@@ -8706,17 +9134,15 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
 			}
 		},
 		/**
-		 * @summary Listens for the click event on the {@link FooGallery.Item#$caption|$caption} element and redirects it to the anchor if required.
+		 * @summary Listens for the click event on the {@link FooGallery.Item#$caption|$caption} element.
 		 * @memberof FooGallery.Item#
 		 * @function onCaptionClick
 		 * @param {jQuery.Event} e - The jQuery.Event object for the click event.
 		 * @private
 		 */
 		onCaptionClick: function (e) {
-			var self = e.data.self, evt = self.tmpl.trigger("caption-click-item", [self]);
-			if (!evt.isDefaultPrevented() && self.$anchor.length > 0 && !$(e.target).is("a[href],:input")) {
-				self.$anchor.get(0).click();
-			}
+			var self = e.data.self;
+			self.tmpl.trigger("caption-click-item", [self]);
 		},
 		/**
 		 * @summary Listens for clicks on caption download buttons and triggers the client-side download helper.
@@ -9579,14 +10005,22 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
 
             self.lastBreakpoint = null;
 
+            self.lastWidth = null;
+
+            self.lastHeight = null;
+
             self.isSmallScreen = false;
             self.isMediumScreen = false;
             self.isLargeScreen = false;
+            self.isXLargeScreen = false;
             self.isMobileLayout = false;
 
-            self.breakpointClassNames = self.opt.breakpoints.map(function(bp){
-                return "fg-" + bp.name + " fg-" + bp.name + "-width" + " fg-" + bp.name + "-height";
-            }).concat(["fg-landscape","fg-portrait"]).join(" ");
+            self.breakpointClassNames = "fg-medium fg-landscape fg-portrait";
+
+            self.pointerMediaQuery = _is.fn(window.matchMedia) ? window.matchMedia("(pointer: coarse)") : null;
+            self.hasCoarsePointer = self.pointerMediaQuery == null || self.pointerMediaQuery.matches;
+            self.isPointerListening = false;
+            self.onPointerChange = self.onPointerChange.bind(self);
 
             self.robserver = new ResizeObserver(_fn.throttle(function (entries) {
                 if (!self.destroying && !self.destroyed){
@@ -9745,6 +10179,7 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
 
             maximize.set(!self.isInline, self.isInline && maximize.isEnabled());
 
+            self.listenToPointer();
             self.robserver.observe(self.el);
 
             self.areas.forEach(function (area) {
@@ -9767,6 +10202,7 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
         },
         doDetach: function(){
             var self = this;
+            self.stopListeningToPointer();
             self.robserver.unobserve(self.el);
             self.areas.forEach(function (area) {
                 area.stopListening();
@@ -9778,10 +10214,10 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
             var self = this;
             self.$el.removeClass(self.breakpointClassNames).addClass(self.lastBreakpoint);
             self.isMediumScreen = self.$el.hasClass("fg-medium");
-            self.isLargeScreen = self.$el.hasClass("fg-large");
-            self.isXLargeScreen = self.$el.hasClass("fg-x-large");
-            self.isSmallScreen = !self.isMediumScreen && !self.isLargeScreen && !self.isXLargeScreen;
-            self.isMobileLayout = self.isSmallScreen && !self.opt.noMobile;
+            self.isLargeScreen = false;
+            self.isXLargeScreen = false;
+            self.isSmallScreen = !self.isMediumScreen;
+            self.isMobileLayout = self.isSmallScreen;
             self.areas.forEach(function (area) {
                 area.resize();
             });
@@ -9789,6 +10225,8 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
         },
         onResize: function(width, height){
             var self = this, bp = self.getBreakpoint(width, height);
+            self.lastWidth = width;
+            self.lastHeight = height;
             if (self.lastBreakpoint !== bp){
                 self.lastBreakpoint = bp;
                 self.resize();
@@ -9796,18 +10234,56 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
         },
         getBreakpoint: function(width, height){
             var self = this,
-                result = [];
+                result = [],
+                breakpoint = _is.number(self.opt.breakpoint) && isFinite(self.opt.breakpoint) && self.opt.breakpoint > 0
+                    ? self.opt.breakpoint
+                    : 600,
+                portrait = height > width,
+                viewportWidth = document.documentElement.clientWidth,
+                panelWidth = Math.min(width, viewportWidth || width),
+                checkedLength = portrait ? panelWidth : height,
+                mobileAllowed = self.opt.mobile !== false && self.opt.noMobile !== true,
+                isMobile = mobileAllowed && self.hasCoarsePointer !== false && checkedLength < breakpoint;
 
-            self.opt.breakpoints.forEach(function(bp){
-                var w = bp.width <= width, h = bp.height <= height;
-                if (w && h) result.push("fg-" + bp.name);
-                if (w) result.push("fg-" + bp.name + "-width");
-                if (h) result.push("fg-" + bp.name + "-height");
-            });
-
-            result.push(width > height ? "fg-landscape" : "fg-portrait");
+            if (!isMobile) result.push("fg-medium");
+            result.push(portrait ? "fg-portrait" : "fg-landscape");
 
             return result.length > 0 ? result.join(" ") : null;
+        },
+        listenToPointer: function(){
+            var self = this, hasCoarsePointer;
+            if (self.pointerMediaQuery == null || self.isPointerListening) return;
+            hasCoarsePointer = !!self.pointerMediaQuery.matches;
+            if (self.hasCoarsePointer !== hasCoarsePointer){
+                self.hasCoarsePointer = hasCoarsePointer;
+                if (_is.number(self.lastWidth) && _is.number(self.lastHeight)){
+                    self.onResize(self.lastWidth, self.lastHeight);
+                }
+            }
+            if (_is.fn(self.pointerMediaQuery.addEventListener)){
+                self.pointerMediaQuery.addEventListener("change", self.onPointerChange);
+            } else if (_is.fn(self.pointerMediaQuery.addListener)) {
+                self.pointerMediaQuery.addListener(self.onPointerChange);
+            }
+            self.isPointerListening = true;
+        },
+        stopListeningToPointer: function(){
+            var self = this;
+            if (self.pointerMediaQuery == null || !self.isPointerListening) return;
+            if (_is.fn(self.pointerMediaQuery.removeEventListener)){
+                self.pointerMediaQuery.removeEventListener("change", self.onPointerChange);
+            } else if (_is.fn(self.pointerMediaQuery.removeListener)) {
+                self.pointerMediaQuery.removeListener(self.onPointerChange);
+            }
+            self.isPointerListening = false;
+        },
+        onPointerChange: function(event){
+            var self = this, hasCoarsePointer = !!event.matches;
+            if (self.hasCoarsePointer === hasCoarsePointer) return;
+            self.hasCoarsePointer = hasCoarsePointer;
+            if (_is.number(self.lastWidth) && _is.number(self.lastHeight)){
+                self.onResize(self.lastWidth, self.lastHeight);
+            }
         },
         getMedia: function(item){
             if (!(item instanceof _.Item)) return null;
@@ -10046,6 +10522,8 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
         panel: {
             classNames: "",
             noMobile: false,
+            mobile: true,
+            breakpoint: 600,
             hoverButtons: false,
             icons: "default",
             transition: "none", // none | fade | horizontal | vertical
@@ -10097,6 +10575,7 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
             thumbs: "none", // none | top | bottom | left | right
             thumbsVisible: true,
             thumbsCaptions: true,
+            thumbsUseMediaCaption: false,
             thumbsCaptionsAlign: "default", // default | left | center | right | justified
             thumbsSmall: false,
             thumbsBestFit: true,
@@ -10117,20 +10596,7 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
                 thumbs: false,
                 cart: true,
                 download: false
-            },
-            breakpoints: [{
-                name: "medium",
-                width: 800,
-                height: 800
-            },{
-                name: "large",
-                width: 1024,
-                height: 1024
-            },{
-                name: "x-large",
-                width: 1280,
-                height: 1280
-            }]
+            }
         }
     },{
         panel: {
@@ -10961,9 +11427,15 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
             this.exit();
             this._super();
         },
+        destroy: function(){
+            this.exit();
+            return this._super();
+        },
         set: function(maximized, visible){
+            var restoring = !maximized && this.panel.isMaximized && this.panel.isInline;
             if (maximized) this.enter();
             else this.exit();
+            if (restoring) this.panel.trigger("restored");
             visible = _is.boolean(visible) ? visible : this.isVisible;
             this.toggle(visible);
         },
@@ -11719,7 +12191,10 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
             self.$stage.append($("<div/>").addClass(self.cls.spacer));
         },
         doCreateThumb: function(item){
-            var self = this, cls = self.cls.thumb;
+            var self = this, cls = self.cls.thumb,
+                caption = self.panel.opt.thumbsUseMediaCaption
+                    ? _.Panel.Media.Caption.resolve(item)
+                    : { title: item.caption, description: item.description };
             return $("<figure/>").addClass(cls.elem).addClass(item.getTypeClass()).addClass(self.panel.cls.states.idle).append(
                 $("<div/>").addClass(cls.media).append(
                     $("<div/>").addClass(cls.overlay),
@@ -11729,8 +12204,8 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
                     $("<div/>").addClass(self.panel.cls.loader)
                 ),
                 $("<div/>").addClass(cls.caption).append(
-                    $("<div/>").addClass(cls.title).html(item.caption),
-                    $("<div/>").addClass(cls.description).html(item.description)
+                    $("<div/>").addClass(cls.title).html(caption.title),
+                    $("<div/>").addClass(cls.description).html(caption.description)
                 )
             ).data("item", item).on("click", {self: self, item: item}, self.onThumbClick);
         },
@@ -11810,6 +12285,7 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
             index = index < 0 ? 0 : (index > self.lastIndex ? self.lastIndex : index);
 
             var states = self.panel.cls.states,
+                viewportExtra = _is.number(self.info.viewportExtra) ? self.info.viewportExtra : 1,
                 rightOrBottom = index >= self.scrollIndex + self.info.count, // position the thumb to the right or bottom of the viewport depending on orientation
                 scrollIndex = rightOrBottom ? index - (self.info.count - 1) : index, // if rightOrBottom we subtract the count - 1 so the thumb appears to the right or bottom of the viewport
                 maxIndex = self.lastIndex - (self.info.count - 1); // the scrollIndex of the last item
@@ -11827,19 +12303,25 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
                     var alignRightOrBottom = scrollIndex > self.scrollIndex, hasFullStage = self.__items.length >= self.info.count, offset, translate;
                     if (self.info.isHorizontal) {
                         offset = -($thumb.prop("offsetLeft"));
-                        if (alignRightOrBottom) offset += self.info.remaining.width;
+                        if (alignRightOrBottom) offset += self.info.remaining.width - (self.info.divider || 0);
                         if (hasFullStage && self.info.stage.width - Math.abs(offset) < self.info.viewport.width) {
                             offset = self.info.viewport.width - self.info.stage.width;
+                            if (viewportExtra === 0) offset = Math.min(0, offset);
                         }
-                        translate = "translateX(" + (offset - 1) + "px)";
+                        translate = "translateX(" + (offset - viewportExtra) + "px)";
                     } else {
                         offset = -($thumb.prop("offsetTop"));
-                        if (alignRightOrBottom) offset += self.info.remaining.height;
+                        if (alignRightOrBottom) offset += self.info.remaining.height - (self.info.divider || 0);
                         if (hasFullStage && self.info.stage.height - Math.abs(offset) < self.info.viewport.height) {
                             offset = self.info.viewport.height - self.info.stage.height;
+                            if (viewportExtra === 0) offset = Math.min(0, offset);
                         }
-                        translate = "translateY(" + (offset - 1) + "px)";
+                        translate = "translateY(" + (offset - viewportExtra) + "px)";
                     }
+                    // Match navigation availability so fractional cell sizing cannot
+                    // leave a fade at an end that cannot be scrolled any further.
+                    self.$viewport.toggleClass("fg-panel-thumbs-overflow-start", scrollIndex > 0)
+                        .toggleClass("fg-panel-thumbs-overflow-end", scrollIndex < maxIndex);
                     if (self.panel.hasTransition && !disableTransition) {
                         _t.start(self.$stage, function ($el) {
                             $el.css("transform", translate);
@@ -11853,6 +12335,7 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
                         def.resolve();
                     }
                 } else {
+                    self.$viewport.removeClass("fg-panel-thumbs-overflow-start fg-panel-thumbs-overflow-end");
                     def.resolve();
                 }
             }).always(function(){
@@ -11874,19 +12357,35 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
                 counts = { horizontal: 0, vertical: 0 },
                 adjusted = { width: 0, height: 0 },
                 remaining = { width: 0, height: 0 },
-                width = 0, height = 0, itemCount = this.__items.length;
+                width = 0, height = 0, extra = 1, divider = 0, naturalDivider = 0, itemCount = this.__items.length;
             if (this.isCreated){
-                viewport = { width: this.$viewport.innerWidth() + 1, height: this.$viewport.innerHeight() + 1 };
+                // Legacy cell dividers need one extra pixel; explicitly framed slider
+                // strips measure their content box exactly, including best-fit end edges.
+                var panelStyle = this.panel && this.panel.el ? window.getComputedStyle(this.panel.el) : null;
+                extra = panelStyle ? parseFloat(panelStyle.getPropertyValue("--fg-panel-thumb-viewport-extra")) : NaN;
+                if (isNaN(extra)) extra = 1;
+                if (panelStyle && panelStyle.getPropertyValue("--fg-slider-square-cells").trim() === "1") {
+                    divider = parseFloat(panelStyle.getPropertyValue("--fg-panel-thumb-separator-width"));
+                    if (isNaN(divider)) divider = 1;
+                }
+                viewport = { width: this.$viewport.innerWidth() + extra, height: this.$viewport.innerHeight() + extra };
                 original = { width: this.$dummy.outerWidth(), height: this.$dummy.outerHeight() };
                 counts = { horizontal: Math.floor(viewport.width / original.width), vertical: Math.floor(viewport.height / original.height) };
+                // Natural square cells add their separator outside the square, so
+                // count the first cell without a leading divider on the strip axis.
+                if (isHorizontal) counts.horizontal = Math.floor((viewport.width + divider) / (original.width + divider));
+                else counts.vertical = Math.floor((viewport.height + divider) / (original.height + divider));
                 adjusted = { width: viewport.width / Math.min(itemCount, counts.horizontal), height: viewport.height / Math.min(itemCount, counts.vertical) };
                 width = this.opt.bestFit ? adjusted.width : original.width;
                 height = this.opt.bestFit ? adjusted.height : original.height;
-                stage = { width: isHorizontal ? this.__items.length * width : width, height: !isHorizontal ? this.__items.length * height : height };
-                remaining = { width: Math.floor(viewport.width - (counts.horizontal * width)), height: Math.floor(viewport.height - (counts.vertical * height)) };
+                naturalDivider = this.opt.bestFit ? 0 : divider;
+                stage = { width: isHorizontal ? itemCount * width + Math.max(0, itemCount - 1) * naturalDivider : width, height: !isHorizontal ? itemCount * height + Math.max(0, itemCount - 1) * naturalDivider : height };
+                remaining = { width: Math.floor(viewport.width - (counts.horizontal * width) - (isHorizontal ? Math.max(0, counts.horizontal - 1) * naturalDivider : 0)), height: Math.floor(viewport.height - (counts.vertical * height) - (!isHorizontal ? Math.max(0, counts.vertical - 1) * naturalDivider : 0)) };
             }
             return {
                 isHorizontal: isHorizontal,
+                divider: naturalDivider,
+                viewportExtra: extra,
                 viewport: viewport,
                 stage: stage,
                 original: original,
@@ -11900,7 +12399,23 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
         },
         resize: function(){
             if (this.isCreated){
+                if (this.panel.$el.hasClass("fg-slider-styled")) {
+                    // Match the shell to the strip's actual clamped curve on narrow strips.
+                    this.panel.$el.css("--fg-slider-strip-radius-limit", (Math.min(this.$inner.outerWidth(), this.$inner.outerHeight()) / 2) + "px");
+                    if (window.getComputedStyle(this.panel.el).getPropertyValue("--fg-slider-square-cells").trim() === "1") {
+                        var squareSide = this.isHorizontal() ? this.$viewport.innerHeight() : this.$viewport.innerWidth();
+                        if (squareSide > 0) this.panel.$el.css("--fg-slider-square-cell-side", squareSide + "px");
+                    }
+                }
                 this.info = this.getInfo();
+                if (this.opt.small && window.getComputedStyle(this.panel.el).getPropertyValue("--fg-slider-square-caption-cells").trim() === "1") {
+                    var cellStyle = window.getComputedStyle(this.$dummy.get(0)),
+                        captionDivider = parseFloat(window.getComputedStyle(this.panel.el).getPropertyValue("--fg-panel-thumb-separator-width")),
+                        availableHeight = this.info.isHorizontal ? this.info.viewport.height - this.info.viewportExtra : this.info.height;
+                    if (isNaN(captionDivider)) captionDivider = 1;
+                    availableHeight -= parseFloat(cellStyle.paddingTop) + parseFloat(cellStyle.paddingBottom) + (this.info.isHorizontal ? 0 : captionDivider);
+                    this.panel.$el.css("--fg-slider-square-caption-side", Math.max(1, Math.min(72, availableHeight)) + "px");
+                }
                 if (this.opt.bestFit){
                     if (this.info.isHorizontal){
                         this.$stage.find(this.sel.thumb.elem).css({width: this.info.width, minWidth: this.info.width, height: "", minHeight: ""});
@@ -12276,30 +12791,9 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
         },
         init: function(item){
             if (!(item instanceof _.Item)) return;
-            var self = this, title, desc, supplied = false;
-            if (item.isCreated){
-                var data = item.$anchor.data() || {};
-                title = _is.string(data.lightboxTitle);
-                desc = _is.string(data.lightboxDescription);
-                if (title || desc){
-                    supplied = true;
-                    self.title = _.safeParse( title ? data.lightboxTitle : "" );
-                    self.description = _.safeParse( desc ? data.lightboxDescription : "" );
-                }
-            } else {
-                var attr = item.attr.anchor;
-                title = _is.string(attr["data-lightbox-title"]);
-                desc = _is.string(attr["data-lightbox-description"]);
-                if (title || desc){
-                    supplied = true;
-                    self.title = _.safeParse( title ? attr["data-lightbox-title"] : "" );
-                    self.description = _.safeParse( desc ? attr["data-lightbox-description"] : "" );
-                }
-            }
-            if (!supplied){
-                self.title = item.caption;
-                self.description = item.description;
-            }
+            var self = this, content = _.Panel.Media.Caption.resolve(item);
+            self.title = content.title;
+            self.description = content.description;
             self.hasTitle = !_is.empty(self.title);
             self.hasDescription = !_is.empty(self.description);
             self.hasExif = item.hasExif && _utils.inArray(self.opt.exif, ["auto","full","partial","minimal"]) !== -1;
@@ -12477,6 +12971,23 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
             return _fn.resolved;
         }
     });
+
+    // Resolve once for both the main caption and strips which share its sources.
+    // Empty strings are explicit overrides and must not fall back to item captions.
+    _.Panel.Media.Caption.resolve = function(item){
+        var data = item.isCreated ? (item.$anchor.data() || {}) : ((item.attr && item.attr.anchor) || {}),
+            titleKey = item.isCreated ? "lightboxTitle" : "data-lightbox-title",
+            descriptionKey = item.isCreated ? "lightboxDescription" : "data-lightbox-description",
+            hasTitle = _is.string(data[titleKey]),
+            hasDescription = _is.string(data[descriptionKey]);
+        if (hasTitle || hasDescription){
+            return {
+                title: _.safeParse(hasTitle ? data[titleKey] : ""),
+                description: _.safeParse(hasDescription ? data[descriptionKey] : "")
+            };
+        }
+        return { title: item.caption, description: item.description };
+    };
 
 })(
     FooGallery.$,
@@ -13214,6 +13725,8 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
                 });
             }
 			self._super(options, element);
+			// Only one item is shown at a time, so filter and page changes are not morphed.
+			self.morphable = false;
 			/**
 			 * @summary The jQuery object containing the inner element that wraps all items.
 			 * @memberof FooGallery.ImageViewerTemplate#
@@ -13333,7 +13846,8 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
 		 * @function onDestroy
 		 */
 		onDestroy: function (event) {
-			var self = this;
+			var self = this, inner = self.$inner.parent()[0];
+			if (inner) inner.style.removeProperty("--fg-viewer-dominant-color");
 			if (self.template.attachFooBox) {
 				self.$el.off({
 					'foobox.previous': self.onFooBoxPrev,
@@ -13365,6 +13879,23 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
 			if (this.pages){
 				this.$current.text(this.pages.current);
 				this.$total.text(this.pages.total);
+			}
+			this.updateBackgroundColor();
+		},
+		/** Apply the active item's color to the shared frame and controls. */
+		updateBackgroundColor: function(){
+			var inner = this.$inner.parent()[0],
+				item = this.pages ? this.pages.available()[0] : null,
+				color = "";
+			if (!inner) return;
+			if (this.$el.hasClass("fg-dominant-color") && item && item.el){
+				// Read the item's own color so missing metadata falls back to the theme.
+				color = item.el.style.getPropertyValue("--fg-dominant-color").trim();
+			}
+			if (color){
+				inner.style.setProperty("--fg-viewer-dominant-color", color);
+			} else {
+				inner.style.removeProperty("--fg-viewer-dominant-color");
 			}
 		},
 		getAutoplaySeconds: function(){
@@ -13524,6 +14055,8 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
 					scrollToTop: false
 				}
 			}), element);
+			// Only one item is shown at a time, so filter and page changes are not morphed.
+			this.morphable = false;
 		}
 	});
 
@@ -14831,6 +15364,8 @@ FooGallery.utils.$, FooGallery.utils, FooGallery.utils.is, FooGallery.utils.fn);
                     type: "none"
                 }
             }), element);
+            // Only one item is shown at a time, so filter and page changes are not morphed.
+            self.morphable = false;
             self.items.LAYOUT_AFTER_LOAD = false;
             self.carousel = null;
             self.on({

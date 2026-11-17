@@ -11,6 +11,8 @@ if ( ! class_exists( 'FooGallery_Admin_Gallery_MetaBox_Items' ) ) {
 
     class FooGallery_Admin_Gallery_MetaBox_Items {
 
+		const PREVIEW_WINDOW_PAGE = 'foogallery-preview-window';
+
         /**
          * FooGallery_Admin_Gallery_MetaBox_Items constructor.
          */
@@ -25,7 +27,128 @@ if ( ! class_exists( 'FooGallery_Admin_Gallery_MetaBox_Items' ) ) {
 
 			//handle previews that have no attachments
 			add_action( 'foogallery_template_no_attachments', array( $this, 'preview_no_attachments' ) );
+
+			// A hidden admin page that shows the live preview in its own window.
+			add_action( 'admin_menu', array( $this, 'register_preview_window_page' ) );
         }
+
+		/**
+		 * Register the hidden page used by the pop-out preview window.
+		 */
+		public function register_preview_window_page() {
+			$hook = add_submenu_page(
+				'',
+				__( 'Gallery Preview', 'foogallery' ),
+				__( 'Gallery Preview', 'foogallery' ),
+				'edit_posts',
+				self::PREVIEW_WINDOW_PAGE,
+				'__return_null'
+			);
+
+			if ( $hook ) {
+				add_action( 'load-' . $hook, array( $this, 'render_preview_window' ) );
+			}
+		}
+
+		/**
+		 * URL of the pop-out preview window for a gallery.
+		 *
+		 * @param int $foogallery_id Gallery ID.
+		 * @return string
+		 */
+		private function preview_window_url( $foogallery_id ) {
+			return add_query_arg(
+				array(
+					'page'          => self::PREVIEW_WINDOW_PAGE,
+					'foogallery_id' => absint( $foogallery_id ),
+				),
+				admin_url( 'admin.php' )
+			);
+		}
+
+		/**
+		 * Output the pop-out preview window without the admin menu chrome.
+		 *
+		 * The editor sends its unsaved preview request to this window, which renders
+		 * it with the same AJAX endpoint and front-end assets as the inline preview.
+		 */
+		public function render_preview_window() {
+			$foogallery_id = isset( $_GET['foogallery_id'] ) ? absint( $_GET['foogallery_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only view; access is checked below.
+			if ( ! $foogallery_id || FOOGALLERY_CPT_GALLERY !== get_post_type( $foogallery_id ) || ! current_user_can( 'edit_post', $foogallery_id ) ) {
+				wp_die( esc_html__( 'You do not have permission to preview this gallery.', 'foogallery' ) );
+			}
+
+			do_action( 'foogallery_enqueue_preview_dependencies' );
+			foogallery_enqueue_core_gallery_template_style();
+			foogallery_enqueue_core_gallery_template_script();
+			wp_enqueue_style( 'dashicons' );
+			wp_enqueue_style( 'foogallery-preview-viewports', FOOGALLERY_URL . 'css/admin-foogallery-preview-viewports.css', array(), FOOGALLERY_VERSION );
+			wp_enqueue_style( 'foogallery-preview-window', FOOGALLERY_URL . 'css/admin-foogallery-preview-window.css', array( 'common', 'foogallery-preview-viewports', 'wp-color-picker' ), FOOGALLERY_VERSION );
+			wp_enqueue_script( 'foogallery-preview-window', FOOGALLERY_URL . 'js/admin-foogallery-preview-window.js', array( 'jquery', 'wp-color-picker' ), FOOGALLERY_VERSION, true );
+			wp_localize_script(
+				'foogallery-preview-window',
+				'FooGalleryPreviewWindow',
+				array(
+					'galleryId' => $foogallery_id,
+					'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
+					'strings'   => array(
+						'background'   => __( 'Background', 'foogallery' ),
+						'waiting'      => __( 'Waiting for the gallery editor…', 'foogallery' ),
+						'noEditor'     => __( 'Open this gallery in the editor to see live changes.', 'foogallery' ),
+						'loading'      => __( 'Updating…', 'foogallery' ),
+						'live'         => __( 'Live', 'foogallery' ),
+						'manual'       => __( 'Auto-update off', 'foogallery' ),
+						'stale'        => __( 'Preview out of date', 'foogallery' ),
+						'reconnecting' => __( 'Editor reloading…', 'foogallery' ),
+						'failed'       => __( 'The preview could not be loaded. Try Refresh.', 'foogallery' ),
+						'unsupported'  => __( 'This browser cannot sync the preview window.', 'foogallery' ),
+					),
+				)
+			);
+
+			$title = get_the_title( $foogallery_id );
+			/* translators: %s: Gallery title. */
+			iframe_header( esc_html( sprintf( __( 'Preview: %s', 'foogallery' ), '' !== $title ? $title : __( '(no title)', 'foogallery' ) ) ) );
+			?>
+			<div class="foogallery-preview-window">
+				<div class="foogallery-preview-window-bar">
+					<strong class="foogallery-preview-window-title"><?php echo esc_html( '' !== $title ? $title : __( '(no title)', 'foogallery' ) ); ?></strong>
+					<span class="foogallery-preview-window-status" role="status"></span>
+					<label class="foogallery-preview-auto-label"><input type="checkbox" role="switch" aria-checked="true" class="foogallery-preview-window-auto" checked /> <?php esc_html_e( 'Auto-update preview', 'foogallery' ); ?></label>
+					<span class="foogallery-preview-window-width" aria-hidden="true"></span>
+					<div class="foogallery-preview-window-viewports" role="group" aria-label="<?php esc_attr_e( 'Preview size', 'foogallery' ); ?>">
+						<?php
+						$viewports = array(
+							'desktop' => array( 'dashicons-desktop', __( 'Desktop View', 'foogallery' ) ),
+							'tablet'  => array( 'dashicons-tablet', __( 'Tablet View', 'foogallery' ) ),
+							'mobile'  => array( 'dashicons-smartphone', __( 'Mobile View', 'foogallery' ) ),
+						);
+						foreach ( $viewports as $viewport => $button ) :
+							?>
+							<button type="button" class="button foogallery-preview-window-viewport<?php echo 'desktop' === $viewport ? ' is-active' : ''; ?>" data-viewport="<?php echo esc_attr( $viewport ); ?>" title="<?php echo esc_attr( $button[1] ); ?>" aria-label="<?php echo esc_attr( $button[1] ); ?>" aria-pressed="<?php echo 'desktop' === $viewport ? 'true' : 'false'; ?>">
+								<span class="dashicons <?php echo esc_attr( $button[0] ); ?>" aria-hidden="true"></span>
+							</button>
+						<?php endforeach; ?>
+					</div>
+					<div class="foogallery-preview-window-background">
+						<label for="foogallery-preview-window-background" class="screen-reader-text"><?php esc_html_e( 'Preview background color', 'foogallery' ); ?></label>
+						<input type="text" id="foogallery-preview-window-background" value="#ffffff" data-default-color="#ffffff" />
+					</div>
+					<button type="button" class="button foogallery-preview-window-refresh">
+						<span class="dashicons dashicons-update" aria-hidden="true"></span>
+						<?php esc_html_e( 'Refresh', 'foogallery' ); ?>
+					</button>
+				</div>
+				<div class="foogallery-preview-window-content">
+					<div class="foogallery-preview-wrapper viewport-desktop">
+						<div class="foogallery_preview_container"></div>
+					</div>
+				</div>
+			</div>
+			<?php
+			iframe_footer();
+			exit;
+		}
 
 		public function add_items_metabox( $post ) {
 			add_meta_box(
@@ -59,32 +182,44 @@ if ( ! class_exists( 'FooGallery_Admin_Gallery_MetaBox_Items' ) ) {
 			if ( empty($mode) || $gallery->is_new() ) {
 				$mode = 'manage';
 			}
+			$gallery_template = foogallery_get_gallery_template( $gallery->gallery_template );
+			if ( ! empty( $gallery_template['promo_preview'] ) ) {
+				$mode = 'preview';
+			}
 			$has_items = !$gallery->is_empty();
 
 			do_action( 'foogallery_gallery_metabox_items', $gallery );
 			?>
 			<?php $this->render_invalid_datasource_notice( $gallery ); ?>
-			<div class="foogallery-hidden foogallery-items-view-switch-container">
+			<div class="foogallery-hidden foogallery-items-view-switch-container" data-view="<?php echo esc_attr( $mode ); ?>">
 				<div class="foogallery-items-view-switch">
 					<a href="#manage" data-value="manage" data-container=".foogallery-items-view-manage" class="<?php echo $mode==='manage' ? 'current' : ''; ?>"><?php esc_html_e('Manage Items', 'foogallery'); ?></a>
 					<a href="#preview" data-value="preview" data-container=".foogallery-items-view-preview" class="<?php echo $mode==='preview' ? 'current' : ''; ?>"><?php esc_html_e('Gallery Preview', 'foogallery'); ?></a>
 				</div>
 				<div class="foogallery-preview-actions">
-					<button type="button" class="foogallery-preview-refresh-btn" title="<?php esc_attr_e('Refresh Preview', 'foogallery'); ?>">
-						<span class="dashicons dashicons-update"></span>
-					</button>
-					<span></span>
-					<button type="button" class="foogallery-viewport-btn active" data-viewport="desktop" title="<?php esc_attr_e('Desktop View', 'foogallery'); ?>" aria-label="<?php esc_attr_e('Desktop View', 'foogallery'); ?>" aria-pressed="true">
-						<span class="dashicons dashicons-desktop" aria-hidden="true"></span>
-					</button>
-					<button type="button" class="foogallery-viewport-btn" data-viewport="tablet" title="<?php esc_attr_e('Tablet View', 'foogallery'); ?>" aria-label="<?php esc_attr_e('Tablet View', 'foogallery'); ?>" aria-pressed="false">
-						<span class="dashicons dashicons-tablet" aria-hidden="true"></span>
-					</button>
-					<button type="button" class="foogallery-viewport-btn" data-viewport="mobile" title="<?php esc_attr_e('Mobile View', 'foogallery'); ?>" aria-label="<?php esc_attr_e('Mobile View', 'foogallery'); ?>" aria-pressed="false">
-						<span class="dashicons dashicons-smartphone" aria-hidden="true"></span>
-					</button>
+					<span class="foogallery-preview-toolbar-controls">
+						<button type="button" class="foogallery-preview-refresh-btn" data-balloon="<?php esc_attr_e( 'Refresh preview', 'foogallery' ); ?>" data-refresh-balloon="<?php esc_attr_e( 'Refresh preview', 'foogallery' ); ?>" data-stale-balloon="<?php esc_attr_e( 'Refresh preview - out of date!', 'foogallery' ); ?>" data-balloon-pos="down" aria-label="<?php esc_attr_e( 'Refresh preview', 'foogallery' ); ?>">
+							<span class="dashicons dashicons-update" aria-hidden="true"></span>
+						</button>
+						<span class="foogallery-preview-status screen-reader-text" role="status" aria-live="polite" data-manual="<?php esc_attr_e( 'Auto-update off', 'foogallery' ); ?>" data-stale="<?php esc_attr_e( 'Preview out of date', 'foogallery' ); ?>" data-failed="<?php esc_attr_e( 'Preview failed. Try Refresh preview.', 'foogallery' ); ?>"></span>
+						<span class="foogallery-preview-icon-controls">
+							<button type="button" class="foogallery-viewport-btn active" data-viewport="desktop" data-balloon="<?php esc_attr_e('Desktop View', 'foogallery'); ?>" data-balloon-pos="down" aria-label="<?php esc_attr_e('Desktop View', 'foogallery'); ?>" aria-pressed="true">
+								<span class="dashicons dashicons-desktop" aria-hidden="true"></span>
+							</button>
+							<button type="button" class="foogallery-viewport-btn" data-viewport="tablet" data-balloon="<?php esc_attr_e('Tablet View', 'foogallery'); ?>" data-balloon-pos="down" aria-label="<?php esc_attr_e('Tablet View', 'foogallery'); ?>" aria-pressed="false">
+								<span class="dashicons dashicons-tablet" aria-hidden="true"></span>
+							</button>
+							<button type="button" class="foogallery-viewport-btn" data-viewport="mobile" data-balloon="<?php esc_attr_e('Mobile View', 'foogallery'); ?>" data-balloon-pos="down" aria-label="<?php esc_attr_e('Mobile View', 'foogallery'); ?>" aria-pressed="false">
+								<span class="dashicons dashicons-smartphone" aria-hidden="true"></span>
+							</button>
+							<button type="button" class="foogallery-preview-popout-btn" data-url="<?php echo esc_url( $this->preview_window_url( $post->ID ) ); ?>" data-balloon="<?php esc_attr_e( 'Open preview in a new window', 'foogallery' ); ?>" data-balloon-pos="down" aria-label="<?php esc_attr_e( 'Open preview in a new window', 'foogallery' ); ?>">
+								<span class="dashicons dashicons-external" aria-hidden="true"></span>
+							</button>
+						</span>
+						<span id="foogallery_preview_spinner" class="spinner"></span>
+					</span>
+					<label class="foogallery-preview-auto-label"><input type="checkbox" role="switch" aria-checked="true" class="foogallery-preview-auto" checked /> <?php esc_html_e( 'Auto-update preview', 'foogallery' ); ?></label>
 				</div>
-				<span id="foogallery_preview_spinner" class="spinner"></span>
 				<input type="hidden" id="foogallery_items_view_input" value="<?php echo esc_attr( $mode ); ?>" name="<?php echo esc_attr( FOOGALLERY_META_SETTINGS . '[foogallery_items_view]' ); ?>" /> <!-- phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -->
 			</div>
 
@@ -101,12 +236,20 @@ if ( ! class_exists( 'FooGallery_Admin_Gallery_MetaBox_Items' ) ) {
 				</div>
 			</div>
 			<div class="foogallery-items-view foogallery-items-view-preview <?php echo $mode==='preview' ? '' : 'foogallery-hidden'; ?>">
+				<div class="foogallery-preview-paused" hidden>
+					<span class="dashicons dashicons-external" aria-hidden="true"></span>
+					<p><?php esc_html_e( 'Inline preview paused while the preview window is open.', 'foogallery' ); ?></p>
+					<button type="button" class="button foogallery-preview-resume-btn"><?php esc_html_e( 'Resume here', 'foogallery' ); ?></button>
+				</div>
 				<!-- Wrap existing preview container -->
 				<div class="foogallery-preview-wrapper viewport-desktop">
 					<div class="foogallery_preview_container <?php echo $mode==='preview' ? '' : 'foogallery-preview-force-refresh'; ?>">
 						<?php
-						if ( $has_items && $mode === 'preview' ) {
-							foogallery_render_gallery( $gallery->ID );
+						if ( ! empty( $gallery_template['promo_preview'] ) ) {
+							$this->render_layout_promo_preview( $gallery_template );
+						} elseif ( $has_items && 'preview' === $mode ) {
+							$loader = new FooGallery_Template_Loader();
+							$loader->render_preview( $gallery->ID );
 						} else if ( $has_items && $mode === 'manage' ) {
 							echo '<div style="padding:20px; text-align: center">';
 							echo '<h3>' . esc_html__( 'Generating preview...', 'foogallery' ) . '</h3>';
@@ -262,6 +405,30 @@ if ( ! class_exists( 'FooGallery_Admin_Gallery_MetaBox_Items' ) ) {
 			echo '</div>';
 		}
 
+		/**
+		 * Render a registered PRO example without using the gallery's media.
+		 *
+		 * @param array $template Registered gallery template and preview metadata.
+		 */
+		private function render_layout_promo_preview( $template ) {
+			$preview = $template['promo_preview'];
+			?>
+			<div class="foogallery-layout-promo-preview">
+				<div class="foogallery-layout-promo-preview-images">
+					<?php foreach ( $preview['images'] as $image ) { ?>
+						<figure>
+							<img src="<?php echo esc_url( $image['src'] ); ?>" alt="<?php echo esc_attr( $image['alt'] ); ?>" />
+						</figure>
+					<?php } ?>
+				</div>
+				<p class="foogallery-layout-promo-preview-cta"><a class="button button-primary" href="<?php echo esc_url( $preview['demo_url'] ); ?>" target="_blank" rel="noopener noreferrer"><?php
+					/* translators: %s: Gallery layout name. */
+					echo esc_html( sprintf( __( 'Visit %s Demo', 'foogallery' ), $template['name'] ) );
+					?> <span class="dashicons dashicons-external" aria-hidden="true"></span><span class="screen-reader-text"> <?php esc_html_e( '(opens in a new tab)', 'foogallery' ); ?></span></a></p>
+			</div>
+			<?php
+		}
+
 		public function ajax_gallery_preview() {
 			if ( ! check_ajax_referer( 'foogallery_preview', 'foogallery_preview_nonce', false ) ) {
 				wp_send_json_error(
@@ -291,7 +458,9 @@ if ( ! class_exists( 'FooGallery_Admin_Gallery_MetaBox_Items' ) ) {
 
 			//check that the template supports previews
 			$gallery_template = foogallery_get_gallery_template( $template );
-			if ( isset( $gallery_template['preview_support'] ) && true === $gallery_template['preview_support'] ) {
+			if ( ! empty( $gallery_template['promo_preview'] ) ) {
+				$this->render_layout_promo_preview( $gallery_template );
+			} elseif ( isset( $gallery_template['preview_support'] ) && true === $gallery_template['preview_support'] ) {
 
 				global $foogallery_gallery_preview;
 
@@ -324,7 +493,8 @@ if ( ! class_exists( 'FooGallery_Admin_Gallery_MetaBox_Items' ) ) {
 
 				do_action( 'foogallery_preview_before_render', $foogallery_id, $args );
 
-				foogallery_render_gallery( $foogallery_id, $args );
+				$loader = new FooGallery_Template_Loader();
+				$loader->render_preview( $foogallery_id, $args );
 
 				do_action( 'foogallery_preview_after_render', $foogallery_id, $args );
 
@@ -352,6 +522,9 @@ if ( ! class_exists( 'FooGallery_Admin_Gallery_MetaBox_Items' ) ) {
 		private function extract_preview_arguments( $args, $post_data, $template ) {
 		    if ( array_key_exists( FOOGALLERY_META_SETTINGS, $post_data ) ) {
 			    $settings = $post_data[FOOGALLERY_META_SETTINGS];
+				if ( array_key_exists( 'favorite_ids', $settings ) ) {
+					$args['favorite_ids'] = implode( ',', foogallery_favorite_ids( $settings['favorite_ids'] ) );
+				}
 			    foreach ( $settings as $key => $value ) {
 			        if ( strpos( $key, $template . '_' ) === 0 ) {
 				        $args[ $this->str_replace_first( $template . '_', '', $key ) ] = $value;
@@ -420,6 +593,7 @@ if ( ! class_exists( 'FooGallery_Admin_Gallery_MetaBox_Items' ) ) {
 				//add core foogallery files for preview
 				foogallery_enqueue_core_gallery_template_style();
 				foogallery_enqueue_core_gallery_template_script();
+				wp_enqueue_style( 'foogallery-preview-viewports', FOOGALLERY_URL . 'css/admin-foogallery-preview-viewports.css', array(), FOOGALLERY_VERSION );
 
 				//make sure we have jquery UI sortable enqueued
 				wp_enqueue_script( 'jquery-ui-sortable');

@@ -35,8 +35,9 @@ $fs_instance = foogallery_fs();
 $foogallery_current_plan = $fs_instance->get_plan_name();
 $is_free = $fs_instance->is_free_plan();
 $is_trial = $fs_instance->is_trial();
-$show_trial_message = !$is_trial && $is_free && !$fs_instance->is_trial_utilized();
+$show_trial_message = ! $is_trial && $is_free && FooGallery_Admin_Setup::trial_selection_available();
 $show_thanks_for_pro = foogallery_is_pro();
+$foogallery_setup_state = FooGallery_Admin_Setup::snapshot();
 
 $upgrade_tab_text = __( 'Upgrade to PRO', 'foogallery' );
 $upgrade_button_text = __( 'Upgrade to PRO!', 'foogallery' );

@@ -340,8 +340,8 @@ if ( ! class_exists( 'FooGallery_Admin_Gallery_Datasources' ) ) {
                             <div class="foogallery-modal-title foogallery-datasource-modal-title">
                                 <h1>
                                     <?php esc_html_e('Add To Gallery From Another Source', 'foogallery'); ?>
-                                    <a class="foogallery-datasource-modal-reload button" href="#" style="display: none; margin-top: -4px;"><span style="padding-top: 3px;" class="dashicons dashicons-update"></span> <?php esc_html_e('Reload', 'foogallery'); ?></a>
                                 </h1>
+                                <a class="foogallery-datasource-modal-reload button" href="#" style="display: none;"><span class="dashicons dashicons-update" aria-hidden="true"></span> <?php esc_html_e('Reload', 'foogallery'); ?></a>
                             </div>
                             <div class="foogallery-datasource-modal-sidebar">
                                 <div class="foogallery-datasource-modal-sidebar-menu">

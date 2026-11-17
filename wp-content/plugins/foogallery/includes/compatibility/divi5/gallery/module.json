@@ -1,0 +1,87 @@
+{
+  "name": "foogallery/gallery",
+  "d4Shortcode": "foogallery_divi_gallery",
+  "title": "FooGallery",
+  "titles": "FooGalleries",
+  "moduleIcon": "divi/module-blurb",
+  "moduleClassName": "foogallery_divi5_gallery",
+  "moduleOrderClassName": "foogallery_divi5_gallery",
+  "category": "module",
+  "childrenName": [],
+  "attributes": {
+    "module": {
+      "type": "object",
+      "selector": "{{selector}}",
+      "default": {
+        "meta": {
+          "adminLabel": {
+            "desktop": {
+              "value": "FooGallery"
+            }
+          }
+        }
+      },
+      "settings": {
+        "meta": {
+          "adminLabel": {}
+        },
+        "advanced": {
+          "elements": {},
+          "html": {},
+          "link": {},
+          "htmlAttributes": {}
+        },
+        "decoration": {
+          "sizing": {},
+          "spacing": {},
+          "border": {},
+          "boxShadow": {},
+          "filters": {},
+          "transform": {},
+          "animation": {},
+          "overflow": {},
+          "disabledOn": {},
+          "transition": {},
+          "position": {},
+          "zIndex": {},
+          "scroll": {},
+          "sticky": {}
+        }
+      }
+    },
+    "galleryId": {
+      "type": "object",
+      "settings": {
+        "innerContent": {
+          "groupType": "group-item",
+          "item": {
+            "groupName": "mainContent",
+            "priority": 10,
+            "render": true,
+            "attrName": "galleryId.innerContent",
+            "label": "Gallery",
+            "features": {
+              "responsive": false,
+              "sticky": false,
+              "hover": false,
+              "dynamicContent": false
+            },
+            "component": {
+              "name": "divi/select",
+              "type": "field",
+              "props": {
+                "options": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "customCssFields": {},
+  "settings": {
+    "content": "auto",
+    "design": "auto",
+    "advanced": "auto"
+  }
+}

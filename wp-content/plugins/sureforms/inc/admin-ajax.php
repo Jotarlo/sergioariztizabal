@@ -36,7 +36,10 @@ class Admin_Ajax {
 	public function __construct() {
 		add_action( 'wp_ajax_sureforms_recommended_plugin_activate', [ $this, 'required_plugin_activate' ] );
 		add_action( 'wp_ajax_sureforms_recommended_plugin_install', 'wp_ajax_install_plugin' );
-		add_action( 'wp_ajax_sureforms_integration', [ $this, 'generate_data_for_suretriggers_integration' ] );
+		// Feeds the OttoKit integration, so it goes with the OttoKit automations switch.
+		if ( Features::is_enabled( 'ottokit' ) ) {
+			add_action( 'wp_ajax_sureforms_integration', [ $this, 'generate_data_for_suretriggers_integration' ] );
+		}
 		add_action( 'wp_ajax_srfm_download_export', [ $this, 'download_export_file' ] );
 		add_action( 'wp_ajax_srfm_download_logs', [ $this, 'download_client_log' ] );
 		add_action( 'wp_ajax_srfm_clear_logs', [ $this, 'clear_client_log' ] );
@@ -490,7 +493,8 @@ class Admin_Ajax {
 		// Get and sanitize the file parameter.
 		$file = isset( $_GET['file'] ) ? sanitize_file_name( wp_unslash( $_GET['file'] ) ) : '';
 
-		if ( empty( $file ) ) {
+		// Only files named by an export (every one starts with `srfm-`) are served.
+		if ( empty( $file ) || 0 !== strpos( $file, 'srfm-' ) ) {
 			wp_die( esc_html__( 'Invalid file request.', 'sureforms' ) );
 		}
 
@@ -514,7 +518,7 @@ class Admin_Ajax {
 
 		// Determine content type and filename based on file extension.
 		$content_type = 'application/octet-stream';
-		$filename     = $file_info['basename'];
+		$filename     = Entries::get_export_download_filename( $file_info['basename'] );
 		if ( isset( $file_info['extension'] ) ) {
 			if ( 'csv' === $file_info['extension'] ) {
 				$content_type = 'text/csv';

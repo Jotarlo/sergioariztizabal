@@ -288,12 +288,39 @@ if ( ! class_exists( 'FooGallery_Blocks' ) ) {
 			$engine = new FooGallery_Template_Loader();
 
 			ob_start();
-
-			$engine->render_template( $attributes );
+			if ( ! $is_dynamic_gallery && $attributes['id'] && $this->is_authorized_editor_preview( $attributes['id'] ) ) {
+				$engine->render_preview( $attributes['id'], $attributes );
+			} else {
+				$engine->render_template( $attributes );
+			}
 
 			$output_string = ob_get_contents();
 			ob_end_clean();
 			return !empty($output_string) ? $output_string : null;
+		}
+
+		/**
+		 * Check the authenticated REST block-renderer route for one readable gallery.
+		 *
+		 * @param int $gallery_id Saved gallery ID.
+		 * @return bool
+		 */
+		private function is_authorized_editor_preview( $gallery_id ) {
+			global $wp;
+
+			$route = isset( $wp->query_vars['rest_route'] ) && is_string( $wp->query_vars['rest_route'] )
+				? untrailingslashit( $wp->query_vars['rest_route'] )
+				: '';
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Core authenticates this REST route; target gallery edit/read capabilities are checked below.
+			$context = isset( $_GET['context'] ) && is_string( $_GET['context'] )
+				? sanitize_key( wp_unslash( $_GET['context'] ) )
+				: '';
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+			return '/wp/v2/block-renderer/fooplugins/foogallery' === $route
+				&& 'edit' === $context
+				&& current_user_can( 'edit_post', $gallery_id )
+				&& current_user_can( 'read_post', $gallery_id );
 		}
 
 		/**

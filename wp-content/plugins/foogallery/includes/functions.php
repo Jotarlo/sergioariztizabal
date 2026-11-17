@@ -354,6 +354,26 @@ function foogallery_gallery_template_setting_raw(  $key, $default_value = '', $d
 }
 
 /**
+ * Whether a gallery was saved before a template setting existed, so the setting has no stored value.
+ *
+ * Used to give new galleries a setting's default while existing galleries keep their previous behaviour.
+ *
+ * @param FooGallery   $gallery  The gallery.
+ * @param array|string $template The gallery template, or its slug.
+ * @param string       $field_id The template field ID (without the template prefix).
+ *
+ * @return bool
+ */
+function foogallery_saved_gallery_missing_setting(  $gallery, $template, $field_id  ) {
+    if ( !is_object( $gallery ) || !is_array( $gallery->settings ) || empty( $gallery->settings ) ) {
+        // A new gallery that has never been saved.
+        return false;
+    }
+    $slug = ( is_array( $template ) && isset( $template['slug'] ) ? $template['slug'] : (string) $template );
+    return !array_key_exists( "{$slug}_{$field_id}", $gallery->settings );
+}
+
+/**
  * Returns the gallery template setting for lightbox
  *
  * @return string
@@ -451,14 +471,18 @@ function foogallery_extract_gallery_shortcodes(  $content  ) {
     $regex_pattern = foogallery_gallery_shortcode_regex();
     if ( preg_match_all( '/' . $regex_pattern . '/s', $content, $matches ) ) {
         for ($i = 0; $i < count( $matches[0] ); ++$i) {
+            // WordPress renders escaped shortcodes as text, not galleries.
+            if ( '[' === $matches[1][$i] && ']' === $matches[6][$i] ) {
+                continue;
+            }
             $shortcode = $matches[0][$i];
             $args = $matches[3][$i];
-            $attribure_string = str_replace( ' ', '&', trim( $args ) );
-            $attribure_string = str_replace( '"', '', $attribure_string );
-            $attributes = wp_parse_args( $attribure_string );
-            if ( array_key_exists( 'id', $attributes ) ) {
+            $attributes = shortcode_parse_atts( $args );
+            if ( is_array( $attributes ) && isset( $attributes['id'] ) ) {
                 $id = intval( $attributes['id'] );
-                $shortcodes[$id] = $shortcode;
+                if ( $id > 0 ) {
+                    $shortcodes[$id] = $shortcode;
+                }
             }
         }
     }
@@ -849,6 +873,7 @@ function foogallery_mobile_settings_core_template_slugs() {
         'carousel',
         'image-viewer',
         'foogridpro',
+        'mosaic',
         'polaroid_new',
         'product',
         'slider',
@@ -2572,7 +2597,7 @@ function foogallery_marketing_pro_features() {
     );
     $features[] = array(
         'feature' => __( 'More Gallery Layouts', 'foogallery' ),
-        'desc'    => __( '3 more awesome gallery layouts, including Slider, Grid and Polaroid.', 'foogallery' ),
+        'desc'    => __( '6 more gallery layouts: Slider, Grid, Polaroid, Spotlight, Mosaic and Wall.', 'foogallery' ),
         'demo'    => 'https://fooplugins.com/foogallery-wordpress-gallery-plugin/slider-gallery/',
     );
     $features[] = array(

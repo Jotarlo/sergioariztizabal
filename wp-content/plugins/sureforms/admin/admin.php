@@ -16,6 +16,7 @@ use SRFM\Inc\Email_Delivery\Lost_Submissions;
 use SRFM\Inc\Email_Delivery\Mailer;
 use SRFM\Inc\Email_Delivery\Status as Email_Delivery_Status;
 use SRFM\Inc\Email_Delivery\Suremail_Adapter;
+use SRFM\Inc\Features;
 use SRFM\Inc\Form_Start;
 use SRFM\Inc\Form_Templates;
 use SRFM\Inc\Generate_Form_Markup;
@@ -193,17 +194,22 @@ class Admin {
 	public function __construct() {
 		add_action( 'admin_menu', [ $this, 'add_menu_page' ], 9 );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
-		add_action( 'admin_menu', [ $this, 'settings_page' ] );
-		add_action( 'admin_menu', [ $this, 'add_learn_page' ] );
 		add_action( 'admin_menu', [ $this, 'add_new_form' ] );
+		// Settings, Learn, SMTP and Upgrade are appended after every item added with a
+		// position (Forms through Partial Entries, including Pro's at priority 30).
+		// WordPress reads a position as an index into the items present at the time,
+		// so an item added earlier would move above a feature item whenever a switched
+		// off feature leaves its slot empty.
+		add_action( 'admin_menu', [ $this, 'settings_page' ], 100 );
+		add_action( 'admin_menu', [ $this, 'add_learn_page' ], 100 );
 		if ( ! Helper::hide_promotions() ) {
-			add_action( 'admin_menu', [ $this, 'add_suremail_page' ] );
+			add_action( 'admin_menu', [ $this, 'add_suremail_page' ], 100 );
 		}
 		if ( ! Helper::has_pro() ) {
 			add_action( 'admin_menu', [ $this, 'add_quiz_page' ] );
 			add_action( 'admin_menu', [ $this, 'add_survey_reports_page' ] );
 			add_action( 'admin_menu', [ $this, 'add_partial_entries_page' ] );
-			add_action( 'admin_menu', [ $this, 'add_upgrade_to_pro' ] );
+			add_action( 'admin_menu', [ $this, 'add_upgrade_to_pro' ], 100 );
 			add_action( 'admin_footer', [ $this, 'add_upgrade_to_pro_target_attr' ] );
 		}
 
@@ -241,13 +247,14 @@ class Admin {
 		$general_options       = get_option( 'srfm_general_settings_options', [] );
 		$admin_notification_on = isset( $general_options['srfm_admin_notification'] ) ? (bool) $general_options['srfm_admin_notification'] : true;
 
-		if ( $admin_notification_on ) {
+		if ( $admin_notification_on && Features::is_enabled( 'entries' ) ) {
 			add_action( 'admin_menu', [ $this, 'maybe_add_entries_badge' ], 99 );
 		}
 
 		add_filter( 'wpforms_current_user_can', [ $this, 'disable_wpforms_capabilities' ], 10, 3 );
 
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_pointer' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'localize_features' ] );
 		// Ajax callbacks for wp-pointer functionality.
 		add_action( 'wp_ajax_should_show_pointer', [ $this, 'pointer_should_show' ] );
 		add_action( 'wp_ajax_sureforms_dismiss_pointer', [ $this, 'pointer_dismissed' ] );
@@ -1166,7 +1173,7 @@ JS;
 			ob_start();
 			?>
 			<a href="<?php echo esc_url( $upsell_link ); ?>" target="_blank" rel="noreferrer" class="sureforms-plugins-go-pro">
-				<?php echo esc_html__( 'Get SureForms Pro', 'sureforms' ); ?>
+				<?php echo esc_html__( 'Get SureForms Business', 'sureforms' ); ?>
 			</a>
 			<?php
 			$links[] = trim( ob_get_clean() );
@@ -1341,6 +1348,10 @@ JS;
 	 * @since 2.7.0
 	 */
 	public function add_quiz_page() {
+		// Upsell for a Pro feature that reads stored entries, so not while Entries is off.
+		if ( ! Features::is_enabled( 'entries' ) ) {
+			return;
+		}
 		add_submenu_page(
 			'sureforms_menu',
 			__( 'Quiz Entries', 'sureforms' ),
@@ -1371,6 +1382,10 @@ JS;
 	 * @since 2.8.0
 	 */
 	public function add_survey_reports_page() {
+		// Upsell for a Pro feature that reads stored entries, so not while Entries is off.
+		if ( ! Features::is_enabled( 'entries' ) ) {
+			return;
+		}
 		add_submenu_page(
 			'sureforms_menu',
 			__( 'Survey Reports', 'sureforms' ),
@@ -1401,6 +1416,10 @@ JS;
 	 * @since 2.9.0
 	 */
 	public function add_partial_entries_page() {
+		// Upsell for a Pro feature that reads stored entries, so not while Entries is off.
+		if ( ! Features::is_enabled( 'entries' ) ) {
+			return;
+		}
 		add_submenu_page(
 			'sureforms_menu',
 			__( 'Partial Entries', 'sureforms' ),
@@ -1489,6 +1508,26 @@ JS;
 	}
 
 	/**
+	 * Expose the feature switches to every admin and editor script as
+	 * `window.srfmFeatures`, read through `window.srfmIsFeatureEnabled()`.
+	 * A key that is not listed reads as on, matching Features::is_enabled().
+	 *
+	 * Attached to `wp-hooks`, which every SureForms and SureForms Pro bundle
+	 * depends on, so it prints before any of them on any screen they load.
+	 *
+	 * @since 2.14.0
+	 * @return void
+	 */
+	public function localize_features() {
+		if ( ! Helper::current_user_can( 'edit_posts' ) ) {
+			return;
+		}
+		$script  = 'window.srfmFeatures = ' . wp_json_encode( Features::for_js() ) . ';';
+		$script .= 'window.srfmIsFeatureEnabled = function ( key ) { var f = window.srfmFeatures && window.srfmFeatures[ key ]; return ! f || false !== f.enabled; };';
+		wp_add_inline_script( 'wp-hooks', $script, 'before' );
+	}
+
+	/**
 	 * Add Learn submenu page.
 	 *
 	 * @return void
@@ -1533,6 +1572,8 @@ JS;
 			[ $this, 'render_forms' ],
 			1
 		);
+		// With the AI form builder off this still opens: the start screen leaves out its
+		// AI card and never routes to the AI screen (getAddNewFormScreen()).
 		add_submenu_page(
 			'sureforms_menu',
 			__( 'New Form', 'sureforms' ),
@@ -1542,7 +1583,7 @@ JS;
 			[ $this, 'add_new_form_callback' ],
 			2
 		);
-		$entries_hook = add_submenu_page(
+		$entries_hook = Features::is_enabled( 'entries' ) ? add_submenu_page(
 			'sureforms_menu',
 			__( 'Entries', 'sureforms' ),
 			__( 'Entries', 'sureforms' ),
@@ -1550,17 +1591,19 @@ JS;
 			SRFM_ENTRIES,
 			[ $this, 'render_entries' ],
 			3
-		);
+		) : false;
 
-		add_submenu_page(
-			'sureforms_menu',
-			__( 'Payments', 'sureforms' ),
-			__( 'Payments', 'sureforms' ),
-			self::$sureforms_page_default_capability,
-			SRFM_PAYMENTS,
-			[ $this, 'render_payments' ],
-			4
-		);
+		if ( Features::is_enabled( 'payments' ) ) {
+			add_submenu_page(
+				'sureforms_menu',
+				__( 'Payments', 'sureforms' ),
+				__( 'Payments', 'sureforms' ),
+				self::$sureforms_page_default_capability,
+				SRFM_PAYMENTS,
+				[ $this, 'render_payments' ],
+				4
+			);
+		}
 
 		if ( $entries_hook ) {
 			add_action( 'load-' . $entries_hook, [ $this, 'mark_entries_page_visit' ] );
@@ -1850,7 +1893,7 @@ JS;
 			'check_three_days_threshold'   => self::check_first_form_creation_threshold(),
 			'check_eight_days_threshold'   => self::check_first_form_creation_threshold( 8 ),
 			'pro_plugin_version'           => Helper::has_pro() ? SRFM_PRO_VER : '',
-			'pro_plugin_name'              => Helper::has_pro() && defined( 'SRFM_PRO_PRODUCT' ) ? SRFM_PRO_PRODUCT : 'SureForms Pro',
+			'pro_plugin_name'              => Helper::has_pro() && defined( 'SRFM_PRO_PRODUCT' ) ? SRFM_PRO_PRODUCT : 'SureForms Business',
 			'sureforms_pricing_page'       => Helper::get_sureforms_website_url( 'pricing' ),
 			'field_spacing_vars'           => Helper::get_css_vars(),
 			'is_ver_lower_than_6_7'        => version_compare( $wp_version, '6.6.2', '<=' ),
@@ -2384,9 +2427,9 @@ JS;
 
 		// Register version outdated notice for React pages.
 		if ( ! version_compare( SRFM_PRO_VER, SRFM_PRO_RECOMMENDED_VER, '>=' ) ) {
-			$pro_plugin_name        = defined( 'SRFM_PRO_PRODUCT' ) ? SRFM_PRO_PRODUCT : 'SureForms Pro';
+			$pro_plugin_name        = defined( 'SRFM_PRO_PRODUCT' ) ? SRFM_PRO_PRODUCT : 'SureForms Business';
 			$react_outdated_message = sprintf(
-				// translators: %1$s: SureForms version, %2$s: SureForms Pro Plugin Name, %3$s: SureForms Pro Version.
+				// translators: %1$s: SureForms version, %2$s: SureForms Business plugin name, %3$s: SureForms Business version.
 				esc_html__( 'SureForms %1$s requires minimum %2$s %3$s to work properly. Please update to the latest version.', 'sureforms' ),
 				esc_html( SRFM_VER ),
 				esc_html( $pro_plugin_name ),
@@ -2668,7 +2711,7 @@ JS;
 			update_option( 'srfm_pro_license_status', $srfm_pro_license_status );
 		}
 
-		$pro_plugin_name = defined( 'SRFM_PRO_PRODUCT' ) ? SRFM_PRO_PRODUCT : 'SureForms Pro';
+		$pro_plugin_name = defined( 'SRFM_PRO_PRODUCT' ) ? SRFM_PRO_PRODUCT : 'SureForms Business';
 		$message         = '';
 		$url             = admin_url( 'admin.php?page=sureforms_form_settings&tab=account-settings' );
 		if ( 'unlicensed' === $srfm_pro_license_status ) {
@@ -2677,7 +2720,7 @@ JS;
 			<p>
 				<?php
 				printf(
-					// translators: %1$s: Opening anchor tag with URL, %2$s: Closing anchor tag, %3$s: SureForms Pro Plugin Name.
+					// translators: %1$s: Opening anchor tag with URL, %2$s: Closing anchor tag, %3$s: SureForms Business plugin name.
 					esc_html__( 'Please %1$sactivate%2$s your copy of %3$s to get new features, access support, receive update notifications, and more.', 'sureforms' ),
 					'<a href="' . esc_url( $url ) . '">',
 					'</a>',
@@ -2695,7 +2738,7 @@ JS;
 			<p>
 				<?php
 				printf(
-					// translators: %1$s: SureForms version, %2$s: SureForms Pro Plugin Name, %3$s: SureForms Pro Version, %4$s: Anchor tag open, %5$s: Closing anchor tag.
+					// translators: %1$s: SureForms version, %2$s: SureForms Business plugin name, %3$s: SureForms Business version, %4$s: Anchor tag open, %5$s: Closing anchor tag.
 					esc_html__( 'SureForms %1$s requires minimum %2$s %3$s to work properly. Please update to the latest version from %4$shere%5$s.', 'sureforms' ),
 					esc_html( SRFM_VER ),
 					esc_html( $pro_plugin_name ),
@@ -3156,7 +3199,13 @@ JS;
 		}
 
 		// Register the AI quick draft widget for capable users (the capability gate above applies); unlike the recent-entries widget below, it is not conditional on having entries.
-		add_action( 'wp_dashboard_setup', [ $this, 'register_ai_dashboard_widget' ] );
+		if ( Features::is_enabled( 'ai_builder' ) ) {
+			add_action( 'wp_dashboard_setup', [ $this, 'register_ai_dashboard_widget' ] );
+		}
+
+		if ( ! Features::is_enabled( 'entries' ) ) {
+			return;
+		}
 
 		// Quick check if there are any entries in the last 7 days.
 		$seven_days_ago = strtotime( '-7 days' );
@@ -3256,7 +3305,7 @@ JS;
 	 */
 	public function enqueue_ai_dashboard_widget_assets( $hook_suffix ) {
 		// Only on the main dashboard, and only for capable users (matches the widget gate).
-		if ( 'index.php' !== $hook_suffix || ! Helper::current_user_can() || Helper::hide_promotions() ) {
+		if ( 'index.php' !== $hook_suffix || ! Helper::current_user_can() || Helper::hide_promotions() || ! Features::is_enabled( 'ai_builder' ) ) {
 			return;
 		}
 
@@ -4091,7 +4140,9 @@ CSS;
 			/* translators: %s: form title. */
 			$categories['notification']['title']   = __( 'A notification failed on %s, and the submission was not stored.', 'sureforms' );
 			$categories['notification']['generic'] = __( 'A notification failed, and the submission was not stored.', 'sureforms' );
-			$categories['notification']['message'] = __( 'This form is set to never store entries, so the email was the only copy of that submission and it could not be sent. Set up email delivery, or turn off "Never store entry data after form submission" for this form, so submissions are not lost.', 'sureforms' );
+			$categories['notification']['message'] = Features::is_enabled( 'entries' )
+				? __( 'This form is set to never store entries, so the email was the only copy of that submission and it could not be sent. Set up email delivery, or turn off "Never store entry data after form submission" for this form, so submissions are not lost.', 'sureforms' )
+				: __( 'The Entries feature is turned off, so the email was the only copy of that submission and it could not be sent. Set up email delivery, or turn Entries back on in Settings → Features, so submissions are not lost.', 'sureforms' );
 		}
 
 		foreach ( $categories as $category => $copy ) {
@@ -5456,7 +5507,7 @@ CSS;
 				sprintf( 'Site: %s', home_url() ),
 				sprintf( 'SureForms: %s', SRFM_VER ),
 				sprintf(
-					'SureForms Pro: %s',
+					'SureForms Business: %s',
 					Helper::has_pro() && defined( 'SRFM_PRO_VER' ) ? SRFM_PRO_VER : 'not active'
 				),
 				sprintf( 'WordPress: %s', Helper::get_string_value( $wp_version ) ),
@@ -5522,7 +5573,9 @@ CSS;
 			}
 		}
 
-		$message = __( 'These forms are set to never store entries, and no email notification for them could be sent, so the submissions were not saved anywhere. Set up email delivery, or turn off "Never store entry data after form submission" on these forms.', 'sureforms' );
+		$message = Features::is_enabled( 'entries' )
+			? __( 'These forms are set to never store entries, and no email notification for them could be sent, so the submissions were not saved anywhere. Set up email delivery, or turn off "Never store entry data after form submission" on these forms.', 'sureforms' )
+			: __( 'The Entries feature is turned off, and no email notification for these forms could be sent, so the submissions were not saved anywhere. Set up email delivery, or turn Entries back on in Settings → Features.', 'sureforms' );
 		if ( ! empty( $titles ) ) {
 			/* translators: %s: comma-separated form titles. */
 			$message .= ' ' . sprintf( __( 'Forms: %s.', 'sureforms' ), implode( ', ', $titles ) );

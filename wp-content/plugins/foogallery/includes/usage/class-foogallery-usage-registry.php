@@ -51,7 +51,7 @@ class FooGallery_Usage_Registry {
 	 */
 	public static function promo_map() {
 		return array(
-			'gallery_templates'     => array( 'layout.polaroid', 'layout.grid', 'layout.slider', 'layout.spotlight' ),
+			'gallery_templates'     => array( 'layout.polaroid', 'layout.grid', 'layout.slider', 'layout.spotlight', 'layout.mosaic', 'layout.wall' ),
 			'mobile_settings'       => 'gallery.mobile_settings',
 			'hover_effects'         => 'gallery.hover_effects',
 			'image_filter_effects'  => 'gallery.thumbnail_effects',
@@ -151,6 +151,8 @@ class FooGallery_Usage_Registry {
 			'layout.grid'                      => self::item( __( 'Grid layout', 'foogallery' ), 'published_gallery_configuration', 'pro', false ),
 			'layout.slider'                    => self::item( __( 'Slider layout', 'foogallery' ), 'published_gallery_configuration', 'pro', false ),
 			'layout.spotlight'                 => self::item( __( 'Spotlight layout', 'foogallery' ), 'published_gallery_configuration', 'pro', false ),
+			'layout.mosaic'                           => self::item( __( 'Mosaic layout', 'foogallery' ), 'published_gallery_configuration', 'pro', false ),
+			'layout.wall'                             => self::item( __( 'Wall layout', 'foogallery' ), 'published_gallery_configuration', 'pro', false ),
 			'layout.product'                   => self::item( __( 'Product layout', 'foogallery' ), 'published_gallery_configuration', 'pro', false ),
 			'gallery.pagination.dots'                  => self::item( __( 'Dots paging', 'foogallery' ), 'published_gallery_configuration', 'core', false ),
 			'gallery.pagination.numbered'              => self::item( __( 'Numbered pagination', 'foogallery' ), 'published_gallery_configuration', 'pro', false ),

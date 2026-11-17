@@ -123,7 +123,7 @@ $demos_created = foogallery_get_setting( 'demo_content' ) === 'on';
                 <dt><?php printf(  esc_html__( '%s Block','foogallery' ), esc_html( foogallery_plugin_name() ) ); ?></dt>
                 <dd><?php esc_html_e( 'Use our block to embed a gallery in the Gutenberg editor. Live previews help you visualize how the gallery will really look on the frontend.', 'foogallery' );?></dd>
                 <?php /* translators: %s: Value inserted at runtime. */ ?>
-                <dt><?php printf( esc_html__( 'The <code>[%s]</code> Shortcode','foogallery' ), esc_html( foogallery_gallery_shortcode_tag() ) );?></dt>
+                <dt><?php printf( esc_html__( 'The [%s] Shortcode','foogallery' ), esc_html( foogallery_gallery_shortcode_tag() ) );?></dt>
                 <dd><?php esc_html_e( 'Copy and paste the gallery shortcode into any page. You can find the shortcode from the gallery listing or within the Gallery Shortcode metabox when you edit a gallery.', 'foogallery' );?></dd>
             </dl>
         </div>

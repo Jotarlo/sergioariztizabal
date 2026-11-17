@@ -494,6 +494,7 @@ if ( !class_exists( 'FooGallery_Masonry_Gallery_Template' ) ) {
 				'border_size' => 'fg-border-medium',
 				'drop_shadow' => 'fg-shadow-outline',
 				'rounded_corners' => 'fg-round-small',
+				'inner_rounded_corners' => 'fg-inner-round-small',
 				'inner_shadow' => '',
 				'hover_effect_icon' => 'fg-hover-zoom4',
 				'hover_effect_scale' => 'fg-hover-semi-zoomed',

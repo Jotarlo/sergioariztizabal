@@ -61,7 +61,9 @@ if ( !class_exists( 'FooGallery_Thumbnails' ) ) {
 
 			//allow for plugins to change the thumbnail creation args one final time
 			$args = apply_filters( 'foogallery_thumbnail_resize_args_final', $args, $original_image_src, $thumbnail_object );
-			$requires_image_processing = ! empty( $args['watermark_options'] );
+			// Explicit gallery fill must also process originals smaller than the target.
+			$requires_image_processing = ! empty( $args['watermark_options'] ) ||
+				( isset( $args['background_fill'] ) && $args['width'] > 0 && $args['height'] > 0 );
 
 			$width  = (int)$args['width'];
 			$height = (int)$args['height'];
@@ -119,7 +121,8 @@ if ( !class_exists( 'FooGallery_Thumbnails' ) ) {
 				//check if we must upscale smaller images
 				if ( 'on' === foogallery_get_setting( 'thumb_resize_upscale_small' ) ) {
 					$force_resize = true;
-					if ( !isset( $args['background_fill'] ) ) {
+					// An explicit null disables fill for this gallery.
+					if ( ! array_key_exists( 'background_fill', $args ) ) {
 						$color = foogallery_get_setting( 'thumb_resize_upscale_small_color', '' );
 						if ( $color !== 'auto' && $color !== 'transparent' ) {
 							$colors = foogallery_rgb_to_color_array( $color );

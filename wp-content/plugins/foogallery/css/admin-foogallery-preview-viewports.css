@@ -1,0 +1,144 @@
+/*
+ * Desktop, tablet and mobile preview viewports.
+ *
+ * Shared by the gallery editor's inline preview and the pop-out preview window.
+ */
+
+/* Preview Wrapper with Viewport Simulation */
+.foogallery-preview-wrapper {
+    transition: all 0.3s ease;
+    margin: 0 auto;
+    border: 1px solid #ddd;
+    background: #fff;
+    position: relative;
+    width: 100%;
+}
+
+.foogallery-preview-wrapper.viewport-desktop {
+    max-width: 100% !important;
+    box-shadow: none !important;
+	border: none;
+}
+
+.foogallery-preview-wrapper.viewport-tablet {
+    max-width: 768px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+}
+
+.foogallery-preview-wrapper.viewport-mobile {
+    max-width: 375px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+}
+
+/* Locked layouts show an example rather than rendering the gallery's media. */
+.foogallery_preview_container:has(> .foogallery-layout-promo-preview) {
+	padding-top: 0;
+}
+
+.foogallery-layout-promo-preview {
+	margin: 0;
+	padding: 0;
+	text-align: center;
+}
+
+.foogallery-layout-promo-preview-images {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 16px;
+	margin: 0;
+	padding: 0;
+}
+
+.foogallery-layout-promo-preview-images figure {
+	flex: 1 1 240px;
+	min-width: 0;
+	margin: 0;
+}
+
+.foogallery-layout-promo-preview-images img {
+	display: block;
+	width: auto;
+	max-width: 100%;
+	height: auto;
+	max-height: 560px;
+	margin: 0 auto;
+}
+
+.foogallery-layout-promo-preview-cta {
+	margin: 0;
+	padding: 0;
+}
+
+.foogallery-layout-promo-preview-cta .button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+	margin: 0;
+}
+
+.foogallery-layout-promo-preview-cta .button .dashicons {
+	width: 16px;
+	height: 16px;
+	font-size: 16px;
+	line-height: 1;
+}
+
+/* The editor narrows a container rather than the browser viewport, so emulate
+ * the Responsive template's mobile column media query inside its preview. */
+.foogallery-preview-wrapper.viewport-mobile .fg-default:is(.fg-d-col1,.fg-d-col2,.fg-d-col3,.fg-d-col4,.fg-d-col5,.fg-d-col6) {
+	max-width: 100%;
+}
+
+.foogallery-preview-wrapper.viewport-mobile .fg-default:is(.fg-d-col1,.fg-d-col2,.fg-d-col3,.fg-d-col4,.fg-d-col5,.fg-d-col6) .fg-item {
+	width: auto;
+	min-width: 0;
+	max-width: none;
+}
+
+.foogallery-preview-wrapper.viewport-mobile .fg-default:is(.fg-d-col1,.fg-d-col2,.fg-d-col3,.fg-d-col4,.fg-d-col5,.fg-d-col6) .fg-image {
+	width: auto;
+}
+
+.foogallery-preview-wrapper.viewport-mobile .fg-default.fg-m-col1 {
+	--fg-m-columns: 1;
+}
+
+.foogallery-preview-wrapper.viewport-mobile .fg-default.fg-m-col2 {
+	--fg-m-columns: 2;
+}
+
+.foogallery-preview-wrapper.viewport-mobile .fg-default.fg-m-col3 {
+	--fg-m-columns: 3;
+}
+
+.foogallery-preview-wrapper.viewport-mobile .fg-default:is(.fg-m-col1,.fg-m-col2,.fg-m-col3) {
+	--fg-m-gallery-max-width: calc(
+		(var(--fg-m-columns) * var(--fg-column-max-width, 99999px)) +
+		((var(--fg-m-columns) - 1) * var(--fg-gutter))
+	);
+	max-width: min(100%, var(--fg-m-gallery-max-width));
+}
+
+.foogallery-preview-wrapper.viewport-mobile .fg-default.fg-m-col1 .fg-item {
+	--fg-m-column-width: 100%;
+}
+
+.foogallery-preview-wrapper.viewport-mobile .fg-default.fg-m-col2 .fg-item {
+	--fg-m-column-width: calc( calc( 100% - var(--fg-gutter) ) / 2 );
+}
+
+.foogallery-preview-wrapper.viewport-mobile .fg-default.fg-m-col3 .fg-item {
+	--fg-m-column-width: calc( calc( 100% - calc( var(--fg-gutter) * 2 ) ) / 3 );
+}
+
+.foogallery-preview-wrapper.viewport-mobile .fg-default:is(.fg-m-col1,.fg-m-col2,.fg-m-col3) .fg-item {
+	width: var(--fg-m-column-width);
+	min-width: var(--fg-m-column-width);
+	max-width: var(--fg-m-column-width);
+}
+
+.foogallery-preview-wrapper.viewport-mobile .fg-default:is(.fg-m-col1,.fg-m-col2,.fg-m-col3) .fg-image {
+	width: 100%;
+}

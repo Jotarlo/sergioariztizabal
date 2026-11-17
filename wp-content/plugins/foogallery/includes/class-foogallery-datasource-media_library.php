@@ -238,11 +238,11 @@ if ( ! class_exists( 'FooGallery_Datasource_MediaLibrary' ) ) {
 							<?php echo $img_tag; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Image Tag safely built above ?>
 						</div>
 					</div>
-					<a class="info" href="#" title="<?php esc_attr_e( 'Edit Info', 'foogallery' ); ?>">
-						<span class="dashicons dashicons-info"></span>
+					<a class="info" href="#" title="<?php esc_attr_e( 'Edit Info', 'foogallery' ); ?>" aria-label="<?php esc_attr_e( 'Edit Info', 'foogallery' ); ?>">
+						<span class="dashicons dashicons-info-outline" aria-hidden="true"></span>
 					</a>
-					<a class="remove" href="#" title="<?php esc_attr_e( 'Remove from gallery', 'foogallery' ); ?>">
-						<span class="dashicons dashicons-dismiss"></span>
+					<a class="remove" href="#" title="<?php esc_attr_e( 'Remove from gallery', 'foogallery' ); ?>" aria-label="<?php esc_attr_e( 'Remove from gallery', 'foogallery' ); ?>">
+						<span class="dashicons dashicons-no-alt" aria-hidden="true"></span>
 					</a>
 				</div>
 			</li>

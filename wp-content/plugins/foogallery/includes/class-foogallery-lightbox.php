@@ -958,6 +958,27 @@ if ( ! class_exists( 'FooGallery_Lightbox' ) ) {
 				);
 			}
 
+			if ( 'foogridpro' === $template['slug'] ) {
+				$field[] = array(
+					'id'            => 'lightbox_show_close_button',
+					'title'         => __( 'Close Button', 'foogallery' ),
+					'desc'          => __( 'Whether to show the close button.', 'foogallery' ),
+					'section_id'    => $section_id,
+					'subsection_id' => 'lightbox-controls',
+					'type'          => 'radio',
+					'default'       => 'no',
+					'choices'       => array(
+						'yes' => __( 'Shown', 'foogallery' ),
+						'no'  => __( 'Hidden', 'foogallery' ),
+					),
+					'row_data'      => array(
+						'data-foogallery-change-selector' => 'input:radio',
+						'data-foogallery-preview'         => 'shortcode',
+						'data-foogallery-value-selector'  => 'input:checked',
+					),
+				);
+			}
+
 			$field[] = array(
 				'id'       => 'lightbox_show_caption_button',
 				'title'    => __( 'Caption Button', 'foogallery' ),
@@ -1308,6 +1329,10 @@ if ( ! class_exists( 'FooGallery_Lightbox' ) ) {
 			$show_thumbstrip_button = foogallery_gallery_template_setting( 'lightbox_show_thumbstrip_button', false );
 			if ( $show_thumbstrip_button !== false ) {
 				$options['buttons']['thumbs'] = ($show_thumbstrip_button === 'yes');
+			}
+
+			if ( 'foogridpro' === $current_foogallery_template ) {
+				$options['buttons']['close'] = 'yes' === foogallery_gallery_template_setting( 'lightbox_show_close_button', 'no' );
 			}
 
 			$show_download_button = foogallery_gallery_template_setting( 'lightbox_show_download_button', false );

@@ -21,6 +21,17 @@ if ( ! class_exists( 'FooGallery_Admin' ) ) {
 		function __construct() {
 			global $foogallery_admin_datasource_instance;
 
+			add_action( 'admin_menu', array( 'FooGallery_Admin_Setup', 'redirect_activation_mode_bookmark' ), 0 );
+			add_action( 'admin_menu', array( 'FooGallery_Admin_Setup', 'redirect_unregistered_trial_return' ), 0 );
+			add_action( 'admin_post_foogallery_start_trial', array( 'FooGallery_Admin_Setup', 'handle_start_trial' ) );
+			add_action( 'admin_post_foogallery_install_pro', array( 'FooGallery_Admin_Setup', 'handle_install_pro' ) );
+			$foogallery_sdk = foogallery_fs();
+			if ( is_object( $foogallery_sdk ) && method_exists( $foogallery_sdk, 'add_filter' ) ) {
+				$foogallery_sdk->add_filter( 'after_connect_url', array( 'FooGallery_Admin_Setup', 'after_successful_connect_url' ) );
+				$foogallery_sdk->add_filter( 'show_admin_notice', array( 'FooGallery_Admin_Setup', 'filter_sdk_admin_notice' ), 10, 2 );
+				$foogallery_sdk->add_filter( 'redirect_on_activation', array( 'FooGallery_Admin_Setup', 'filter_sdk_redirect_on_activation' ) );
+			}
+
 			//init some other actions
 			add_action( 'init', array( $this, 'init' ) );
 
@@ -45,7 +56,6 @@ if ( ! class_exists( 'FooGallery_Admin' ) ) {
 
 			// include PRO promotion.
 			new FooGallery_Pro_Promotion();
-			new FooGallery_Trial_Mode();
 
 			// Command Palette integration (WP 6.3+).
 			new FooGallery_Command_Palette();
@@ -63,6 +73,7 @@ if ( ! class_exists( 'FooGallery_Admin' ) ) {
 
 			add_filter( 'fs_show_trial_foogallery', array( $this, 'force_trial_hide' ) );
 			add_action( 'admin_init', array( $this, 'force_hide_trial_notice' ), 99 );
+			add_action( 'admin_notices', array( 'FooGallery_Admin_Setup', 'render_notice' ) );
 		}
 
 		public function enqueue_scripts_and_styles( $hook ) {
@@ -79,6 +90,7 @@ if ( ! class_exists( 'FooGallery_Admin' ) ) {
             $handle = $foogallery->register_and_enqueue_js( 'admin-foogallery-edit.js' );
 
 			if ( $handle ) {
+				$foogallery->register_and_enqueue_js( 'admin-foogallery-favorites.js', array( 'jquery', $handle ) );
 				$strings = apply_filters( 'foogallery_admin_il8n', array() );
 				$strings = is_array( $strings ) ? $strings : array();
 
@@ -137,6 +149,7 @@ if ( ! class_exists( 'FooGallery_Admin' ) ) {
 			$links[] = '<a href="' . esc_url( foogallery_admin_settings_url() ) . '"><b>' . __( 'Settings', 'foogallery' ) . '</b></a>';
 
 			$links[] = '<a href="' . esc_url( foogallery_admin_help_url() ) . '"><b>' . __( 'Help', 'foogallery' ) . '</b></a>';
+			$links[] = '<a href="' . esc_url( foogallery_admin_url_for_page( 'foogallery-license-trial' ) ) . '"><b>' . esc_html__( 'License & Trial', 'foogallery' ) . '</b></a>';
 
 			return $links;
 		}

@@ -32,10 +32,10 @@ $foogallery_pro_features = foogallery_pro_features();
         <?php if ( $show_trial_message ) { ?>
             <header>
                 <h3><?php esc_html_e( 'FooGallery PRO Free Trial 🤩', 'foogallery' );?></h3>
-                <p><?php esc_html_e( 'Want to test out all the PRO features below? No problem! You can start a 7-day free trial immediately!', 'foogallery' );?></p>
+                <p><?php echo esc_html( $fs_instance->is_registered() ? __( 'You can start a 7-day trial. Install and activate the PRO plugin to use its features.', 'foogallery' ) : __( 'Connect this site to check trial availability. If eligible, choose a trial plan and install PRO to use its features.', 'foogallery' ) ); ?></p>
             </header>
             <footer>
-                <a class="foogallery-admin-help-button-cta" href="<?php echo esc_url ( foogallery_admin_freetrial_url() ); ?>"><?php esc_html_e( 'Start Your 7-day Free Trial', 'foogallery' ); ?></a>
+                <a class="foogallery-admin-help-button-cta" href="<?php echo esc_url( FooGallery_Admin_Setup::start_trial_url() ); ?>"><?php echo esc_html( $fs_instance->is_registered() ? __( 'Start Your 7-day Free Trial', 'foogallery' ) : __( 'Connect to Check Trial Availability', 'foogallery' ) ); ?></a>
             </footer>
         <?php } else if ( $show_thanks_for_pro ) { 
             $current_plan_name = isset( $foogallery_plans[ $foogallery_current_plan ] ) ? $foogallery_plans[ $foogallery_current_plan ] : '';
@@ -43,14 +43,17 @@ $foogallery_pro_features = foogallery_pro_features();
             <header>
                 <?php /* translators: %s: Value inserted at runtime. */ ?>
                 <h3><?php echo sprintf( esc_html__( 'Thanks for your support by purchasing a %s license 😍', 'foogallery' ), '<span class="fgah-plan-' . esc_attr( $foogallery_current_plan ) . '">' . esc_html( $current_plan_name ) . '</span>' );?></h3>
-                <p><?php esc_html_e( 'Check out the PRO features you can start using immediately...', 'foogallery' );?></p>
+                <p><?php echo esc_html( 'ready' === $foogallery_setup_state['phase'] ? __( 'Explore the PRO features available with your active plan.', 'foogallery' ) : __( 'Your PRO access needs setup before these features can run.', 'foogallery' ) ); ?></p>
             </header>
         <?php } else if ( $is_trial ) { ?>
             <header>
                 <h3><?php esc_html_e( 'Thanks for trying out PRO 😍', 'foogallery' );?></h3>
-                <p><?php esc_html_e( 'Check out the PRO features you can try out immediately...', 'foogallery' );?></p>
+                <p><?php echo esc_html( 'ready' === $foogallery_setup_state['phase'] ? __( 'Explore the PRO features available during your trial.', 'foogallery' ) : __( 'Finish PRO setup before trial features can run on this site.', 'foogallery' ) ); ?></p>
             </header>
         <?php } ?>
+		<?php if ( 'ready' !== $foogallery_setup_state['phase'] ) : ?>
+			<p><a href="<?php echo esc_url( foogallery_admin_url_for_page( 'foogallery-license-trial' ) ); ?>"><?php esc_html_e( 'Check License & Trial setup', 'foogallery' ); ?></a></p>
+		<?php endif; ?>
     </section>
 
 	<?php

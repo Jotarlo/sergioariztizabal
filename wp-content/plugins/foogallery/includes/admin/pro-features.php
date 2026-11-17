@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 return array(
     'gallery_templates' => array(
         'title' => foogallery__( 'PRO Gallery Layouts','foogallery' ),
-        'desc' => foogallery__( '4 more advanced gallery layouts to help you showcase your photography, including Slider PRO, Grid PRO, Polaroid PRO, and Spotlight PRO.', 'foogallery' ),
+        'desc' => foogallery__( '6 more advanced gallery layouts to help you showcase your photography: Slider PRO, Grid PRO, Polaroid PRO, Spotlight PRO, Mosaic PRO, and Wall PRO. Arrange responsive tiles with Mosaic or create animated photo walls behind content or inline with Wall.', 'foogallery' ),
         'link' => 'https://fooplugins.com/foogallery-wordpress-gallery-plugin/gallery-templates/',
         'utm_content' => 'gallery_templates',
         'link_text' => foogallery__( 'Learn More','foogallery' ),

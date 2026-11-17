@@ -3,7 +3,7 @@
 /*
 Plugin Name: FooGallery
 Description: FooGallery is the most intuitive and extensible gallery management tool ever created for WordPress
-Version:     3.3.17
+Version:     3.3.37
 Author:      FooPlugins
 Plugin URI:  https://fooplugins.com/foogallery-wordpress-gallery-plugin/
 Author URI:  https://fooplugins.com
@@ -24,6 +24,8 @@ if ( version_compare( PHP_VERSION, '7.2', '<' ) || version_compare( $GLOBALS['wp
     } );
     return;
 }
+// Register the Freemius transport policy even when another FooGallery edition initialized the SDK first.
+require_once __DIR__ . '/includes/security/class-foogallery-freemius-transport-guard.php';
 if ( function_exists( 'foogallery_fs' ) ) {
     foogallery_fs()->set_basename( false, __FILE__ );
 } else {
@@ -32,7 +34,7 @@ if ( function_exists( 'foogallery_fs' ) ) {
         define( 'FOOGALLERY_PATH', plugin_dir_path( __FILE__ ) );
         define( 'FOOGALLERY_URL', plugin_dir_url( __FILE__ ) );
         define( 'FOOGALLERY_FILE', __FILE__ );
-        define( 'FOOGALLERY_VERSION', '3.3.17' );
+        define( 'FOOGALLERY_VERSION', '3.3.37' );
         define( 'FOOGALLERY_SETTINGS_VERSION', '2' );
         if ( file_exists( FOOGALLERY_PATH . 'vendor-scoped/scoper-autoload.php' ) ) {
             require_once FOOGALLERY_PATH . 'vendor-scoped/scoper-autoload.php';
@@ -44,6 +46,7 @@ if ( function_exists( 'foogallery_fs' ) ) {
         require_once FOOGALLERY_PATH . 'includes/background-jobs/class-foogallery-jobs.php';
         require_once FOOGALLERY_PATH . 'includes/constants.php';
         require_once FOOGALLERY_PATH . 'includes/functions.php';
+        require_once FOOGALLERY_PATH . 'includes/gallery-favorites.php';
         // Create a helper function for easy SDK access.
         function foogallery_fs() {
             global $foogallery_fs;
@@ -195,6 +198,7 @@ if ( function_exists( 'foogallery_fs' ) ) {
                 add_filter( 'foogallery_extensions_for_view', array($this, 'add_foogallery_feature_links'), 30 );
                 // init Gutenberg!
                 new FooGallery_Gutenberg();
+                FooGallery_Gallery_Usage::register();
                 // init advanced settings.
                 new FooGallery_Advanced_Gallery_Settings();
                 // init localization for FooGallery.
